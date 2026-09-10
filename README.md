@@ -1,17 +1,42 @@
-# farma_di_mobile
+# Farma DI Mobile
 
-A new Flutter project.
+Aplicación móvil desarrollada con Flutter como base para la gestión de servicios
+de una farmacia. El proyecto se encuentra en desarrollo y su estructura está
+preparada para incorporar nuevas pantallas y componentes.
 
-## Getting Started
+## Tecnologías
 
-This project is a starting point for a Flutter application.
+- Flutter y Dart
+- Material Design
+- `flutter_lints` para el análisis estático del código
 
-A few resources to get you started if this is your first Flutter project:
+## Estructura principal
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- `lib/main.dart`: punto de entrada de la aplicación.
+- `lib/screen/`: pantallas de la aplicación.
+- `lib/widgets/`: componentes reutilizables.
+- `test/`: pruebas del proyecto.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Instalación y ejecución
+
+1. Instalar Flutter y verificar el entorno con `flutter doctor`.
+2. Descargar las dependencias:
+
+   ```bash
+   flutter pub get
+   ```
+
+3. Ejecutar la aplicación en un dispositivo o emulador:
+
+   ```bash
+   flutter run
+   ```
+
+Para validar el código, usar `flutter analyze` y `flutter test`.
+
+## Equipo de desarrollo
+
+- Angel David Gonzales Morales
+- Diego Manuel Baltodano Ruiz
+- Diesther Jamil Selva Lara
+- William Roberto Cortez Mendieta
