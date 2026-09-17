@@ -70,7 +70,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       
-      // Integración de tu BottomNavigationBar
       bottomNavigationBar: buildBottomNavigationBar(
         context,
         _bottomNavIndex,
@@ -159,3 +158,85 @@ class _CatalogScreenState extends State<CatalogScreen> {
       ),
     );
   }
+
+  Widget _buildTabItem(String title, int index) {
+    bool isSelected = _selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedTab = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF2C3E50) : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: 'Buscar por nombre, marca o categ...',
+        hintStyle: const TextStyle(color: Color(0xFFA0AEC0)),
+        prefixIcon: const Icon(Icons.search, color: Color(0xFFA0AEC0)),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    List<String> filters = ["Todos", "En stock", "Stock bajo", "Agotado"];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(filters.length, (index) {
+          bool isSelected = _selectedFilter == index;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: ChoiceChip(
+              label: Text(filters[index]),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() => _selectedFilter = index);
+              },
+              backgroundColor: Colors.white,
+              selectedColor: const Color(0xFF2C3E50),
+              showCheckmark: false,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : const Color(0xFF64748B),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected ? const Color(0xFF2C3E50) : const Color(0xFFE2E8F0),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+ 
