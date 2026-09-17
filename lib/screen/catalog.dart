@@ -21,6 +21,7 @@ void main() {
   );
 }
 
+// Pantalla temporal para evitar errores al probar la navegación
 Widget _dummyScreen(String title, String route) {
   return Scaffold(
     appBar: AppBar(title: Text(title)),
@@ -51,3 +52,93 @@ Widget _dummyScreen(String title, String route) {
   );
 }
 
+
+class CatalogScreen extends StatefulWidget {
+  const CatalogScreen({super.key});
+
+  @override
+  State<CatalogScreen> createState() => _CatalogScreenState();
+}
+
+class _CatalogScreenState extends State<CatalogScreen> {
+  int _selectedTab = 0; // 0: Productos, 1: Categorias, 2: Marcas
+  int _selectedFilter = 0; // 0: Todos, 1: En stock, 2: Stock bajo, 3: Agotado
+  int _bottomNavIndex = 1; // 1: Índice de "Catálogos"
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      
+      // Integración de tu BottomNavigationBar
+      bottomNavigationBar: buildBottomNavigationBar(
+        context,
+        _bottomNavIndex,
+        (int index) {
+          if (_bottomNavIndex == index) return; 
+
+          String routeName = '';
+          switch (index) {
+            case 0:
+              routeName = AppRoutes.home;
+              break;
+            case 1:
+              routeName = AppRoutes.catalog;
+              break;
+            case 2:
+              routeName = AppRoutes.metrics;
+              break;
+            case 3:
+              routeName = AppRoutes.logs;
+              break;
+            case 4:
+              routeName = AppRoutes.roles;
+              break;
+            case 5:
+              routeName = AppRoutes.settings;
+              break;
+          }
+
+          if (routeName.isNotEmpty) {
+            Navigator.pushReplacementNamed(context, routeName);
+          }
+        },
+      ),
+
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                'Catálogos',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildMainTabs(),
+              const SizedBox(height: 16),
+              
+              if (_selectedTab == 0) ...[
+                _buildSearchBar(),
+                const SizedBox(height: 16),
+                _buildFilters(),
+                const SizedBox(height: 16),
+                Expanded(child: _buildProductsList()),
+              ] else if (_selectedTab == 1) ...[
+                Expanded(child: _buildCategoriesList()),
+              ] else if (_selectedTab == 2) ...[
+                const SizedBox(height: 16),
+                Expanded(child: _buildBrandsList()),
+              ]
+            ],
+          ),
+        ),
+      ),
+    );
+  }
