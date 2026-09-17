@@ -1,7 +1,3 @@
-// el nombre de las pantallas pueden cambiar
-// este archivo es solo para referencia
-// una vez validadas las pantallas exsactas a
-// desarrollar quedara el routes definido
 abstract final class AppRoutes {
   static const home = '/home';
   static const catalog = '/catalog';
