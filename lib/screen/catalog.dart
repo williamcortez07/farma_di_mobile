@@ -142,3 +142,20 @@ class _CatalogScreenState extends State<CatalogScreen> {
       ),
     );
   }
+
+  Widget _buildMainTabs() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _buildTabItem("Productos", 0),
+          _buildTabItem("Categorias", 1),
+          _buildTabItem("Marcas", 2),
+        ],
+      ),
+    );
+  }
