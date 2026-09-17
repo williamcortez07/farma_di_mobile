@@ -70,6 +70,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       
+      // Integración de tu BottomNavigationBar
       bottomNavigationBar: buildBottomNavigationBar(
         context,
         _bottomNavIndex,
@@ -141,6 +142,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
       ),
     );
   }
+
+  // --- WIDGETS DE LA INTERFAZ ---
 
   Widget _buildMainTabs() {
     return Container(
@@ -239,4 +242,30 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
- 
+  Widget _buildProductsList() {
+    final List<Map<String, dynamic>> allProducts = [
+      {"name": "Paracetamol 500mg", "desc": "Bayer · Analgésicos", "price": "12.50", "stock": 142, "status": 1},
+      {"name": "Ibuprofeno 400mg", "desc": "Genfar · Analgésicos", "price": "9.75", "stock": 8, "status": 2},
+      {"name": "Amoxicilina 500mg", "desc": "MK · Antibióticos", "price": "24.00", "stock": 55, "status": 1},
+      {"name": "Vitamina C 1g", "desc": "Redoxon · Vitaminas", "price": "18.50", "stock": 0, "status": 3},
+      {"name": "Loratadina 10mg", "desc": "Bayer · Antihistamínicos", "price": "7.25", "stock": 230, "status": 1},
+      {"name": "Metformina 850mg", "desc": "MK · Antidiabéticos", "price": "32.00", "stock": 88, "status": 1},
+      {"name": "Omeprazol 20mg", "desc": "Genfar · Gastrointestinal", "price": "15.80", "stock": 17, "status": 2},
+      {"name": "Atorvastatina 20mg", "desc": "Pfizer · Cardiovascular", "price": "45.00", "stock": 0, "status": 3},
+    ];
+
+    List<Map<String, dynamic>> filteredProducts = allProducts;
+    if (_selectedFilter != 0) {
+      filteredProducts = allProducts.where((p) => p['status'] == _selectedFilter).toList();
+    }
+
+    return ListView.builder(
+      itemCount: filteredProducts.length,
+      itemBuilder: (context, index) {
+        final product = filteredProducts[index];
+        return _buildProductCard(product);
+      },
+    );
+  }
+
+  
