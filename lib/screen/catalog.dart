@@ -21,7 +21,6 @@ void main() {
   );
 }
 
-// Pantalla temporal para evitar errores al probar la navegación
 Widget _dummyScreen(String title, String route) {
   return Scaffold(
     appBar: AppBar(title: Text(title)),
@@ -142,8 +141,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
       ),
     );
   }
-
-  // --- WIDGETS DE LA INTERFAZ ---
 
   Widget _buildMainTabs() {
     return Container(
@@ -268,4 +265,123 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
-  
+  Widget _buildProductCard(Map<String, dynamic> product) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEF2F6),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Text("💊", style: TextStyle(fontSize: 24)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      product['name'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                    Text(
+                      "Q ${product['price']}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF3B82F6),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  product['desc'],
+                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _buildStatusBadge(product['status']),
+                    const SizedBox(width: 8),
+                    Text(
+                      "${product['stock']} uds.",
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(int status) {
+    Color bgColor;
+    Color textColor;
+    String text;
+
+    switch (status) {
+      case 1:
+        bgColor = const Color(0xFFDCFCE7);
+        textColor = const Color(0xFF166534);
+        text = "En stock";
+        break;
+      case 2:
+        bgColor = const Color(0xFFFFEDD5);
+        textColor = const Color(0xFFC2410C);
+        text = "Stock bajo";
+        break;
+      case 3:
+      default:
+        bgColor = const Color(0xFFFEE2E2);
+        textColor = const Color(0xFFB91C1C);
+        text = "Agotado";
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
