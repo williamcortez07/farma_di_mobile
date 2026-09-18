@@ -450,3 +450,89 @@ class _CatalogScreenState extends State<CatalogScreen> {
       },
     );
   }
+
+  Widget _buildBrandsList() {
+    final List<Map<String, dynamic>> brands = [
+      {"initials": "Ba", "name": "Bayer", "desc": "Alemania · 48 productos", "active": true},
+      {"initials": "Ge", "name": "Genfar", "desc": "Colombia · 62 productos", "active": true},
+      {"initials": "MK", "name": "MK", "desc": "Colombia · 35 productos", "active": true},
+      {"initials": "Pf", "name": "Pfizer", "desc": "EE.UU. · 29 productos", "active": true},
+      {"initials": "Re", "name": "Redoxon", "desc": "Suiza · 11 productos", "active": true},
+      {"initials": "No", "name": "Novartis", "desc": "Suiza · 22 productos", "active": false},
+    ];
+
+    return ListView.builder(
+      itemCount: brands.length,
+      itemBuilder: (context, index) {
+        final brand = brands[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFF1F5F9)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEEF2F6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    brand['initials'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      brand['name'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      brand['desc'],
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: brand['active'] ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  brand['active'] ? "Activa" : "Inactiva",
+                  style: TextStyle(
+                    color: brand['active'] ? const Color(0xFF166534) : const Color(0xFF64748B),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
