@@ -385,3 +385,68 @@ class _CatalogScreenState extends State<CatalogScreen> {
       ),
     );
   }
+
+  Widget _buildCategoriesList() {
+    final List<Map<String, dynamic>> categories = [
+      {"icon": "💊", "name": "Analgésicos", "count": 34},
+      {"icon": "🧬", "name": "Antibióticos", "count": 22},
+      {"icon": "🌿", "name": "Vitaminas", "count": 18},
+      {"icon": "🤧", "name": "Antihistamínicos", "count": 12},
+      {"icon": "🩻", "name": "Gastrointestinal", "count": 27},
+      {"icon": "💉", "name": "Antidiabéticos", "count": 15},
+      {"icon": "❤️", "name": "Cardiovascular", "count": 20},
+      {"icon": "🧴", "name": "Dermatología", "count": 9},
+    ];
+
+    return GridView.builder(
+      padding: const EdgeInsets.only(top: 16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.15,
+      ),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final cat = categories[index];
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFF1F5F9)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(cat['icon'], style: const TextStyle(fontSize: 28)),
+              const Spacer(),
+              Text(
+                cat['name'],
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: Color(0xFF1E293B),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "${cat['count']} productos",
+                style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
