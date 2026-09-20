@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const MetricsPage(),
+      body: const Metrics(),
       bottomNavigationBar: buildBottomNavigationBar(context, _currenteIndex, (
         index,
       ) {
