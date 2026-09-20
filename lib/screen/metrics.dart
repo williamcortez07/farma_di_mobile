@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:farma_di_mobile/widgets/botton_Navigation.dart';
 import 'package:intl/intl.dart';
 
 void main() {
@@ -23,70 +22,31 @@ class MetricsApp extends StatelessWidget {
   }
 }
 
-class MetricsPage extends StatefulWidget {
+class MetricsPage extends StatelessWidget {
   const MetricsPage({super.key});
 
   @override
-  State<MetricsPage> createState() => _MetricsPageState();
-}
-
-class _MetricsPageState extends State<MetricsPage> {
-  int _currentIndex = 2;
-
-  final List<String> _viewTitles = const [
-    'Inicio',
-    'Catálogos',
-    'Panel general',
-    'Logs',
-    'Roles',
-    'Ajustes',
-  ];
-
-  void _onNavigationTap(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final String formattedDate = DateFormat('dd/MM/yyyy')
-        .format(DateTime.now());
-    final String currentTitle = _viewTitles[_currentIndex];
-
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Fecha actual: $formattedDate',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                currentTitle,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Contenido de $currentTitle',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+      appBar: AppBar(
+        title: const Text('Panel general'),
+        backgroundColor: Colors.white,
       ),
-      bottomNavigationBar: buildBottomNavigationBar(
-        context,
-        _currentIndex,
-        _onNavigationTap,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Métricas generales',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Fecha actual: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
       ),
     );
   }
