@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,6 +22,3 @@ class _HomeScreenState extends State<HomeScreen> {
     throw UnimplementedError();
   }
 }
-=======
-
->>>>>>> 39b85324467656d1441ee36ac07ccc4a10ab0d92
