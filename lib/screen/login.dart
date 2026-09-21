@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/widgets/routes.dart';
 import 'package:flutter/services.dart';
-
+import '../theme/app_colors.dart';
 
 
 //Esto va en un archivo aparte
 abstract final class _Palette {
-  static const ink = Color(0xFF2C3E50);
-  static const sheet = Color(0xFFF4F5F5);
-  static const accent = Color(0xFF3B9BE0); 
-  static const link = Color(0xFF2F80C4); 
-  static const track = Color(0xFFE6E9EC);
-  static const border = Color(0xFFDDE2E6);
-  static const muted = Color(0xFF6B7782); 
-  static const hint = Color(0xFF9AA4AD);
-  static const onInkMuted = Color(0xFFAAB6C2);
+  static const ink = AppColors.ink;
+  static const sheet = AppColors.sheet;
+  static const accent = AppColors.accent;
+  static const link = AppColors.link;
+  static const track = AppColors.track;
+  static const border = AppColors.border;
+  static const muted = AppColors.muted; 
+  static const hint = AppColors.hint;
+  static const onInkMuted = AppColors.onInkMuted;
 }
 
 enum UserRole {
@@ -46,10 +46,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _fillDemo() {
-    _email.text = _role.demoEmail;
-    _password.text = '12345678';
-  }
+  
 
   Future<void> _submit() async {
     if (_loading) return;
@@ -87,9 +84,8 @@ class _LoginPageState extends State<LoginPage> {
                           bottomInset: bottomInset,
                           role: _role,
                           onRoleChanged: (r) => setState(() => _role = r),
-                          emailController: _email,
-                          passwordController: _password,
-                          onDemo: _fillDemo,
+                          email: _email,
+                          password: _password,
                           onSubmit: _submit,
                           loading: _loading,
                         ),
@@ -159,9 +155,8 @@ class _FormSheet extends StatelessWidget {
     required this.bottomInset,
     required this.role,
     required this.onRoleChanged,
-    required this.emailController,
-    required this.passwordController,
-    required this.onDemo,
+    required this.email,
+    required this.password,
     required this.onSubmit,
     required this.loading,
   });
@@ -169,9 +164,8 @@ class _FormSheet extends StatelessWidget {
   final double bottomInset;
   final UserRole role;
   final ValueChanged<UserRole> onRoleChanged;
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final VoidCallback onDemo;
+  final TextEditingController email;
+  final TextEditingController password;
   final VoidCallback onSubmit;
   final bool loading;
 
@@ -203,7 +197,7 @@ class _FormSheet extends StatelessWidget {
           const _FieldLabel('Correo electrónico'),
           const SizedBox(height: 8),
           TextField(
-            controller: emailController,
+            controller: email,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.username],
@@ -216,7 +210,7 @@ class _FormSheet extends StatelessWidget {
           const _FieldLabel('Contraseña'),
           const SizedBox(height: 8),
           TextField(
-            controller: passwordController,
+            controller: password,
             obscureText: true,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
@@ -229,7 +223,7 @@ class _FormSheet extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: onDemo,
+              onPressed: () {},
               style: TextButton.styleFrom(
                 foregroundColor: _Palette.link,
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),

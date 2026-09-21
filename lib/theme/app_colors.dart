@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
+
+
   static const Color background = Color(0xFFF4F6FA);
   static const Color surface = Colors.white;
 
@@ -35,5 +37,16 @@ class AppColors {
   // Panel de perfil (Preferencias)
   static const Color profileCard = Color(0xFF1E293F);
 
-  static const Color border = Color(0xFFEDEFF3);
+
+  //Login
+  static const Color ink = Color(0xFF2C3E50);
+  static const Color sheet = Color(0xFFF4F5F5);
+  static const Color accent = Color(0xFF3B9BE0); 
+  static const Color link = Color(0xFF2F80C4); 
+  static const Color track = Color(0xFFE6E9EC);
+  static const Color border = Color(0xFFDDE2E6);
+  static const Color muted = Color(0xFF6B7782); 
+  static const Color hint = Color(0xFF9AA4AD);
+  static const Color onInkMuted = Color(0xFFAAB6C2);
 }
+
