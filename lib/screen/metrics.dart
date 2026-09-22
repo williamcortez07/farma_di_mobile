@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:farma_di_mobile/widgets/botton_Navigation.dart';
 import 'package:intl/intl.dart';
 
 void main() {
@@ -18,75 +17,165 @@ class MetricsApp extends StatelessWidget {
         fontFamily: 'Arial',
         scaffoldBackgroundColor: const Color(0xFFFFFFFC),
       ),
-      home: const MetricsPage(),
+      home: const Metrics(),
     );
   }
 }
 
-class MetricsPage extends StatefulWidget {
+// este fragmento esra de prueba para la poner la fecha en tiempo real
+class MetricsPage extends StatelessWidget {
   const MetricsPage({super.key});
 
   @override
-  State<MetricsPage> createState() => _MetricsPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Panel general'),
+        backgroundColor: Colors.white,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Métricas generales',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 16),
+
+            Text(
+              'Fecha actual: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _MetricsPageState extends State<MetricsPage> {
-  int _currentIndex = 2;
+// final
 
-  final List<String> _viewTitles = const [
-    'Inicio',
-    'Catálogos',
-    'Panel general',
-    'Logs',
-    'Roles',
-    'Ajustes',
-  ];
-
-  void _onNavigationTap(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
+class Metrics extends StatelessWidget {
+  const Metrics({super.key});
   @override
   Widget build(BuildContext context) {
-    final String formattedDate = DateFormat('dd/MM/yyyy')
-        .format(DateTime.now());
-    final String currentTitle = _viewTitles[_currentIndex];
-
-    return Scaffold(
-      body: SafeArea(
+    return SafeArea(
+      child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Fecha actual: $formattedDate',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                currentTitle,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Contenido de $currentTitle',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                'Fecha actual: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
                 ),
               ),
+
+              const SizedBox(height: 4),
+              const Text(
+                'Metricas y análisis',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              _buildMetricsGrid(),
+              const SizedBox(height: 20),
+              // _buildChartCard(), // comentado por ahora para compilarción, implementarlo abajo
             ],
           ),
         ),
       ),
-      bottomNavigationBar: buildBottomNavigationBar(
-        context,
-        _currentIndex,
-        _onNavigationTap,
+    );
+  }
+}
+
+Widget _buildMetricsGrid() {
+  return GridView.count(
+    crossAxisCount: 2,
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    crossAxisSpacing: 12,
+    mainAxisSpacing: 12,
+    childAspectRatio: 1.5,
+    children: const [
+      MetricCard(
+        value: 'C\$ 365,600',
+        title: 'Ingresos totales',
+        detail: '+18.3% vs año anterior',
+        detailColor: Colors.green,
+      ),
+      MetricCard(
+        value: 'C\$ 176.50',
+        title: 'Ticket promedio',
+        detail: '+ C\$ 12 vs mes anterior',
+        detailColor: Colors.green,
+      ),
+      MetricCard(
+        value: '2,096',
+        title: ':::',
+        detail: '95 tasa de exito',
+        detailColor: Colors.green,
+      ),
+      MetricCard(
+        value: '14',
+        title: ' productos pronto a vencer',
+        detail: '3 desde el lunes',
+        detailColor: Colors.red,
+      ),
+    ],
+  );
+}
+
+class MetricCard extends StatelessWidget {
+  final String value;
+  final String title;
+  final String detail;
+  final Color detailColor;
+
+  const MetricCard({
+    super.key,
+    required this.value,
+    required this.title,
+    required this.detail,
+    required this.detailColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 4),
+
+          Text(title, style: const TextStyle(fontSize: 13)),
+          const SizedBox(height: 4),
+          Text(detail, style: TextStyle(fontSize: 11, color: detailColor)),
+        ],
       ),
     );
   }
