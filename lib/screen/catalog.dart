@@ -1,534 +1,451 @@
 import 'package:flutter/material.dart';
-// Asegúrate de que estas rutas coincidan con la ubicación de tus archivos
-import '../widgets/botton_Navigation.dart'; 
-import '../widgets/routes.dart'; 
+import 'package:intl/intl.dart';
 
-// --- PUNTO DE ENTRADA AISLADO PARA PRUEBAS ---
-void main() {
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.catalog,
-      routes: {
-        AppRoutes.home: (context) => _dummyScreen('Inicio', AppRoutes.home),
-        AppRoutes.catalog: (context) => const CatalogScreen(),
-        AppRoutes.metrics: (context) => _dummyScreen('Métricas', AppRoutes.metrics),
-        AppRoutes.logs: (context) => _dummyScreen('Logs', AppRoutes.logs),
-        AppRoutes.roles: (context) => _dummyScreen('Roles', AppRoutes.roles),
-        AppRoutes.settings: (context) => _dummyScreen('Ajustes', AppRoutes.settings),
-      },
-    ),
-  );
+class Producto {
+  final String nombre;
+  final String marca;
+  final String categoria;
+  final double precio;
+  final int cantidad;
+  final String estado;
+
+  Producto({
+    required this.nombre,
+    required this.marca,
+    required this.categoria,
+    required this.precio,
+    required this.cantidad,
+    required this.estado,
+  });
 }
 
-Widget _dummyScreen(String title, String route) {
-  return Scaffold(
-    appBar: AppBar(title: Text(title)),
-    body: Center(child: Text('Pantalla de $title en construcción')),
-    bottomNavigationBar: Builder(
-      builder: (context) {
-        int index = 0;
-        if (route == AppRoutes.catalog) index = 1;
-        if (route == AppRoutes.metrics) index = 2;
-        if (route == AppRoutes.logs) index = 3;
-        if (route == AppRoutes.roles) index = 4;
-        if (route == AppRoutes.settings) index = 5;
+class Marca {
+  final String nombre;
+  final String pais;
+  final int totalProductos;
+  final bool activa;
 
-        return buildBottomNavigationBar(context, index, (newIndex) {
-          String nextRoute = AppRoutes.home;
-          switch (newIndex) {
-            case 0: nextRoute = AppRoutes.home; break;
-            case 1: nextRoute = AppRoutes.catalog; break;
-            case 2: nextRoute = AppRoutes.metrics; break;
-            case 3: nextRoute = AppRoutes.logs; break;
-            case 4: nextRoute = AppRoutes.roles; break;
-            case 5: nextRoute = AppRoutes.settings; break;
-          }
-          Navigator.pushReplacementNamed(context, nextRoute);
-        });
-      }
-    ),
-  );
+  Marca({
+    required this.nombre,
+    required this.pais,
+    required this.totalProductos,
+    required this.activa,
+  });
 }
 
+final List<Producto> listaProductos = [
+  Producto(
+      nombre: 'Paracetamol 500mg',
+      marca: 'Bayer',
+      categoria: 'Analgésicos',
+      precio: 12.50,
+      cantidad: 142,
+      estado: 'En stock'),
+  Producto(
+      nombre: 'Ibuprofeno 400mg',
+      marca: 'Genfar',
+      categoria: 'Analgésicos',
+      precio: 9.75,
+      cantidad: 8,
+      estado: 'Stock bajo'),
+  Producto(
+      nombre: 'Amoxicilina 500mg',
+      marca: 'MK',
+      categoria: 'Antibióticos',
+      precio: 24.00,
+      cantidad: 55,
+      estado: 'En stock'),
+  Producto(
+      nombre: 'Vitamina C 1g',
+      marca: 'Redoxon',
+      categoria: 'Vitaminas',
+      precio: 18.50,
+      cantidad: 0,
+      estado: 'Agotado'),
+  Producto(
+      nombre: 'Loratadina 10mg',
+      marca: 'Bayer',
+      categoria: 'Antihistamínicos',
+      precio: 7.25,
+      cantidad: 230,
+      estado: 'En stock'),
+  Producto(
+      nombre: 'Metformina 850mg',
+      marca: 'MK',
+      categoria: 'Antidiabéticos',
+      precio: 32.00,
+      cantidad: 88,
+      estado: 'En stock'),
+  Producto(
+      nombre: 'Omeprazol 20mg',
+      marca: 'Genfar',
+      categoria: 'Gastrointestinal',
+      precio: 15.80,
+      cantidad: 17,
+      estado: 'Stock bajo'),
+  Producto(
+      nombre: 'Atorvastatina 20mg',
+      marca: 'Pfizer',
+      categoria: 'Cardiovascular',
+      precio: 45.00,
+      cantidad: 0,
+      estado: 'Agotado'),
+];
 
-class CatalogScreen extends StatefulWidget {
+final List<Marca> listaMarcas = [
+  Marca(nombre: 'Bayer', pais: 'Alemania', totalProductos: 48, activa: true),
+  Marca(nombre: 'Genfar', pais: 'Colombia', totalProductos: 62, activa: true),
+  Marca(nombre: 'MK', pais: 'Colombia', totalProductos: 35, activa: true),
+  Marca(nombre: 'Pfizer', pais: 'EE.UU.', totalProductos: 29, activa: true),
+  Marca(nombre: 'Redoxon', pais: 'Suiza', totalProductos: 11, activa: true),
+  Marca(nombre: 'Novartis', pais: 'Suiza', totalProductos: 22, activa: false),
+];
+
+final NumberFormat formatoQuetzales = NumberFormat.currency(locale: 'es_GT', symbol: 'Q ');
+
+class CatalogScreen extends StatelessWidget {
   const CatalogScreen({super.key});
 
   @override
-  State<CatalogScreen> createState() => _CatalogScreenState();
-}
-
-class _CatalogScreenState extends State<CatalogScreen> {
-  int _selectedTab = 0; // 0: Productos, 1: Categorias, 2: Marcas
-  int _selectedFilter = 0; // 0: Todos, 1: En stock, 2: Stock bajo, 3: Agotado
-  int _bottomNavIndex = 1; // 1: Índice de "Catálogos"
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      
-      // Integración de tu BottomNavigationBar
-      bottomNavigationBar: buildBottomNavigationBar(
-        context,
-        _bottomNavIndex,
-        (int index) {
-          if (_bottomNavIndex == index) return; 
-
-          String routeName = '';
-          switch (index) {
-            case 0:
-              routeName = AppRoutes.home;
-              break;
-            case 1:
-              routeName = AppRoutes.catalog;
-              break;
-            case 2:
-              routeName = AppRoutes.metrics;
-              break;
-            case 3:
-              routeName = AppRoutes.logs;
-              break;
-            case 4:
-              routeName = AppRoutes.roles;
-              break;
-            case 5:
-              routeName = AppRoutes.settings;
-              break;
-          }
-
-          if (routeName.isNotEmpty) {
-            Navigator.pushReplacementNamed(context, routeName);
-          }
-        },
-      ),
-
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        body: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              const Text(
-                'Catálogos',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Catálogos',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-              _buildMainTabs(),
-              const SizedBox(height: 16),
-              
-              if (_selectedTab == 0) ...[
-                _buildSearchBar(),
-                const SizedBox(height: 16),
-                _buildFilters(),
-                const SizedBox(height: 16),
-                Expanded(child: _buildProductsList()),
-              ] else if (_selectedTab == 1) ...[
-                Expanded(child: _buildCategoriesList()),
-              ] else if (_selectedTab == 2) ...[
-                const SizedBox(height: 16),
-                Expanded(child: _buildBrandsList()),
-              ]
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: const TabBar(
+                    indicator: BoxDecoration(
+                      color: Color(0xFF1E2A45),
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Color(0xFF1E2A45),
+                    dividerColor: Colors.transparent,
+                    tabs: [
+                      Tab(text: 'Productos'),
+                      Tab(text: 'Categorías'),
+                      Tab(text: 'Marcas'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Expanded(
+                child: TabBarView(
+                  children: [
+                    ProductosTab(),
+                    CategoriasTab(),
+                    MarcasTab(),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildMainTabs() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          _buildTabItem("Productos", 0),
-          _buildTabItem("Categorias", 1),
-          _buildTabItem("Marcas", 2),
-        ],
-      ),
-    );
-  }
+class ProductosTab extends StatefulWidget {
+  const ProductosTab({super.key});
 
-  Widget _buildTabItem(String title, int index) {
-    bool isSelected = _selectedTab == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedTab = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF2C3E50) : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
+  @override
+  State<ProductosTab> createState() => _ProductosTabState();
+}
+
+class _ProductosTabState extends State<ProductosTab> {
+  String textoBusqueda = '';
+  String filtroSeleccionado = 'Todos';
+
+  final List<String> filtros = ['Todos', 'En stock', 'Stock bajo', 'Agotado'];
+
+  @override
+  Widget build(BuildContext context) {
+    List<Producto> productosFiltrados = listaProductos.where((producto) {
+      final coincideTexto = producto.nombre
+              .toLowerCase()
+              .contains(textoBusqueda.toLowerCase()) ||
+          producto.marca.toLowerCase().contains(textoBusqueda.toLowerCase()) ||
+          producto.categoria
+              .toLowerCase()
+              .contains(textoBusqueda.toLowerCase());
+
+      final coincideFiltro =
+          filtroSeleccionado == 'Todos' || producto.estado == filtroSeleccionado;
+
+      return coincideTexto && coincideFiltro;
+    }).toList();
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: TextField(
+            onChanged: (valor) {
+              setState(() {
+                textoBusqueda = valor;
+              });
+            },
+            decoration: InputDecoration(
+              hintText: 'Buscar por nombre, marca o categoría',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Buscar por nombre, marca o categ...',
-        hintStyle: const TextStyle(color: Color(0xFFA0AEC0)),
-        prefixIcon: const Icon(Icons.search, color: Color(0xFFA0AEC0)),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilters() {
-    List<String> filters = ["Todos", "En stock", "Stock bajo", "Agotado"];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(filters.length, (index) {
-          bool isSelected = _selectedFilter == index;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: ChoiceChip(
-              label: Text(filters[index]),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() => _selectedFilter = index);
-              },
-              backgroundColor: Colors.white,
-              selectedColor: const Color(0xFF2C3E50),
-              showCheckmark: false,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : const Color(0xFF64748B),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: isSelected ? const Color(0xFF2C3E50) : const Color(0xFFE2E8F0),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: filtros.map((filtro) {
+              final estaSeleccionado = filtroSeleccionado == filtro;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(filtro),
+                  selected: estaSeleccionado,
+                  selectedColor: const Color(0xFF1E2A45),
+                  labelStyle: TextStyle(
+                    color: estaSeleccionado ? Colors.white : Colors.black87,
+                  ),
+                  backgroundColor: Colors.white,
+                  onSelected: (_) {
+                    setState(() {
+                      filtroSeleccionado = filtro;
+                    });
+                  },
                 ),
-              ),
-            ),
-          );
-        }),
-      ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: productosFiltrados.isEmpty
+              ? const Center(child: Text('No se encontraron productos'))
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: productosFiltrados.length,
+                  itemBuilder: (context, index) {
+                    return TarjetaProducto(producto: productosFiltrados[index]);
+                  },
+                ),
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildProductsList() {
-    final List<Map<String, dynamic>> allProducts = [
-      {"name": "Paracetamol 500mg", "desc": "Bayer · Analgésicos", "price": "12.50", "stock": 142, "status": 1},
-      {"name": "Ibuprofeno 400mg", "desc": "Genfar · Analgésicos", "price": "9.75", "stock": 8, "status": 2},
-      {"name": "Amoxicilina 500mg", "desc": "MK · Antibióticos", "price": "24.00", "stock": 55, "status": 1},
-      {"name": "Vitamina C 1g", "desc": "Redoxon · Vitaminas", "price": "18.50", "stock": 0, "status": 3},
-      {"name": "Loratadina 10mg", "desc": "Bayer · Antihistamínicos", "price": "7.25", "stock": 230, "status": 1},
-      {"name": "Metformina 850mg", "desc": "MK · Antidiabéticos", "price": "32.00", "stock": 88, "status": 1},
-      {"name": "Omeprazol 20mg", "desc": "Genfar · Gastrointestinal", "price": "15.80", "stock": 17, "status": 2},
-      {"name": "Atorvastatina 20mg", "desc": "Pfizer · Cardiovascular", "price": "45.00", "stock": 0, "status": 3},
-    ];
+class TarjetaProducto extends StatelessWidget {
+  final Producto producto;
+  const TarjetaProducto({super.key, required this.producto});
 
-    List<Map<String, dynamic>> filteredProducts = allProducts;
-    if (_selectedFilter != 0) {
-      filteredProducts = allProducts.where((p) => p['status'] == _selectedFilter).toList();
+  Color colorEstado() {
+    switch (producto.estado) {
+      case 'En stock':
+        return Colors.green;
+      case 'Stock bajo':
+        return Colors.orange;
+      default:
+        return Colors.red;
     }
-
-    return ListView.builder(
-      itemCount: filteredProducts.length,
-      itemBuilder: (context, index) {
-        final product = filteredProducts[index];
-        return _buildProductCard(product);
-      },
-    );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFEEF2F6),
+              color: const Color(0xFFEDEEF3),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
-              child: Text("💊", style: TextStyle(fontSize: 24)),
-            ),
+            child: const Icon(Icons.medication, color: Colors.deepOrange),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      product['name'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Color(0xFF1E293B),
-                      ),
-                    ),
-                    Text(
-                      "Q ${product['price']}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Color(0xFF3B82F6),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
                 Text(
-                  product['desc'],
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                  producto.nombre,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
-                const SizedBox(height: 8),
+                Text(
+                  '${producto.marca} · ${producto.categoria}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+                const SizedBox(height: 6),
                 Row(
                   children: [
-                    _buildStatusBadge(product['status']),
-                    const SizedBox(width: 8),
-                    Text(
-                      "${product['stock']} uds.",
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: colorEstado().withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        producto.estado,
+                        style: TextStyle(
+                          color: colorEstado(),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 8),
+                    Text('${producto.cantidad} uds.',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ],
+            ),
+          ),
+          Text(
+            formatoQuetzales.format(producto.precio),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1E2A45),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildStatusBadge(int status) {
-    Color bgColor;
-    Color textColor;
-    String text;
+class CategoriasTab extends StatelessWidget {
+  const CategoriasTab({super.key});
 
-    switch (status) {
-      case 1:
-        bgColor = const Color(0xFFDCFCE7);
-        textColor = const Color(0xFF166534);
-        text = "En stock";
-        break;
-      case 2:
-        bgColor = const Color(0xFFFFEDD5);
-        textColor = const Color(0xFFC2410C);
-        text = "Stock bajo";
-        break;
-      case 3:
-      default:
-        bgColor = const Color(0xFFFEE2E2);
-        textColor = const Color(0xFFB91C1C);
-        text = "Agotado";
-        break;
-    }
+  @override
+  Widget build(BuildContext context) {
+    final categoriasUnicas = listaProductos.map((p) => p.categoria).toSet().toList();
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoriesList() {
-    final List<Map<String, dynamic>> categories = [
-      {"icon": "💊", "name": "Analgésicos", "count": 34},
-      {"icon": "🧬", "name": "Antibióticos", "count": 22},
-      {"icon": "🌿", "name": "Vitaminas", "count": 18},
-      {"icon": "🤧", "name": "Antihistamínicos", "count": 12},
-      {"icon": "🩻", "name": "Gastrointestinal", "count": 27},
-      {"icon": "💉", "name": "Antidiabéticos", "count": 15},
-      {"icon": "❤️", "name": "Cardiovascular", "count": 20},
-      {"icon": "🧴", "name": "Dermatología", "count": 9},
-    ];
-
-    return GridView.builder(
-      padding: const EdgeInsets.only(top: 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.15,
-      ),
-      itemCount: categories.length,
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: categoriasUnicas.length,
       itemBuilder: (context, index) {
-        final cat = categories[index];
+        final categoria = categoriasUnicas[index];
+        final cantidad =
+            listaProductos.where((p) => p.categoria == categoria).length;
+
         return Container(
-          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              )
-            ],
+            borderRadius: BorderRadius.circular(14),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              Text(cat['icon'], style: const TextStyle(fontSize: 28)),
-              const Spacer(),
-              Text(
-                cat['name'],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Color(0xFF1E293B),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              const Icon(Icons.category, color: Color(0xFF1E2A45)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(categoria,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(height: 4),
-              Text(
-                "${cat['count']} productos",
-                style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
-              ),
+              Text('$cantidad productos',
+                  style: const TextStyle(color: Colors.grey)),
             ],
           ),
         );
       },
     );
   }
+}
 
-  Widget _buildBrandsList() {
-    final List<Map<String, dynamic>> brands = [
-      {"initials": "Ba", "name": "Bayer", "desc": "Alemania · 48 productos", "active": true},
-      {"initials": "Ge", "name": "Genfar", "desc": "Colombia · 62 productos", "active": true},
-      {"initials": "MK", "name": "MK", "desc": "Colombia · 35 productos", "active": true},
-      {"initials": "Pf", "name": "Pfizer", "desc": "EE.UU. · 29 productos", "active": true},
-      {"initials": "Re", "name": "Redoxon", "desc": "Suiza · 11 productos", "active": true},
-      {"initials": "No", "name": "Novartis", "desc": "Suiza · 22 productos", "active": false},
-    ];
+class MarcasTab extends StatelessWidget {
+  const MarcasTab({super.key});
 
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: brands.length,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: listaMarcas.length,
       itemBuilder: (context, index) {
-        final brand = brands[index];
+        final marca = listaMarcas[index];
+        final iniciales = marca.nombre.length >= 2
+            ? marca.nombre.substring(0, 2)
+            : marca.nombre;
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2F6),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    brand['initials'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xFF64748B),
-                    ),
-                  ),
-                ),
+              CircleAvatar(
+                backgroundColor: const Color(0xFFEDEEF3),
+                foregroundColor: const Color(0xFF1E2A45),
+                child: Text(iniciales),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      brand['name'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Color(0xFF1E293B),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      brand['desc'],
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
-                    ),
+                    Text(marca.nombre,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text('${marca.pais} · ${marca.totalProductos} productos',
+                        style: const TextStyle(color: Colors.grey, fontSize: 13)),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: brand['active'] ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
+                  color: (marca.activa ? Colors.green : Colors.grey)
+                      .withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  brand['active'] ? "Activa" : "Inactiva",
+                  marca.activa ? 'Activa' : 'Inactiva',
                   style: TextStyle(
-                    color: brand['active'] ? const Color(0xFF166534) : const Color(0xFF64748B),
+                    color: marca.activa ? Colors.green : Colors.grey[700],
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         );
