@@ -5,4 +5,6 @@ abstract final class AppRoutes {
   static const logs = '/logs';
   static const roles = '/roles';
   static const settings = '/settings';
+
+  AppRoutes._();
 }
