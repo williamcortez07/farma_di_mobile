@@ -101,7 +101,7 @@ final List<Marca> listaMarcas = [
   Marca(nombre: 'Novartis', pais: 'Suiza', totalProductos: 22, activa: false),
 ];
 
-final NumberFormat formatoQuetzales = NumberFormat.currency(locale: 'es_GT', symbol: 'Q ');
+final NumberFormat formatoCordobas = NumberFormat.currency(locale: 'es_NI', symbol: 'C\$ ');
 
 class CatalogScreen extends StatelessWidget {
   const CatalogScreen({super.key});
@@ -338,7 +338,7 @@ class TarjetaProducto extends StatelessWidget {
             ),
           ),
           Text(
-            formatoQuetzales.format(producto.precio),
+            formatoCordobas.format(producto.precio),
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E2A45),
