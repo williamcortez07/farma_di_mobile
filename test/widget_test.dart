@@ -5,7 +5,7 @@ import 'package:farma_di_mobile/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const FarmaDiApp());
 
     expect(find.text('0'), findsOneWidget);
     expect(find.text('1'), findsNothing);

@@ -1,4 +1,5 @@
-abstract final class AppRoutes {
+final class AppRoutes {
+  static const login = '/login';
   static const home = '/home';
   static const catalog = '/catalog';
   static const metrics = '/metrics';
