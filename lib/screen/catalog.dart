@@ -1,7 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class Producto {
+class Product {
+  final int productId;
+  final String tradeName;
+  final String genericName;
+  final String categoryName;
+  final String presentationName;
+  final String supplierName;
+  final String brandName;
+  final int criticalStock;
+  final bool isActive;
+
+  Product({
+    required this.productId,
+    required this.tradeName,
+    required this.genericName,
+    required this.categoryName,
+    required this.presentationName,
+    required this.supplierName,
+    required this.brandName,
+    required this.criticalStock,
+    required this.isActive,
+  });
+}
+
+class Brand {
+  final int brandId;
+  final String brandName;
+  final String brandDescription;
+  final bool isActive;
+
+  Brand({
+    required this.brandId,
+    required this.brandName,
+    required this.brandDescription,
+    required this.isActive,
+  });
+}
+
+class Inventory {
+  final int inventoryId;
+  final int productId;
+  final double unitPrice;
+
+  Inventory({
+    required this.inventoryId,
+    required this.productId,
+    required this.unitPrice,
+  });
+}
+
+class ProductBatch {
+  final int batchId;
+  final int productId;
+  final int quantity;
+  final DateTime expirationDate;
+
+  ProductBatch({
+    required this.batchId,
+    required this.productId,
+    required this.quantity,
+    required this.expirationDate,
+  });
+}
+
+class CatalogoProductoVista {
   final String nombre;
   final String marca;
   final String categoria;
@@ -9,7 +73,7 @@ class Producto {
   final int cantidad;
   final String estado;
 
-  Producto({
+  CatalogoProductoVista({
     required this.nombre,
     required this.marca,
     required this.categoria,
@@ -19,89 +83,172 @@ class Producto {
   });
 }
 
-class Marca {
-  final String nombre;
-  final String pais;
-  final int totalProductos;
-  final bool activa;
-
-  Marca({
-    required this.nombre,
-    required this.pais,
-    required this.totalProductos,
-    required this.activa,
-  });
-}
-
-final List<Producto> listaProductos = [
-  Producto(
-      nombre: 'Paracetamol 500mg',
-      marca: 'Bayer',
-      categoria: 'Analgésicos',
-      precio: 12.50,
-      cantidad: 142,
-      estado: 'En stock'),
-  Producto(
-      nombre: 'Ibuprofeno 400mg',
-      marca: 'Genfar',
-      categoria: 'Analgésicos',
-      precio: 9.75,
-      cantidad: 8,
-      estado: 'Stock bajo'),
-  Producto(
-      nombre: 'Amoxicilina 500mg',
-      marca: 'MK',
-      categoria: 'Antibióticos',
-      precio: 24.00,
-      cantidad: 55,
-      estado: 'En stock'),
-  Producto(
-      nombre: 'Vitamina C 1g',
-      marca: 'Redoxon',
-      categoria: 'Vitaminas',
-      precio: 18.50,
-      cantidad: 0,
-      estado: 'Agotado'),
-  Producto(
-      nombre: 'Loratadina 10mg',
-      marca: 'Bayer',
-      categoria: 'Antihistamínicos',
-      precio: 7.25,
-      cantidad: 230,
-      estado: 'En stock'),
-  Producto(
-      nombre: 'Metformina 850mg',
-      marca: 'MK',
-      categoria: 'Antidiabéticos',
-      precio: 32.00,
-      cantidad: 88,
-      estado: 'En stock'),
-  Producto(
-      nombre: 'Omeprazol 20mg',
-      marca: 'Genfar',
-      categoria: 'Gastrointestinal',
-      precio: 15.80,
-      cantidad: 17,
-      estado: 'Stock bajo'),
-  Producto(
-      nombre: 'Atorvastatina 20mg',
-      marca: 'Pfizer',
-      categoria: 'Cardiovascular',
-      precio: 45.00,
-      cantidad: 0,
-      estado: 'Agotado'),
+final List<Product> listaProducts = [
+  Product(
+      productId: 1,
+      tradeName: 'Paracetamol 500mg',
+      genericName: 'Paracetamol',
+      categoryName: 'Analgésicos',
+      presentationName: 'Tableta',
+      supplierName: 'Distribuidora Central',
+      brandName: 'Bayer',
+      criticalStock: 20,
+      isActive: true),
+  Product(
+      productId: 2,
+      tradeName: 'Ibuprofeno 400mg',
+      genericName: 'Ibuprofeno',
+      categoryName: 'Analgésicos',
+      presentationName: 'Tableta',
+      supplierName: 'Distribuidora Central',
+      brandName: 'Genfar',
+      criticalStock: 15,
+      isActive: true),
+  Product(
+      productId: 3,
+      tradeName: 'Amoxicilina 500mg',
+      genericName: 'Amoxicilina',
+      categoryName: 'Antibióticos',
+      presentationName: 'Cápsula',
+      supplierName: 'Farma Import',
+      brandName: 'MK',
+      criticalStock: 20,
+      isActive: true),
+  Product(
+      productId: 4,
+      tradeName: 'Vitamina C 1g',
+      genericName: 'Ácido ascórbico',
+      categoryName: 'Vitaminas',
+      presentationName: 'Tableta efervescente',
+      supplierName: 'Nutrisalud',
+      brandName: 'Redoxon',
+      criticalStock: 10,
+      isActive: true),
+  Product(
+      productId: 5,
+      tradeName: 'Loratadina 10mg',
+      genericName: 'Loratadina',
+      categoryName: 'Antihistamínicos',
+      presentationName: 'Tableta',
+      supplierName: 'Distribuidora Central',
+      brandName: 'Bayer',
+      criticalStock: 30,
+      isActive: true),
+  Product(
+      productId: 6,
+      tradeName: 'Metformina 850mg',
+      genericName: 'Metformina',
+      categoryName: 'Antidiabéticos',
+      presentationName: 'Tableta',
+      supplierName: 'Farma Import',
+      brandName: 'MK',
+      criticalStock: 25,
+      isActive: true),
+  Product(
+      productId: 7,
+      tradeName: 'Omeprazol 20mg',
+      genericName: 'Omeprazol',
+      categoryName: 'Gastrointestinal',
+      presentationName: 'Cápsula',
+      supplierName: 'Distribuidora Central',
+      brandName: 'Genfar',
+      criticalStock: 15,
+      isActive: true),
+  Product(
+      productId: 8,
+      tradeName: 'Atorvastatina 20mg',
+      genericName: 'Atorvastatina',
+      categoryName: 'Cardiovascular',
+      presentationName: 'Tableta',
+      supplierName: 'Farma Import',
+      brandName: 'Pfizer',
+      criticalStock: 10,
+      isActive: true),
 ];
 
-final List<Marca> listaMarcas = [
-  Marca(nombre: 'Bayer', pais: 'Alemania', totalProductos: 48, activa: true),
-  Marca(nombre: 'Genfar', pais: 'Colombia', totalProductos: 62, activa: true),
-  Marca(nombre: 'MK', pais: 'Colombia', totalProductos: 35, activa: true),
-  Marca(nombre: 'Pfizer', pais: 'EE.UU.', totalProductos: 29, activa: true),
-  Marca(nombre: 'Redoxon', pais: 'Suiza', totalProductos: 11, activa: true),
-  Marca(nombre: 'Novartis', pais: 'Suiza', totalProductos: 22, activa: false),
+final List<Brand> listaBrands = [
+  Brand(
+      brandId: 1,
+      brandName: 'Bayer',
+      brandDescription: 'Laboratorio farmacéutico alemán',
+      isActive: true),
+  Brand(
+      brandId: 2,
+      brandName: 'Genfar',
+      brandDescription: 'Laboratorio farmacéutico colombiano',
+      isActive: true),
+  Brand(
+      brandId: 3,
+      brandName: 'MK',
+      brandDescription: 'Laboratorio farmacéutico colombiano',
+      isActive: true),
+  Brand(
+      brandId: 4,
+      brandName: 'Pfizer',
+      brandDescription: 'Laboratorio farmacéutico estadounidense',
+      isActive: true),
+  Brand(
+      brandId: 5,
+      brandName: 'Redoxon',
+      brandDescription: 'Marca de suplementos vitamínicos suiza',
+      isActive: true),
+  Brand(
+      brandId: 6,
+      brandName: 'Novartis',
+      brandDescription: 'Laboratorio farmacéutico suizo',
+      isActive: false),
+];
+
+final List<Inventory> listaInventory = [
+  Inventory(inventoryId: 1, productId: 1, unitPrice: 12.50),
+  Inventory(inventoryId: 2, productId: 2, unitPrice: 9.75),
+  Inventory(inventoryId: 3, productId: 3, unitPrice: 24.00),
+  Inventory(inventoryId: 4, productId: 4, unitPrice: 18.50),
+  Inventory(inventoryId: 5, productId: 5, unitPrice: 7.25),
+  Inventory(inventoryId: 6, productId: 6, unitPrice: 32.00),
+  Inventory(inventoryId: 7, productId: 7, unitPrice: 15.80),
+  Inventory(inventoryId: 8, productId: 8, unitPrice: 45.00),
+];
+
+final List<ProductBatch> listaProductBatches = [
+  ProductBatch(batchId: 1, productId: 1, quantity: 142, expirationDate: DateTime(2027, 6, 1)),
+  ProductBatch(batchId: 2, productId: 2, quantity: 8, expirationDate: DateTime(2027, 3, 1)),
+  ProductBatch(batchId: 3, productId: 3, quantity: 55, expirationDate: DateTime(2027, 9, 1)),
+  ProductBatch(batchId: 4, productId: 4, quantity: 0, expirationDate: DateTime(2026, 12, 1)),
+  ProductBatch(batchId: 5, productId: 5, quantity: 230, expirationDate: DateTime(2028, 1, 1)),
+  ProductBatch(batchId: 6, productId: 6, quantity: 88, expirationDate: DateTime(2027, 5, 1)),
+  ProductBatch(batchId: 7, productId: 7, quantity: 17, expirationDate: DateTime(2027, 4, 1)),
+  ProductBatch(batchId: 8, productId: 8, quantity: 0, expirationDate: DateTime(2026, 11, 1)),
 ];
 
 final NumberFormat formatoCordobas = NumberFormat.currency(locale: 'es_NI', symbol: 'C\$ ');
+
+List<CatalogoProductoVista> construirVistaProductos() {
+  return listaProducts.map((producto) {
+    final inventario = listaInventory.firstWhere((i) => i.productId == producto.productId);
+    final cantidadTotal = listaProductBatches
+        .where((b) => b.productId == producto.productId)
+        .fold<int>(0, (suma, lote) => suma + lote.quantity);
+
+    String estado;
+    if (cantidadTotal == 0) {
+      estado = 'Agotado';
+    } else if (cantidadTotal <= producto.criticalStock) {
+      estado = 'Stock bajo';
+    } else {
+      estado = 'En stock';
+    }
+
+    return CatalogoProductoVista(
+      nombre: producto.tradeName,
+      marca: producto.brandName,
+      categoria: producto.categoryName,
+      precio: inventario.unitPrice,
+      cantidad: cantidadTotal,
+      estado: estado,
+    );
+  }).toList();
+}
 
 class CatalogScreen extends StatelessWidget {
   const CatalogScreen({super.key});
@@ -111,16 +258,21 @@ class CatalogScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: const Color(0xFFF3F4F6),
         body: SafeArea(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Catálogos',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E2A45),
+                    ),
                   ),
                 ),
               ),
@@ -180,7 +332,9 @@ class _ProductosTabState extends State<ProductosTab> {
 
   @override
   Widget build(BuildContext context) {
-    List<Producto> productosFiltrados = listaProductos.where((producto) {
+    final vistaProductos = construirVistaProductos();
+
+    List<CatalogoProductoVista> productosFiltrados = vistaProductos.where((producto) {
       final coincideTexto = producto.nombre
               .toLowerCase()
               .contains(textoBusqueda.toLowerCase()) ||
@@ -263,7 +417,7 @@ class _ProductosTabState extends State<ProductosTab> {
 }
 
 class TarjetaProducto extends StatelessWidget {
-  final Producto producto;
+  final CatalogoProductoVista producto;
   const TarjetaProducto({super.key, required this.producto});
 
   Color colorEstado() {
@@ -355,7 +509,7 @@ class CategoriasTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoriasUnicas = listaProductos.map((p) => p.categoria).toSet().toList();
+    final categoriasUnicas = listaProducts.map((p) => p.categoryName).toSet().toList();
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -363,7 +517,7 @@ class CategoriasTab extends StatelessWidget {
       itemBuilder: (context, index) {
         final categoria = categoriasUnicas[index];
         final cantidad =
-            listaProductos.where((p) => p.categoria == categoria).length;
+            listaProducts.where((p) => p.categoryName == categoria).length;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -397,12 +551,12 @@ class MarcasTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: listaMarcas.length,
+      itemCount: listaBrands.length,
       itemBuilder: (context, index) {
-        final marca = listaMarcas[index];
-        final iniciales = marca.nombre.length >= 2
-            ? marca.nombre.substring(0, 2)
-            : marca.nombre;
+        final marca = listaBrands[index];
+        final iniciales = marca.brandName.length >= 2
+            ? marca.brandName.substring(0, 2)
+            : marca.brandName;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -423,9 +577,9 @@ class MarcasTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(marca.nombre,
+                    Text(marca.brandName,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text('${marca.pais} · ${marca.totalProductos} productos',
+                    Text(marca.brandDescription,
                         style: const TextStyle(color: Colors.grey, fontSize: 13)),
                   ],
                 ),
@@ -433,14 +587,14 @@ class MarcasTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (marca.activa ? Colors.green : Colors.grey)
+                  color: (marca.isActive ? Colors.green : Colors.grey)
                       .withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  marca.activa ? 'Activa' : 'Inactiva',
+                  marca.isActive ? 'Activa' : 'Inactiva',
                   style: TextStyle(
-                    color: marca.activa ? Colors.green : Colors.grey[700],
+                    color: marca.isActive ? Colors.green : Colors.grey[700],
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -452,4 +606,4 @@ class MarcasTab extends StatelessWidget {
       },
     );
   }
-}
+} 
