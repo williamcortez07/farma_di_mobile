@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/widgets/routes.dart';
 import 'package:flutter/services.dart';
+import '../theme/app_colors.dart';
 
 
-
-//Esto va en un archivo aparte
 abstract final class _Palette {
-  static const ink = Color(0xFF2C3E50);
-  static const sheet = Color(0xFFF4F5F5);
-  static const accent = Color(0xFF3B9BE0); 
-  static const link = Color(0xFF2F80C4); 
-  static const track = Color(0xFFE6E9EC);
-  static const border = Color(0xFFDDE2E6);
-  static const muted = Color(0xFF6B7782); 
-  static const hint = Color(0xFF9AA4AD);
-  static const onInkMuted = Color(0xFFAAB6C2);
-}
-
-enum UserRole {
-  admin('Administrador', 'admin@farmadi.com'),
-  seller('Vendedor', 'vendedor@farmadi.com');
-
-  const UserRole(this.label, this.demoEmail);
-  final String label;
-  final String demoEmail;
+  static const ink = AppColors.ink;
+  static const sheet = AppColors.sheet;
+  static const accent = AppColors.accent;
+  static const border = AppColors.border;
+  static const muted = AppColors.muted; 
+  static const hint = AppColors.hint;
+  static const onInkMuted = AppColors.onInkMuted;
 }
 
 class LoginPage extends StatefulWidget {
@@ -36,7 +24,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
-  UserRole _role = UserRole.admin;
   bool _loading = false;
 
   @override
@@ -46,10 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _fillDemo() {
-    _email.text = _role.demoEmail;
-    _password.text = '12345678';
-  }
+  
 
   Future<void> _submit() async {
     if (_loading) return;
@@ -85,11 +69,8 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                         child: _FormSheet(
                           bottomInset: bottomInset,
-                          role: _role,
-                          onRoleChanged: (r) => setState(() => _role = r),
-                          emailController: _email,
-                          passwordController: _password,
-                          onDemo: _fillDemo,
+                          email: _email,
+                          password: _password,
                           onSubmit: _submit,
                           loading: _loading,
                         ),
@@ -157,21 +138,15 @@ class _Brand extends StatelessWidget {
 class _FormSheet extends StatelessWidget {
   const _FormSheet({
     required this.bottomInset,
-    required this.role,
-    required this.onRoleChanged,
-    required this.emailController,
-    required this.passwordController,
-    required this.onDemo,
+    required this.email,
+    required this.password,
     required this.onSubmit,
     required this.loading,
   });
 
   final double bottomInset;
-  final UserRole role;
-  final ValueChanged<UserRole> onRoleChanged;
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final VoidCallback onDemo;
+  final TextEditingController email;
+  final TextEditingController password;
   final VoidCallback onSubmit;
   final bool loading;
 
@@ -188,7 +163,7 @@ class _FormSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'ACCEDER COMO',
+            'ACCEDER',
             style: TextStyle(
               color: _Palette.muted,
               fontSize: 11,
@@ -196,27 +171,25 @@ class _FormSheet extends StatelessWidget {
               letterSpacing: 0.9,
             ),
           ),
-          const SizedBox(height: 10),
-          _RoleSelector(value: role, onChanged: onRoleChanged),
           const SizedBox(height: 22),
 
           const _FieldLabel('Correo electrónico'),
           const SizedBox(height: 8),
           TextField(
-            controller: emailController,
+            controller: email,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.username],
             cursorColor: _Palette.ink,
             style: _inputTextStyle,
-            decoration: _inputDecoration(role.demoEmail),
+            decoration: _inputDecoration('usuario@farmadi.com'),
           ),
           const SizedBox(height: 18),
 
           const _FieldLabel('Contraseña'),
           const SizedBox(height: 8),
           TextField(
-            controller: passwordController,
+            controller: password,
             obscureText: true,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
@@ -226,23 +199,7 @@ class _FormSheet extends StatelessWidget {
             decoration: _inputDecoration('••••••••'),
           ),
 
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: onDemo,
-              style: TextButton.styleFrom(
-                foregroundColor: _Palette.link,
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              child: const Text('Usar credenciales de demo →'),
-            ),
-          ),
+          
           const SizedBox(height: 10),
 
           SizedBox(
@@ -344,66 +301,3 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-class _RoleSelector extends StatelessWidget {
-  const _RoleSelector({required this.value, required this.onChanged});
-
-  final UserRole value;
-  final ValueChanged<UserRole> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 46,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: _Palette.track,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            alignment: value == UserRole.admin
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: FractionallySizedBox(
-              widthFactor: 0.5,
-              heightFactor: 1,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: _Palette.ink,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              for (final role in UserRole.values)
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => onChanged(role),
-                    child: Center(
-                      child: AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 220),
-                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: role == value
-                                  ? Colors.white
-                                  : const Color(0xFF3A4652),
-                            ),
-                        child: Text(role.label),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
