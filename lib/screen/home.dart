@@ -9,7 +9,9 @@ import 'metrics.dart';
 import 'roles.dart';
 import 'settings.dart';
 
+//-----------------------------------------------------------------------------
 // Colores propios de esta pantalla
+//-----------------------------------------------------------------------------
 const Color _mutedTextColor = Color(0xFF7A858D);
 const Color _titleColor = Color(0xFF18334A);
 const Color _valueColor = Color(0xFF1D3346);
@@ -58,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ============================================================
-// HOME / PANEL GENERAL
+// VISTA HOME
 // ============================================================
 
 class _HomeOverview extends StatelessWidget {
@@ -89,7 +91,7 @@ class _HomeOverview extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          color: _chartAccentColor,
+                          color: _tittleColor,
                           letterSpacing: 0.4,
                         ),
                       ),
@@ -112,7 +114,7 @@ class _HomeOverview extends StatelessWidget {
             const SizedBox(height: 18),
 
             // --------------------------------------------------
-            // TARJETAS DE ESTADÍSTICAS (KPIs aprobados)
+            // TARJETAS SEGÚN KPIS
             // --------------------------------------------------
             Row(
               children: [
@@ -223,7 +225,7 @@ class _HomeOverview extends StatelessWidget {
 }
 
 // ============================================================
-// BOTÓN "SALIR" DEL ENCABEZADO
+// BOTÓN SALIR
 // ============================================================
 
 class _LogoutButton extends StatelessWidget {
