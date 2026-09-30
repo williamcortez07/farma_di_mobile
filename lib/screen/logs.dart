@@ -26,9 +26,8 @@ class LogEntry {
   });
 }
 
-/// ---------------------------------------------------------
 /// 2. PANTALLA PRINCIPAL
-/// ---------------------------------------------------------
+
 class LogsScreen extends StatefulWidget {
   const LogsScreen({super.key});
 
@@ -51,15 +50,15 @@ class _LogsScreenState extends State<LogsScreen> {
       message: 'Falló conexión con SQL Server (timeout 30s) en módulo de facturación.',
       module: 'db.connection',
       user: '@sistema',
-      time: '14:52:01',
+      time: '2026-10-1',
     ),
     LogEntry(
       id: 'L-0040',
       level: LogLevel.warn,
       message: 'Alerta Farma-Di: Stock bajo detectado para Paracetamol 500mg (5 uds).',
-      module: 'inventory.monitor',
+      module: 'inventory',
       user: '@sistema',
-      time: '14:48:17',
+      time: '2026-10-1',
     ),
   ]; 
 
@@ -115,7 +114,7 @@ class _LogsScreenState extends State<LogsScreen> {
       style: TextStyle(
         fontSize: 24.0,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
+        color: AppColors.ink,
       ),
     );
   }
@@ -167,7 +166,7 @@ class _LogsScreenState extends State<LogsScreen> {
   }
 
   Widget _buildFilterChip(String label, Color? dotColor, String? count) {
-    // Regla 5: Variable booleana prefijada
+    //Variable booleana prefijada
     final bool isSelected = _selectedFilter == label; 
 
     return GestureDetector(
@@ -274,6 +273,105 @@ class LogCard extends StatelessWidget {
     }
   }
 
+//Método privado para manejar la vista del modal
+  void _showDetailsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Detalles del Log: ${log.id}',
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const Divider(color: AppColors.border),
+              const SizedBox(height: 16.0),
+              _buildDetailRow('Nivel', _getLevelText(), _getBadgeTextColor()),
+              _buildDetailRow('Módulo', log.module, AppColors.textPrimary),
+              _buildDetailRow('Usuario', log.user, AppColors.textPrimary),
+              
+              const SizedBox(height: 16.0),
+              const Text(
+                'Mensaje Completo:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Text(
+                  log.message,
+                  style: const TextStyle(color: AppColors.textPrimary),
+                ),
+              ),
+              const SizedBox(height: 24.0),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Método auxiliar para construir las filas del modal
+  Widget _buildDetailRow(String label, String value, Color valueColor) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80.0,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: valueColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -290,27 +388,45 @@ class LogCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: _getBadgeBackgroundColor(),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Text(
-                  _getLevelText(),
-                  style: TextStyle(
-                    color: _getBadgeTextColor(),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12.0,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      color: _getBadgeBackgroundColor(),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Text(
+                      _getLevelText(),
+                      style: TextStyle(
+                        color: _getBadgeTextColor(),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    log.id,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                log.id,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14.0,
+              // Botón para abrir el modal siguiendo la regla de callbacks
+              InkWell(
+                onTap: () => _showDetailsModal(context),
+                borderRadius: BorderRadius.circular(8.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Icon(
+                    Icons.open_in_new,
+                    size: 20.0,
+                    color: AppColors.ink,
+                  ),
                 ),
               ),
             ],
@@ -318,8 +434,10 @@ class LogCard extends StatelessWidget {
           const SizedBox(height: 12.0),
           Text(
             log.message,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: AppColors.textPrimary,
+              color: AppColors.ink,
               fontSize: 15.0,
               fontWeight: FontWeight.w500,
             ),
@@ -331,13 +449,7 @@ class LogCard extends StatelessWidget {
               const SizedBox(width: 8.0),
               _buildChip(log.user),
               const Spacer(),
-              Text(
-                log.time,
-                style: const TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 12.0,
-                ),
-              ),
+              
             ],
           ),
         ],
