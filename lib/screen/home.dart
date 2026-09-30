@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _screens = const <Widget>[
     _HomeOverview(),
     CatalogScreen(),
-    Metrics(),
+    MetricsScreen(),
     LogsScreen(),
     RolesScreen(),
     SettingsScreen(),
