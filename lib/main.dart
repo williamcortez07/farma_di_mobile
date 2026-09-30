@@ -28,7 +28,7 @@ class FarmaDiApp extends StatelessWidget {
         AppRoutes.home: (_) => const HomeScreen(),
         AppRoutes.login: (_) => const LoginPage(),
         AppRoutes.catalog: (_) => const CatalogScreen(),
-        AppRoutes.metrics: (_) => const Metrics(),
+        AppRoutes.metrics: (_) => const MetricsScreen(),
         AppRoutes.logs: (_) => const LogsScreen(),
         AppRoutes.roles: (_) => const RolesScreen(),
         AppRoutes.settings: (_) => const SettingsScreen(),
