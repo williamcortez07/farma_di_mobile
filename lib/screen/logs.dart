@@ -44,7 +44,24 @@ class _LogsScreenState extends State<LogsScreen> {
   String _selectedFilter = 'ALL';
 
 
-  final List<LogEntry> _logs = []; 
+  final List<LogEntry> _logs = [
+    LogEntry(
+      id: 'L-0041',
+      level: LogLevel.error,
+      message: 'Falló conexión con SQL Server (timeout 30s) en módulo de facturación.',
+      module: 'db.connection',
+      user: '@sistema',
+      time: '14:52:01',
+    ),
+    LogEntry(
+      id: 'L-0040',
+      level: LogLevel.warn,
+      message: 'Alerta Farma-Di: Stock bajo detectado para Paracetamol 500mg (5 uds).',
+      module: 'inventory.monitor',
+      user: '@sistema',
+      time: '14:48:17',
+    ),
+  ]; 
 
   @override
   void dispose() {
