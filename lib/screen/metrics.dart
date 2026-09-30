@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/logout_button.dart';
+import '../widgets/routes.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 
@@ -54,7 +56,7 @@ class MetricsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(context),
               const SizedBox(height: sectionSpacing),
               _buildFilters(),
               const SizedBox(height: sectionSpacing),
@@ -74,13 +76,11 @@ class MetricsScreen extends StatelessWidget {
     );
   }
 
-  void _handleLogout() {
-    // este componete tiene que ser un elemeto compartido,
-    // por solo prueba lo dejo aqui una vez esten listas todas las vistas
-    // pasa a la carpeta widget...
+  void _handleLogout(BuildContext context) {
+    Navigator.of(context).pushReplacementNamed(AppRoutes.login);
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -107,17 +107,7 @@ class MetricsScreen extends StatelessWidget {
             ),
           ],
         ),
-        OutlinedButton.icon(
-          onPressed: _handleLogout,
-          icon: const Icon(Icons.logout, size: 16),
-          label: const Text('Salir'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primaryDark,
-            backgroundColor: AppColors.surface,
-            side: const BorderSide(color: AppColors.trackBackground),
-            shape: const StadiumBorder(),
-          ),
-        ),
+        LogoutButton(onPressed: () => _handleLogout(context)),
       ],
     );
   }
