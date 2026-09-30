@@ -1,12 +1,25 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
 import '../widgets/botton_Navigation.dart';
 import 'catalog.dart';
 import 'logs.dart';
 import 'metrics.dart';
 import 'roles.dart';
 import 'settings.dart';
+
+// Colores propios de esta pantalla
+const Color _mutedTextColor = Color(0xFF7A858D);
+const Color _titleColor = Color(0xFF18334A);
+const Color _valueColor = Color(0xFF1D3346);
+const Color _cardBorderColor = Color(0xFFE3E8EC);
+const Color _positiveColor = Color(0xFF27AE60);
+const Color _warningColor = Color(0xFFE67E22);
+const Color _criticalColor = Color(0xFFE74C3C);
+const Color _chartAccentColor = Color(0xFF3498DB);
+const Color _chartLabelColor = Color(0xFF8A959D);
+const Color _newUserColor = Color(0xFF6845A5);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F8),
+      backgroundColor: AppColors.background,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
@@ -63,42 +76,54 @@ class _HomeOverview extends StatelessWidget {
             // --------------------------------------------------
             // ENCABEZADO
             // --------------------------------------------------
-            const Text(
-              'JUEVES, 24 DE SEPTIEMBRE',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF7A858D),
-                letterSpacing: 0.4,
-              ),
-            ),
-
-            const SizedBox(height: 3),
-
-            const Text(
-              'Panel general',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF18334A),
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'LUNES, 28 DE SEPTIEMBRE',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: _chartAccentColor,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                      SizedBox(height: 3),
+                      Text(
+                        'Panel general',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: _titleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const _LogoutButton(),
+              ],
             ),
 
             const SizedBox(height: 18),
 
             // --------------------------------------------------
-            // TARJETAS DE ESTADÍSTICAS
+            // TARJETAS DE ESTADÍSTICAS (KPIs aprobados)
             // --------------------------------------------------
             Row(
               children: [
                 Expanded(
                   child: _DashboardCard(
-                    icon: Icons.monetization_on_outlined,
-                    iconColor: const Color(0xFFE59B1A),
-                    value: 'C\$ 9,640',
-                    label: 'Ventas hoy',
-                    badge: '+12.4%',
-                    badgeColor: const Color(0xFF27AE60),
+                    icon: Icons.medication_outlined,
+                    iconColor: _criticalColor,
+                    value: '14',
+                    label: 'Próx. a vencer',
+                    badge: '3 críticos',
+                    badgeColor: _criticalColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -106,10 +131,10 @@ class _HomeOverview extends StatelessWidget {
                   child: _DashboardCard(
                     icon: Icons.inventory_2_outlined,
                     iconColor: const Color(0xFF9C6B3C),
-                    value: '47',
-                    label: 'Pedidos',
-                    badge: '+8 vs ayer',
-                    badgeColor: const Color(0xFF27AE60),
+                    value: '842 uds',
+                    label: 'Más vendidos',
+                    badge: '+18% sem',
+                    badgeColor: _positiveColor,
                   ),
                 ),
               ],
@@ -121,23 +146,23 @@ class _HomeOverview extends StatelessWidget {
               children: [
                 Expanded(
                   child: _DashboardCard(
-                    icon: Icons.medication_outlined,
-                    iconColor: const Color(0xFFE84C88),
-                    value: '1,284',
-                    label: 'Productos',
-                    badge: '18 bajo stock',
-                    badgeColor: const Color(0xFFE67E22),
+                    icon: Icons.savings_outlined,
+                    iconColor: const Color(0xFFE59B1A),
+                    value: 'C\$ 18,420',
+                    label: 'Ganancia bruta',
+                    badge: 'Top: Genfar',
+                    badgeColor: _chartAccentColor,
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _DashboardCard(
-                    icon: Icons.people_alt_outlined,
-                    iconColor: const Color(0xFF6845A5),
-                    value: '12',
-                    label: 'Usuarios activos',
-                    badge: '3 en línea',
-                    badgeColor: const Color(0xFF27AE60),
+                    icon: Icons.local_shipping_outlined,
+                    iconColor: _warningColor,
+                    value: '+4.2%',
+                    label: 'Var. compras',
+                    badge: 'vs mes ant.',
+                    badgeColor: _warningColor,
                   ),
                 ),
               ],
@@ -148,7 +173,7 @@ class _HomeOverview extends StatelessWidget {
             // --------------------------------------------------
             // GRÁFICA
             // --------------------------------------------------
-            _SalesChartCard(),
+            const _SalesChartCard(),
 
             const SizedBox(height: 18),
 
@@ -160,14 +185,14 @@ class _HomeOverview extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF18334A),
+                color: _titleColor,
               ),
             ),
 
             const SizedBox(height: 8),
 
-            _ActivityCard(
-              color: const Color(0xFF27AE60),
+            const _ActivityCard(
+              color: _positiveColor,
               title: 'Venta #4821',
               description: 'C\$ 340.00',
               time: 'hace 5 min',
@@ -175,31 +200,63 @@ class _HomeOverview extends StatelessWidget {
 
             const SizedBox(height: 7),
 
-            _ActivityCard(
-              color: const Color(0xFFE67E22),
-              title: 'Stock bajo',
-              description: 'Paracetamol 500mg',
+            const _ActivityCard(
+              color: _warningColor,
+              title: 'Stock bajo / Vencimiento',
+              description: 'Amoxicilina 500mg (Lote #41)',
               time: 'hace 14 min',
             ),
 
             const SizedBox(height: 7),
 
-            _ActivityCard(
-              color: const Color(0xFF6845A5),
-              title: 'Nuevo usuario',
-              description: 'Administrador registrado',
-              time: 'hace 28 min',
-            ),
-
-            const SizedBox(height: 7),
-
-            _ActivityCard(
-              color: const Color(0xFF3498DB),
-              title: 'Producto actualizado',
-              description: 'Ibuprofeno 400mg',
-              time: 'hace 42 min',
+            const _ActivityCard(
+              color: _chartAccentColor,
+              title: 'Recepción prov. Droguería Central',
+              description: 'Orden #DC-9082 confirmada',
+              time: 'hace 45 min',
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// BOTÓN "SALIR" DEL ENCABEZADO
+// ============================================================
+
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => Navigator.of(context).pushReplacementNamed('/login'),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F3F5),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.logout, size: 14, color: _mutedTextColor),
+              SizedBox(width: 5),
+              Text(
+                'Salir',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: _mutedTextColor,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -235,13 +292,10 @@ class _DashboardCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(
-          color: const Color(0xFFE3E8EC),
-          width: 1,
-        ),
+        border: Border.all(color: _cardBorderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.025),
+            color: Colors.black.withValues(alpha: 0.025),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -254,19 +308,12 @@ class _DashboardCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                size: 17,
-                color: iconColor,
-              ),
+              Icon(icon, size: 17, color: iconColor),
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 3,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: badgeColor.withOpacity(0.10),
+                    color: badgeColor.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -283,25 +330,21 @@ class _DashboardCard extends StatelessWidget {
               ),
             ],
           ),
-
           const Spacer(),
-
           Text(
             value,
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1D3346),
+              color: _valueColor,
             ),
           ),
-
           const SizedBox(height: 2),
-
           Text(
             label,
             style: const TextStyle(
               fontSize: 9,
-              color: Color(0xFF7A858D),
+              color: _mutedTextColor,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -325,17 +368,11 @@ class _SalesChartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(
-          color: const Color(0xFFE3E8EC),
-          width: 1,
-        ),
+        border: Border.all(color: _cardBorderColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --------------------------------------------------
-          // TITULO DE LA GRÁFICA
-          // --------------------------------------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -344,15 +381,11 @@ class _SalesChartCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF18334A),
+                  color: _titleColor,
                 ),
               ),
-
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEAF4FB),
                   borderRadius: BorderRadius.circular(10),
@@ -362,18 +395,13 @@ class _SalesChartCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 8,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF3498DB),
+                    color: _chartAccentColor,
                   ),
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
-          // --------------------------------------------------
-          // GRÁFICA
-          // --------------------------------------------------
           SizedBox(
             height: 130,
             child: LineChart(
@@ -382,64 +410,32 @@ class _SalesChartCard extends StatelessWidget {
                 maxX: 6,
                 minY: 0,
                 maxY: 100,
-
-                // Sin bordes
-                borderData: FlBorderData(
-                  show: false,
-                ),
-
-                // Sin cuadrícula
-                gridData: FlGridData(
-                  show: false,
-                ),
-
-                // Ejes
+                borderData: FlBorderData(show: false),
+                gridData: const FlGridData(show: false),
                 titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 22,
                       interval: 1,
                       getTitlesWidget: (value, meta) {
-                        const days = [
-                          'L',
-                          'M',
-                          'X',
-                          'J',
-                          'V',
-                          'S',
-                          'D',
-                        ];
-
+                        const days = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
                         final index = value.toInt();
-
                         if (index < 0 || index >= days.length) {
                           return const SizedBox.shrink();
                         }
-
+                        final isSelected = index == 5;
                         return Padding(
                           padding: const EdgeInsets.only(top: 7),
                           child: Text(
                             days[index],
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 8,
-                              color: Color(0xFF8A959D),
-                              fontWeight: FontWeight.w500,
+                              color: isSelected ? _chartAccentColor : _chartLabelColor,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                             ),
                           ),
                         );
@@ -447,37 +443,35 @@ class _SalesChartCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Línea
                 lineBarsData: [
                   LineChartBarData(
                     spots: const [
-                      FlSpot(0, 52),
-                      FlSpot(1, 63),
-                      FlSpot(2, 56),
-                      FlSpot(3, 72),
-                      FlSpot(4, 80),
-                      FlSpot(5, 91),
-                      FlSpot(6, 68),
+                      FlSpot(0, 48),
+                      FlSpot(1, 58),
+                      FlSpot(2, 66),
+                      FlSpot(3, 50),
+                      FlSpot(4, 64),
+                      FlSpot(5, 92),
+                      FlSpot(6, 60),
                     ],
-
                     isCurved: true,
                     curveSmoothness: 0.3,
-
                     barWidth: 1.8,
-
                     isStrokeCapRound: true,
-
-                    color: const Color(0xFF3498DB),
-
-                    dotData: const FlDotData(
-                      show: false,
+                    color: _chartAccentColor,
+                    dotData: FlDotData(
+                      show: true,
+                      checkToShowDot: (spot, barData) => spot.x == 5,
+                      getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
+                        radius: 3,
+                        color: _chartAccentColor,
+                        strokeWidth: 2,
+                        strokeColor: Colors.white,
+                      ),
                     ),
-
-                    // Área debajo de la línea
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF3498DB).withOpacity(0.08),
+                      color: _chartAccentColor.withValues(alpha: 0.08),
                     ),
                   ),
                 ],
@@ -510,35 +504,21 @@ class _ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(
-        minHeight: 48,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 11,
-        vertical: 8,
-      ),
+      constraints: const BoxConstraints(minHeight: 48),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(11),
-        border: Border.all(
-          color: const Color(0xFFE3E8EC),
-        ),
+        border: Border.all(color: _cardBorderColor),
       ),
       child: Row(
         children: [
-          // Punto de actividad
           Container(
             width: 7,
             height: 7,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
-
           const SizedBox(width: 9),
-
-          // Información
           Expanded(
             child: RichText(
               text: TextSpan(
@@ -553,25 +533,14 @@ class _ActivityCard extends StatelessWidget {
                   ),
                   TextSpan(
                     text: description,
-                    style: const TextStyle(
-                      fontSize: 9,
-                      color: Color(0xFF687780),
-                    ),
+                    style: const TextStyle(fontSize: 9, color: Color(0xFF687780)),
                   ),
                 ],
               ),
             ),
           ),
-
           const SizedBox(width: 6),
-
-          Text(
-            time,
-            style: const TextStyle(
-              fontSize: 8,
-              color: Color(0xFF8A959D),
-            ),
-          ),
+          Text(time, style: const TextStyle(fontSize: 8, color: _chartLabelColor)),
         ],
       ),
     );

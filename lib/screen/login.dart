@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/widgets/routes.dart';
 import 'package:flutter/services.dart';
-import '../theme/app_colors.dart';
 
+import '../theme/app_colors.dart';
 
 abstract final class _Palette {
   static const ink = AppColors.ink;
   static const sheet = AppColors.sheet;
   static const accent = AppColors.accent;
   static const border = AppColors.border;
-  static const muted = AppColors.muted; 
+  static const muted = AppColors.muted;
   static const hint = AppColors.hint;
   static const onInkMuted = AppColors.onInkMuted;
 }
@@ -32,8 +32,6 @@ class _LoginPageState extends State<LoginPage> {
     _password.dispose();
     super.dispose();
   }
-
-  
 
   Future<void> _submit() async {
     if (_loading) return;
@@ -199,7 +197,6 @@ class _FormSheet extends StatelessWidget {
             decoration: _inputDecoration('••••••••'),
           ),
 
-          
           const SizedBox(height: 10),
 
           SizedBox(
@@ -255,7 +252,6 @@ class _FormSheet extends StatelessWidget {
   }
 }
 
-
 const _inputTextStyle = TextStyle(
   color: _Palette.ink,
   fontSize: 14,
@@ -300,4 +296,3 @@ class _FieldLabel extends StatelessWidget {
     );
   }
 }
-
