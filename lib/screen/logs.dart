@@ -313,7 +313,7 @@ class LogCard extends StatelessWidget {
               
               const SizedBox(height: 16.0),
               const Text(
-                'Mensaje Completo:',
+                'Informacion del log:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textSecondary,
