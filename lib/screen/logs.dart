@@ -26,7 +26,7 @@ class LogEntry {
   });
 }
 
-/// 2. PANTALLA PRINCIPAL
+// PANTALLA PRINCIPAL
 
 class LogsScreen extends StatefulWidget {
   const LogsScreen({super.key});
@@ -47,17 +47,17 @@ class _LogsScreenState extends State<LogsScreen> {
     LogEntry(
       id: 'L-0041',
       level: LogLevel.error,
-      message: 'Falló conexión con SQL Server (timeout 30s) en módulo de facturación.',
+      message: 'Falló conexión con SQL Server en módulo de facturación.',
       module: 'db.connection',
-      user: '@sistema',
+      user: 'VN-William',
       time: '2026-10-1',
     ),
     LogEntry(
       id: 'L-0040',
       level: LogLevel.warn,
-      message: 'Alerta Farma-Di: Stock bajo detectado para Paracetamol 500mg (5 uds).',
-      module: 'inventory',
-      user: '@sistema',
+      message: 'Alerta Farma-Di: Stock bajo detectado para Paracetamol 500mg.',
+      module: 'Inventario',
+      user: 'AD-Angel',
       time: '2026-10-1',
     ),
   ]; 
