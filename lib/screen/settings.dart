@@ -39,9 +39,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Ana García', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.5)),
+                      Text('William Cortez', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.5)),
                       SizedBox(height: 2),
-                      Text('a.garcia@farmadi.com', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('wil.cortez@farmadi.com', style: TextStyle(color: Colors.white70, fontSize: 12)),
                       SizedBox(height: 2),
                       Text('Administrador · Activo',
                           style: TextStyle(color: AppColors.success, fontSize: 11.5, fontWeight: FontWeight.w600)),
@@ -210,10 +210,10 @@ class _EditProfileModal extends StatefulWidget {
 }
 
 class _EditProfileModalState extends State<_EditProfileModal> {
-  final _nombreCtrl = TextEditingController(text: 'Ana');
-  final _apellidoCtrl = TextEditingController(text: 'García');
-  final _correoCtrl = TextEditingController(text: 'a.garcia@farmadi.com');
-  final _telefonoCtrl = TextEditingController(text: '+505 8890-4321');
+  final _nombreCtrl = TextEditingController(text: 'William');
+  final _apellidoCtrl = TextEditingController(text: 'Cortez');
+  final _correoCtrl = TextEditingController(text: 'w.cortez@farmadi.com');
+  final _telefonoCtrl = TextEditingController(text: '+505 8513-4793');
   String _rol = 'Administrador';
   bool _cuentaActiva = true;
 
@@ -290,14 +290,14 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                           const CircleAvatar(
                             radius: 26,
                             backgroundColor: AppColors.profileCard,
-                            child: Text('AG',
+                            child: Text('WC',
                                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           ),
                           const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
-                              Text('Ana García',
+                              Text('William Cortez',
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                               SizedBox(height: 3),
                               Row(
@@ -353,7 +353,7 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                           SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              'Última sesión: Hoy a las 08:30 AM (Mostrador Principal)',
+                              'Última sesión: Hoy a las 08:05 AM (Mostrador Principal)',
                               style: TextStyle(fontSize: 11.5, color: _modalMuted),
                             ),
                           ),
