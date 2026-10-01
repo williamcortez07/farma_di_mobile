@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
 
-
-enum LogLevel {
-  error,
-  warn,
-  info,
-}
+enum LogLevel { error, warn, info }
 
 class LogEntry {
   final String id;
@@ -38,10 +34,9 @@ class LogsScreen extends StatefulWidget {
 class _LogsScreenState extends State<LogsScreen> {
   //Controladores indicando el campo que controlan
   final TextEditingController _searchController = TextEditingController();
-  
+
   //Variables privadas para el estado interno
   String _selectedFilter = 'ALL';
-
 
   final List<LogEntry> _logs = [
     LogEntry(
@@ -60,7 +55,7 @@ class _LogsScreenState extends State<LogsScreen> {
       user: 'AD-Angel',
       time: '2026-10-1',
     ),
-  ]; 
+  ];
 
   @override
   void dispose() {
@@ -97,9 +92,7 @@ class _LogsScreenState extends State<LogsScreen> {
               const SizedBox(height: 16.0),
               _buildFilters(),
               const SizedBox(height: 16.0),
-              Expanded(
-                child: _buildLogList(),
-              ),
+              Expanded(child: _buildLogList()),
             ],
           ),
         ),
@@ -153,13 +146,22 @@ class _LogsScreenState extends State<LogsScreen> {
           _buildFilterChip('ALL', null, null),
           const SizedBox(width: 8.0),
           _buildFilterChip(
-              'ERROR', AppColors.red, _getLogCount(LogLevel.error).toString()),
+            'ERROR',
+            AppColors.red,
+            _getLogCount(LogLevel.error).toString(),
+          ),
           const SizedBox(width: 8.0),
           _buildFilterChip(
-              'WARN', AppColors.warning, _getLogCount(LogLevel.warn).toString()),
+            'WARN',
+            AppColors.warning,
+            _getLogCount(LogLevel.warn).toString(),
+          ),
           const SizedBox(width: 8.0),
           _buildFilterChip(
-              'INFO', AppColors.primary, _getLogCount(LogLevel.info).toString()),
+            'INFO',
+            AppColors.primary,
+            _getLogCount(LogLevel.info).toString(),
+          ),
         ],
       ),
     );
@@ -167,7 +169,7 @@ class _LogsScreenState extends State<LogsScreen> {
 
   Widget _buildFilterChip(String label, Color? dotColor, String? count) {
     //Variable booleana prefijada
-    final bool isSelected = _selectedFilter == label; 
+    final bool isSelected = _selectedFilter == label;
 
     return GestureDetector(
       onTap: () => _handleFilterTap(label),
@@ -203,7 +205,7 @@ class _LogsScreenState extends State<LogsScreen> {
                   fontSize: 13.0,
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),
@@ -227,18 +229,13 @@ class _LogsScreenState extends State<LogsScreen> {
       },
     );
   }
-
-  
 }
 
 /// WIDGETS REUTILIZABLES
 class LogCard extends StatelessWidget {
   final LogEntry log;
 
-  const LogCard({
-    super.key,
-    required this.log,
-  });
+  const LogCard({super.key, required this.log});
 
   Color _getBadgeBackgroundColor() {
     switch (log.level) {
@@ -273,7 +270,7 @@ class LogCard extends StatelessWidget {
     }
   }
 
-//Método privado para manejar la vista del modal
+  //Método privado para manejar la vista del modal
   void _showDetailsModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -300,7 +297,10 @@ class LogCard extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -310,7 +310,7 @@ class LogCard extends StatelessWidget {
               _buildDetailRow('Nivel', _getLevelText(), _getBadgeTextColor()),
               _buildDetailRow('Módulo', log.module, AppColors.textPrimary),
               _buildDetailRow('Usuario', log.user, AppColors.textPrimary),
-              
+
               const SizedBox(height: 16.0),
               const Text(
                 'Informacion del log:',
@@ -361,10 +361,7 @@ class LogCard extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                color: valueColor,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(color: valueColor, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -391,7 +388,10 @@ class LogCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 4.0,
+                    ),
                     decoration: BoxDecoration(
                       color: _getBadgeBackgroundColor(),
                       borderRadius: BorderRadius.circular(12.0),
@@ -449,7 +449,6 @@ class LogCard extends StatelessWidget {
               const SizedBox(width: 8.0),
               _buildChip(log.user),
               const Spacer(),
-              
             ],
           ),
         ],
