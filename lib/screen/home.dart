@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ============================================================
-// VISTA HOME
+// VISTA PANTALLA HOME
 // ============================================================
 
 class _HomeOverview extends StatelessWidget {
