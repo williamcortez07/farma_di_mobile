@@ -195,7 +195,7 @@ class _SwitchRowState extends State<_SwitchRow> {
 }
 
 // ============================================================
-// MODAL "DETALLE Y EDICIÓN DE USUARIO"
+// MODAL
 // ============================================================
 
 const Color _modalMuted = Color(0xFF7A858D);
