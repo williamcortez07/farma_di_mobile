@@ -195,7 +195,7 @@ class _SwitchRowState extends State<_SwitchRow> {
 }
 
 // ============================================================
-// MODAL
+// MODAL DE AJUSTES
 // ============================================================
 
 const Color _modalMuted = Color(0xFF7A858D);
