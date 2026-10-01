@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../widgets/botton_Navigation.dart';
+import '../widgets/logout_button.dart';
+import '../widgets/routes.dart';
 import 'catalog.dart';
 import 'logs.dart';
 import 'metrics.dart';
@@ -59,6 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+void _handleLogout(BuildContext context) {
+  Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+}
+
 // ============================================================
 // VISTA PANTALLA HOME
 // ============================================================
@@ -107,7 +113,7 @@ class _HomeOverview extends StatelessWidget {
                     ],
                   ),
                 ),
-                const _LogoutButton(),
+                LogoutButton(onPressed: () => _handleLogout(context)),
               ],
             ),
 
@@ -218,47 +224,6 @@ class _HomeOverview extends StatelessWidget {
               time: 'hace 45 min',
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================
-// BOTÓN SALIR
-// ============================================================
-
-class _LogoutButton extends StatelessWidget {
-  const _LogoutButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () => Navigator.of(context).pushReplacementNamed('/login'),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F3F5),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.logout, size: 14, color: _mutedTextColor),
-              SizedBox(width: 5),
-              Text(
-                'Salir',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _mutedTextColor,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
