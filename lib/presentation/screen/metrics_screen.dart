@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-import '../widgets/logout_button.dart';
-import '../widgets/routes.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 
@@ -24,6 +22,7 @@ class MetricsApp extends StatelessWidget {
 
 const double sectionSpacing = 16;
 
+// metricas usa statelesswidget porque solo es una vista estatica, esto cuando se conecte con la api tendria que ser con stateful y menejo de estado con setstate
 class MetricsScreen extends StatelessWidget {
   const MetricsScreen({super.key});
   static const List<SupplierShare> _suppliers = [
@@ -50,6 +49,15 @@ class MetricsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+
+      /* appBar: AppNavbar(
+        profileImageUrl: null,
+        onProfileTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.profile);
+        },
+      ),
+      */
+      // comentariado porque  esto lo maneja home_screen con el IdexedStack, line 58
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -76,10 +84,6 @@ class MetricsScreen extends StatelessWidget {
     );
   }
 
-  void _handleLogout(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed(AppRoutes.login);
-  }
-
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,14 +92,6 @@ class MetricsScreen extends StatelessWidget {
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'LUNES, 28 DE SEPTIEMBRE',
-              style: TextStyle(
-                fontSize: 11,
-                letterSpacing: 0.5,
-                color: AppColors.mutedText,
-              ),
-            ),
             SizedBox(height: 4),
             Text(
               'Métricas',
@@ -107,7 +103,6 @@ class MetricsScreen extends StatelessWidget {
             ),
           ],
         ),
-        LogoutButton(onPressed: () => _handleLogout(context)),
       ],
     );
   }
