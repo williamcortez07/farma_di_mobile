@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-import 'screen/catalog.dart';
-import 'screen/home.dart';
-import 'screen/login.dart';
-import 'screen/logs.dart';
-import 'screen/metrics.dart';
-import 'screen/roles.dart';
-import 'screen/settings.dart';
-import 'widgets/routes.dart';
+import 'presentation/screen/catalog_screen.dart';
+import 'presentation/screen/home_screen.dart';
+import 'presentation/screen/login_screen.dart';
+import 'presentation/screen/logs_screen.dart';
+import 'presentation/screen/metrics_screen.dart';
+import 'presentation/screen/roles_screen.dart';
+import 'presentation/screen/settings_screen.dart';
+import 'presentation/widgets/routes.dart';
+import 'presentation/screen/profile_screen.dart';
 
-void main() => runApp(const FarmaDiApp());
+// se usa intl para no tener que formatear a mano la fecha
+//
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es');
+  runApp(const FarmaDiApp());
+}
 
 class FarmaDiApp extends StatelessWidget {
   const FarmaDiApp({super.key});
@@ -32,6 +40,7 @@ class FarmaDiApp extends StatelessWidget {
         AppRoutes.logs: (_) => const LogsScreen(),
         AppRoutes.roles: (_) => const RolesScreen(),
         AppRoutes.settings: (_) => const SettingsScreen(),
+        AppRoutes.profile:(_) => const ProfileScreen(),
       },
     );
   }

@@ -5,11 +5,11 @@ import '../theme/app_colors.dart';
 import '../widgets/botton_Navigation.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/routes.dart';
-import 'catalog.dart';
-import 'logs.dart';
-import 'metrics.dart';
-import 'roles.dart';
-import 'settings.dart';
+import 'catalog_screen.dart';
+import 'logs_screen.dart';
+import 'metrics_screen.dart';
+import 'roles_screen.dart';
+import 'settings_screen.dart';
 
 //-----------------------------------------------------------------------------
 // Colores propios de esta pantalla
@@ -23,7 +23,6 @@ const Color _warningColor = Color(0xFFE67E22);
 const Color _criticalColor = Color(0xFFE74C3C);
 const Color _chartAccentColor = Color(0xFF3498DB);
 const Color _chartLabelColor = Color(0xFF8A959D);
-const Color _newUserColor = Color(0xFF6845A5);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -48,10 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: buildBottomNavigationBar(
         context,
         _currentIndex,
@@ -278,7 +274,10 @@ class _DashboardCard extends StatelessWidget {
               Icon(icon, size: 17, color: iconColor),
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: badgeColor.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(10),
@@ -380,9 +379,15 @@ class _SalesChartCard extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 gridData: const FlGridData(show: false),
                 titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -401,8 +406,12 @@ class _SalesChartCard extends StatelessWidget {
                             days[index],
                             style: TextStyle(
                               fontSize: 8,
-                              color: isSelected ? _chartAccentColor : _chartLabelColor,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                              color: isSelected
+                                  ? _chartAccentColor
+                                  : _chartLabelColor,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
                             ),
                           ),
                         );
@@ -429,12 +438,13 @@ class _SalesChartCard extends StatelessWidget {
                     dotData: FlDotData(
                       show: true,
                       checkToShowDot: (spot, barData) => spot.x == 5,
-                      getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
-                        radius: 3,
-                        color: _chartAccentColor,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      ),
+                      getDotPainter: (spot, percent, bar, index) =>
+                          FlDotCirclePainter(
+                            radius: 3,
+                            color: _chartAccentColor,
+                            strokeWidth: 2,
+                            strokeColor: Colors.white,
+                          ),
                     ),
                     belowBarData: BarAreaData(
                       show: true,
@@ -500,14 +510,20 @@ class _ActivityCard extends StatelessWidget {
                   ),
                   TextSpan(
                     text: description,
-                    style: const TextStyle(fontSize: 9, color: Color(0xFF687780)),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: Color(0xFF687780),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 6),
-          Text(time, style: const TextStyle(fontSize: 8, color: _chartLabelColor)),
+          Text(
+            time,
+            style: const TextStyle(fontSize: 8, color: _chartLabelColor),
+          ),
         ],
       ),
     );

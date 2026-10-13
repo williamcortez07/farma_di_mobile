@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:farma_di_mobile/widgets/routes.dart';
+import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_colors.dart';

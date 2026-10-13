@@ -105,9 +105,9 @@ class _LogsScreenState extends State<LogsScreen> {
     return const Text(
       'Logs del sistema',
       style: TextStyle(
-        fontSize: 24.0,
-        fontWeight: FontWeight.bold,
-        color: AppColors.ink,
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+        color: AppColors.primaryDark,
       ),
     );
   }

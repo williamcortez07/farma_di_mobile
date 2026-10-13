@@ -1,4 +1,7 @@
+import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/app_navbar.dart';
 
 class ProductModel {
   final int productId;
@@ -371,22 +374,25 @@ class _PillIcon extends StatelessWidget {
 class CatalogScreen extends StatelessWidget {
   const CatalogScreen({super.key});
 
-  String _formatCurrentDate() {
-    final DateTime now = DateTime.now();
-    final String day = now.day.toString().padLeft(2, '0');
-    final String month = now.month.toString().padLeft(2, '0');
-    return 'Fecha actual: $day/$month/${now.year}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
-        appBar: _buildAppBar(),
+        /*
+        appBar: AppNavbar(
+          profileImageUrl: null,
+          onProfileTap: () {
+            Navigator.of(context).pushNamed(AppRoutes.profile);
+          },
+        ),
+        */
+        // comentariado porque  esto lo maneja home_screen con el IdexedStack, line 58
         body: Column(
           children: [
+            _buildAppBar(context),
+
             _buildTabBar(),
             const Expanded(
               child: TabBarView(
@@ -399,7 +405,7 @@ class CatalogScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0.5,
@@ -409,41 +415,17 @@ class CatalogScreen extends StatelessWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            _formatCurrentDate(),
-            style: const TextStyle(
-              fontSize: 10.0,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF90A4AE),
-              letterSpacing: 0.8,
-            ),
-          ),
           const SizedBox(height: 1.0),
           const Text(
             'Catálogos',
             style: TextStyle(
-              fontSize: 22.0,
-              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
               color: Color(0xFF1A1A2E),
             ),
           ),
         ],
       ),
-      actions: [
-        TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.logout_rounded,
-            size: 16.0,
-            color: Color(0xFF607D8B),
-          ),
-          label: const Text(
-            'Salir',
-            style: TextStyle(fontSize: 13.0, color: Color(0xFF607D8B)),
-          ),
-        ),
-        const SizedBox(width: 4.0),
-      ],
     );
   }
 
