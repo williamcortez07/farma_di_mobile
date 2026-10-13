@@ -61,10 +61,7 @@ void _handleLogout(BuildContext context) {
   Navigator.of(context).pushReplacementNamed(AppRoutes.login);
 }
 
-// ============================================================
 // VISTA PANTALLA HOME
-// ============================================================
-
 class _HomeOverview extends StatelessWidget {
   const _HomeOverview();
 
@@ -77,9 +74,7 @@ class _HomeOverview extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --------------------------------------------------
             // ENCABEZADO
-            // --------------------------------------------------
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,7 +84,7 @@ class _HomeOverview extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'LUNES, 28 DE SEPTIEMBRE',
+                        'LUNES, 12 DE OCTUBRE',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -115,9 +110,7 @@ class _HomeOverview extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            // --------------------------------------------------
             // TARJETAS SEGÚN KPIS
-            // --------------------------------------------------
             Row(
               children: [
                 Expanded(
@@ -174,16 +167,12 @@ class _HomeOverview extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            // --------------------------------------------------
             // GRÁFICA
-            // --------------------------------------------------
             const _SalesChartCard(),
 
             const SizedBox(height: 18),
 
-            // --------------------------------------------------
             // ACTIVIDAD RECIENTE
-            // --------------------------------------------------
             const Text(
               'Actividad reciente',
               style: TextStyle(
@@ -226,10 +215,7 @@ class _HomeOverview extends StatelessWidget {
   }
 }
 
-// ============================================================
 // TARJETA DE ESTADÍSTICA
-// ============================================================
-
 class _DashboardCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -320,10 +306,7 @@ class _DashboardCard extends StatelessWidget {
   }
 }
 
-// ============================================================
 // TARJETA DE GRÁFICA
-// ============================================================
-
 class _SalesChartCard extends StatelessWidget {
   const _SalesChartCard();
 
@@ -461,10 +444,7 @@ class _SalesChartCard extends StatelessWidget {
   }
 }
 
-// ============================================================
 // ACTIVIDAD RECIENTE
-// ============================================================
-
 class _ActivityCard extends StatelessWidget {
   final Color color;
   final String title;

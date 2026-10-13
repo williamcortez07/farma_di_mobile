@@ -45,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   radius: 24,
                   backgroundColor: Colors.white.withValues(alpha: 0.15),
                   child: const Text(
-                    'AG',
+                    'WC',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
