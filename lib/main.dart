@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'presentation/screen/catalog.dart';
 import 'presentation/screen/home.dart';
@@ -9,7 +10,10 @@ import 'presentation/screen/roles.dart';
 import 'presentation/screen/settings.dart';
 import 'presentation/widgets/routes.dart';
 
-void main() => runApp(const FarmaDiApp());
+Future<void> main() async {
+  await dotenv.load();
+  runApp(const FarmaDiApp());
+}
 
 class FarmaDiApp extends StatelessWidget {
   const FarmaDiApp({super.key});
