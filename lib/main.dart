@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'screen/catalog.dart';
-import 'screen/home.dart';
-import 'screen/login.dart';
-import 'screen/logs.dart';
-import 'screen/metrics.dart';
-import 'screen/roles.dart';
-import 'screen/settings.dart';
-import 'widgets/routes.dart';
+import 'presentation/screen/catalog.dart';
+import 'presentation/screen/home.dart';
+import 'presentation/screen/login.dart';
+import 'presentation/screen/logs.dart';
+import 'presentation/screen/metrics.dart';
+import 'presentation/screen/roles.dart';
+import 'presentation/screen/settings.dart';
+import 'presentation/widgets/routes.dart';
 
 void main() => runApp(const FarmaDiApp());
 
