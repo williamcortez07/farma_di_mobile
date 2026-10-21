@@ -10,4 +10,6 @@ class ApiConstants {
 
 
   static const String login = 'login';
+
+  static const timeoutduration = Duration(seconds: 30);
 }
