@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'presentation/screen/catalog_screen.dart';
 import 'presentation/screen/home_screen.dart';
@@ -11,10 +12,9 @@ import 'presentation/screen/settings_screen.dart';
 import 'presentation/widgets/routes.dart';
 import 'presentation/screen/profile_screen.dart';
 
-// se usa intl para no tener que formatear a mano la fecha
-//
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   await initializeDateFormatting('es');
   runApp(const FarmaDiApp());
 }
