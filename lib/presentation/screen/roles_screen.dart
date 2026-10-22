@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../widgets/notification_widget.dart';
-import '../widgets/routes.dart';
-import '../widgets/app_navbar.dart';
 
 enum _UserFormStatus { saved, cancelled }
 
@@ -24,7 +22,7 @@ class _UserFormResult {
     required String phone,
     required bool isActive,
   }) : this(
-         status: _UserFormStatus.saved,
+         status: _UserFormStatus.cancelled,
          name: name,
          email: email,
          role: role,
