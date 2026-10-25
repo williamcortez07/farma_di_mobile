@@ -9,9 +9,12 @@ import 'presentation/screen/metrics.dart';
 import 'presentation/screen/roles.dart';
 import 'presentation/screen/settings.dart';
 import 'presentation/widgets/routes.dart';
+import 'core/di/injection.dart'; 
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
+  setupDependencies(); 
   runApp(const FarmaDiApp());
 }
 

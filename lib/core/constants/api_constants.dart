@@ -9,7 +9,7 @@ class ApiConstants {
   static ApiConstants get instance => _instance;
 
 
-  static const String login = 'login';
+  static const String login = '/Auth/login';
 
   static const timeoutduration = Duration(seconds: 30);
 }
