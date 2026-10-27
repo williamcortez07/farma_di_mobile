@@ -7,9 +7,11 @@ import 'package:farma_di_mobile/core/errors/app_exception.dart';
 import 'package:flutter/foundation.dart';
 
 class ApiClient {
-  ApiClient({this.tokenProvider});
+  ApiClient({this.tokenProvider, http.Client? client})
+      : _client = client ?? http.Client();
+
   final Future<String?> Function()? tokenProvider;
-  final http.Client _client = http.Client();
+  final http.Client _client;
 
   Future<dynamic> get(String path, { Map<String, String>? query }) async => _send('GET', path, query, null);
   Future<dynamic> post(String path, { Object? body }) async => _send('POST', path, null, body);
@@ -22,7 +24,8 @@ class ApiClient {
     final headers = {'Content-Type': 'application/json'};
     final token = await tokenProvider?.call();
     if (token != null) headers['Authorization'] = 'Bearer $token';
-    if (body != null) {headers['Content-Type'] = 'application/json';
+    if (body != null) {
+      headers['Content-Type'] = 'application/json';
     }
 
     final request = http.Request(method, uri)..headers.addAll(headers);
@@ -39,7 +42,6 @@ class ApiClient {
       throw const NetworkException('Request timed out. Please try again later.');
     } on http.ClientException {
       throw const NetworkException();
-
     }
 
     debugPrint('→ $method $uri');
@@ -75,7 +77,6 @@ class ApiClient {
     try {
       final data = jsonDecode(response.body);
       if (data is Map && data['message'] is String) return data['message'] as String;
-
     } catch(_){}
     return 'Respuesta fallida del servidor con código de estado ${response.statusCode}.';
   }
