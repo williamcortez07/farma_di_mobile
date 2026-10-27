@@ -14,6 +14,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
   fl_chart: ^1.2.0
+  flutter_dotenv: ^6.0.1
+  http: ^1.6.0
+  flutter_secure_storage: ^11.2.0
+  get_it: ^9.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -23,6 +27,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+   - .env
 
 
 

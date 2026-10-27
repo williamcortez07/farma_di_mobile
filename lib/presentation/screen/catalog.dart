@@ -1,327 +1,12 @@
 import 'package:flutter/material.dart';
-
-class ProductModel {
-  final int productId;
-  final String tradeName;
-  final String genericName;
-  final String categoryName;
-  final String presentationName;
-  final String supplierName;
-  final String brandName;
-  final String barcode;
-  final int criticalStock;
-  final bool isActive;
-
-  const ProductModel({
-    required this.productId,
-    required this.tradeName,
-    required this.genericName,
-    required this.categoryName,
-    required this.presentationName,
-    required this.supplierName,
-    required this.brandName,
-    required this.barcode,
-    required this.criticalStock,
-    required this.isActive,
-  });
-}
-
-class BrandModel {
-  final int brandId;
-  final String brandName;
-  final String brandDescription;
-  final bool isActive;
-
-  const BrandModel({
-    required this.brandId,
-    required this.brandName,
-    required this.brandDescription,
-    required this.isActive,
-  });
-}
-
-class InventoryModel {
-  final int inventoryId;
-  final int productId;
-  final double unitPrice;
-
-  const InventoryModel({
-    required this.inventoryId,
-    required this.productId,
-    required this.unitPrice,
-  });
-}
-
-class ProductBatchModel {
-  final int batchId;
-  final int productId;
-  final int quantity;
-  final DateTime expirationDate;
-
-  ProductBatchModel({
-    required this.batchId,
-    required this.productId,
-    required this.quantity,
-    required this.expirationDate,
-  });
-}
-
-class CatalogProductViewModel {
-  final String tradeName;
-  final String brandName;
-  final String categoryName;
-  final String barcode;
-  final double unitPrice;
-  final int totalQuantity;
-  final String stockStatus;
-
-  const CatalogProductViewModel({
-    required this.tradeName,
-    required this.brandName,
-    required this.categoryName,
-    required this.barcode,
-    required this.unitPrice,
-    required this.totalQuantity,
-    required this.stockStatus,
-  });
-}
-
-class CatalogService {
-  List<ProductModel> getProducts() => _mockProducts;
-  List<BrandModel> getBrands() => _mockBrands;
-
-  List<CatalogProductViewModel> getProductCatalogView() {
-    return _mockProducts.map(_buildProductView).toList();
-  }
-
-  CatalogProductViewModel _buildProductView(ProductModel product) {
-    final InventoryModel inv = _mockInventory.firstWhere(
-      (InventoryModel i) => i.productId == product.productId,
-    );
-    final int totalQuantity = _calculateTotalQuantity(product.productId);
-    return CatalogProductViewModel(
-      tradeName: product.tradeName,
-      brandName: product.brandName,
-      categoryName: product.categoryName,
-      barcode: product.barcode,
-      unitPrice: inv.unitPrice,
-      totalQuantity: totalQuantity,
-      stockStatus: _resolveStockStatus(totalQuantity, product.criticalStock),
-    );
-  }
-
-  int _calculateTotalQuantity(int productId) {
-    return _mockProductBatches
-        .where((ProductBatchModel b) => b.productId == productId)
-        .fold<int>(0, (int total, ProductBatchModel b) => total + b.quantity);
-  }
-
-  String _resolveStockStatus(int totalQuantity, int criticalStock) {
-    if (totalQuantity == 0) return 'Agotado';
-    if (totalQuantity <= criticalStock) return 'Stock bajo';
-    return 'En stock';
-  }
-
-  static const List<ProductModel> _mockProducts = [
-    ProductModel(
-      productId: 1,
-      tradeName: 'Paracetamol 500mg',
-      genericName: 'Paracetamol',
-      categoryName: 'Analgésicos',
-      presentationName: 'Tableta',
-      supplierName: 'Distribuidora Central',
-      brandName: 'Bayer',
-      barcode: 'BAR-7481928374',
-      criticalStock: 20,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 2,
-      tradeName: 'Ibuprofeno 400mg',
-      genericName: 'Ibuprofeno',
-      categoryName: 'Analgésicos',
-      presentationName: 'Tableta',
-      supplierName: 'Distribuidora Central',
-      brandName: 'Genfar',
-      barcode: 'BAR-9932139012',
-      criticalStock: 15,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 3,
-      tradeName: 'Amoxicilina 500mg',
-      genericName: 'Amoxicilina',
-      categoryName: 'Antibióticos',
-      presentationName: 'Cápsula',
-      supplierName: 'Farma Import',
-      brandName: 'MK',
-      barcode: 'BAR-5544213731',
-      criticalStock: 20,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 4,
-      tradeName: 'Vitamina C 1g',
-      genericName: 'Ác. ascórbico',
-      categoryName: 'Vitaminas',
-      presentationName: 'Tableta efervescente',
-      supplierName: 'Nutrisalud',
-      brandName: 'Redoxon',
-      barcode: 'BAR-3385984221',
-      criticalStock: 10,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 5,
-      tradeName: 'Loratadina 10mg',
-      genericName: 'Loratadina',
-      categoryName: 'Antihistamínicos',
-      presentationName: 'Tableta',
-      supplierName: 'Distribuidora Central',
-      brandName: 'Bayer',
-      barcode: 'BAR-1192137450',
-      criticalStock: 30,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 6,
-      tradeName: 'Metformina 850mg',
-      genericName: 'Metformina',
-      categoryName: 'Antidiabéticos',
-      presentationName: 'Tableta',
-      supplierName: 'Farma Import',
-      brandName: 'MK',
-      barcode: 'BAR-6672849103',
-      criticalStock: 25,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 7,
-      tradeName: 'Omeprazol 20mg',
-      genericName: 'Omeprazol',
-      categoryName: 'Gastrointestinal',
-      presentationName: 'Cápsula',
-      supplierName: 'Distribuidora Central',
-      brandName: 'Genfar',
-      barcode: 'BAR-7723918264',
-      criticalStock: 15,
-      isActive: true,
-    ),
-    ProductModel(
-      productId: 8,
-      tradeName: 'Atorvastatina 20mg',
-      genericName: 'Atorvastatina',
-      categoryName: 'Cardiovascular',
-      presentationName: 'Tableta',
-      supplierName: 'Farma Import',
-      brandName: 'Pfizer',
-      barcode: 'BAR-8841029374',
-      criticalStock: 10,
-      isActive: true,
-    ),
-  ];
-
-  static const List<BrandModel> _mockBrands = [
-    BrandModel(
-      brandId: 1,
-      brandName: 'Bayer',
-      brandDescription: 'Laboratorio farmacéutico alemán',
-      isActive: true,
-    ),
-    BrandModel(
-      brandId: 2,
-      brandName: 'Genfar',
-      brandDescription: 'Laboratorio farmacéutico colombiano',
-      isActive: true,
-    ),
-    BrandModel(
-      brandId: 3,
-      brandName: 'MK',
-      brandDescription: 'Laboratorio farmacéutico colombiano',
-      isActive: true,
-    ),
-    BrandModel(
-      brandId: 4,
-      brandName: 'Pfizer',
-      brandDescription: 'Laboratorio farmacéutico estadounidense',
-      isActive: true,
-    ),
-    BrandModel(
-      brandId: 5,
-      brandName: 'Redoxon',
-      brandDescription: 'Marca de suplementos vitamínicos suiza',
-      isActive: true,
-    ),
-    BrandModel(
-      brandId: 6,
-      brandName: 'Novartis',
-      brandDescription: 'Laboratorio farmacéutico suizo',
-      isActive: false,
-    ),
-  ];
-
-  static const List<InventoryModel> _mockInventory = [
-    InventoryModel(inventoryId: 1, productId: 1, unitPrice: 12.50),
-    InventoryModel(inventoryId: 2, productId: 2, unitPrice: 9.75),
-    InventoryModel(inventoryId: 3, productId: 3, unitPrice: 24.00),
-    InventoryModel(inventoryId: 4, productId: 4, unitPrice: 18.50),
-    InventoryModel(inventoryId: 5, productId: 5, unitPrice: 7.25),
-    InventoryModel(inventoryId: 6, productId: 6, unitPrice: 32.00),
-    InventoryModel(inventoryId: 7, productId: 7, unitPrice: 15.80),
-    InventoryModel(inventoryId: 8, productId: 8, unitPrice: 45.00),
-  ];
-
-  static final List<ProductBatchModel> _mockProductBatches = [
-    ProductBatchModel(
-      batchId: 1,
-      productId: 1,
-      quantity: 142,
-      expirationDate: DateTime(2027, 6, 1),
-    ),
-    ProductBatchModel(
-      batchId: 2,
-      productId: 2,
-      quantity: 8,
-      expirationDate: DateTime(2027, 3, 1),
-    ),
-    ProductBatchModel(
-      batchId: 3,
-      productId: 3,
-      quantity: 55,
-      expirationDate: DateTime(2027, 9, 1),
-    ),
-    ProductBatchModel(
-      batchId: 4,
-      productId: 4,
-      quantity: 0,
-      expirationDate: DateTime(2026, 12, 1),
-    ),
-    ProductBatchModel(
-      batchId: 5,
-      productId: 5,
-      quantity: 230,
-      expirationDate: DateTime(2028, 1, 1),
-    ),
-    ProductBatchModel(
-      batchId: 6,
-      productId: 6,
-      quantity: 88,
-      expirationDate: DateTime(2027, 5, 1),
-    ),
-    ProductBatchModel(
-      batchId: 7,
-      productId: 7,
-      quantity: 17,
-      expirationDate: DateTime(2027, 4, 1),
-    ),
-    ProductBatchModel(
-      batchId: 8,
-      productId: 8,
-      quantity: 0,
-      expirationDate: DateTime(2026, 11, 1),
-    ),
-  ];
-}
+import 'package:farma_di_mobile/core/di/injection.dart';
+import 'package:farma_di_mobile/data/models/brand_model.dart';
+import 'package:farma_di_mobile/data/models/category_model.dart';
+import 'package:farma_di_mobile/data/models/catalog_view_model.dart';
+import 'package:farma_di_mobile/presentation/providers/catalog_provider.dart';
+import 'package:farma_di_mobile/presentation/widgets/error_view.dart';
+import 'package:farma_di_mobile/presentation/widgets/loading_view.dart';
+import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 
 class _PillIcon extends StatelessWidget {
   final String categoryName;
@@ -368,8 +53,27 @@ class _PillIcon extends StatelessWidget {
   }
 }
 
-class CatalogScreen extends StatelessWidget {
+class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
+
+  @override
+  State<CatalogScreen> createState() => _CatalogScreenState();
+}
+
+class _CatalogScreenState extends State<CatalogScreen> {
+  late final CatalogProvider _provider = getIt<CatalogProvider>();
+
+  @override
+  void initState() {
+    super.initState();
+    _provider.refreshAll();
+  }
+
+  @override
+  void dispose() {
+    _provider.dispose();
+    super.dispose();
+  }
 
   String _formatCurrentDate() {
     final DateTime now = DateTime.now();
@@ -388,9 +92,13 @@ class CatalogScreen extends StatelessWidget {
         body: Column(
           children: [
             _buildTabBar(),
-            const Expanded(
+            Expanded(
               child: TabBarView(
-                children: [ProductsTab(), CategoriesTab(), BrandsTab()],
+                children: [
+                  ProductsTab(provider: _provider),
+                  CategoriesTab(provider: _provider),
+                  BrandsTab(provider: _provider),
+                ],
               ),
             ),
           ],
@@ -431,7 +139,12 @@ class CatalogScreen extends StatelessWidget {
       ),
       actions: [
         TextButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.login,
+              (route) => false,
+            );
+          },
           icon: const Icon(
             Icons.logout_rounded,
             size: 16.0,
@@ -485,23 +198,22 @@ class CatalogScreen extends StatelessWidget {
 }
 
 class ProductsTab extends StatefulWidget {
-  const ProductsTab({super.key});
+  final CatalogProvider provider;
+
+  const ProductsTab({super.key, required this.provider});
 
   @override
   State<ProductsTab> createState() => _ProductsTabState();
 }
 
 class _ProductsTabState extends State<ProductsTab> {
-  final CatalogService _catalogService = CatalogService();
   final TextEditingController _searchController = TextEditingController();
-  String _searchText = '';
-  String _selectedFilter = 'Todos';
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(() {
-      setState(() => _searchText = _searchController.text);
+      widget.provider.setSearchText(_searchController.text);
     });
   }
 
@@ -513,62 +225,73 @@ class _ProductsTabState extends State<ProductsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final List<CatalogProductViewModel> all = _catalogService
-        .getProductCatalogView();
-    final int inStockCount = all
-        .where((p) => p.stockStatus == 'En stock')
-        .length;
-    final int lowStockCount = all
-        .where((p) => p.stockStatus == 'Stock bajo')
-        .length;
-    final int outOfStockCount = all
-        .where((p) => p.stockStatus == 'Agotado')
-        .length;
-    final List<CatalogProductViewModel> filtered = _filterProducts(all);
+    return ListenableBuilder(
+      listenable: widget.provider,
+      builder: (context, _) {
+        final provider = widget.provider;
 
-    return Column(
-      children: [
-        _SearchBar(controller: _searchController),
-        _FilterRow(
-          selected: _selectedFilter,
-          total: all.length,
-          inStock: inStockCount,
-          lowStock: lowStockCount,
-          outOfStock: outOfStockCount,
-          onSelected: (String f) => setState(() => _selectedFilter = f),
-        ),
-        Expanded(
-          child: filtered.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No se encontraron productos.',
-                    style: TextStyle(color: Color(0xFF90A4AE)),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                  itemCount: filtered.length,
-                  itemBuilder: (BuildContext context, int index) =>
-                      _ProductCard(product: filtered[index]),
-                ),
-        ),
-      ],
+        return Column(
+          children: [
+            _SearchBar(controller: _searchController),
+            _FilterRow(
+              selected: provider.selectedStockFilter,
+              total: provider.products.length,
+              inStock: provider.inStockCount,
+              lowStock: provider.lowStockCount,
+              outOfStock: provider.outOfStockCount,
+              onSelected: (filter) => provider.setSelectedStockFilter(filter),
+            ),
+            Expanded(
+              child: _buildBody(provider),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  List<CatalogProductViewModel> _filterProducts(
-    List<CatalogProductViewModel> list,
-  ) {
-    return list.where((CatalogProductViewModel p) {
-      final bool matchesSearch =
-          _searchText.isEmpty ||
-          p.tradeName.toLowerCase().contains(_searchText.toLowerCase()) ||
-          p.brandName.toLowerCase().contains(_searchText.toLowerCase()) ||
-          p.categoryName.toLowerCase().contains(_searchText.toLowerCase());
-      final bool matchesFilter =
-          _selectedFilter == 'Todos' || p.stockStatus == _selectedFilter;
-      return matchesSearch && matchesFilter;
-    }).toList();
+  Widget _buildBody(CatalogProvider provider) {
+    if (provider.productsStatus == CatalogStatus.loading) {
+      return const LoadingView(message: 'Cargando productos...');
+    }
+
+    if (provider.productsStatus == CatalogStatus.error) {
+      return ErrorView(
+        message: provider.productsError ?? 'Error al cargar productos.',
+        onRetry: () => provider.fetchProducts(),
+      );
+    }
+
+    final filtered = provider.filteredProducts;
+
+    if (filtered.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () => provider.fetchProducts(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 80),
+            Center(
+              child: Text(
+                'No se encontraron productos.',
+                style: TextStyle(color: Color(0xFF90A4AE)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => provider.fetchProducts(),
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+        itemCount: filtered.length,
+        itemBuilder: (BuildContext context, int index) =>
+            _ProductCard(product: filtered[index]),
+      ),
+    );
   }
 }
 
@@ -671,14 +394,14 @@ class _FilterRow extends StatelessWidget {
             ),
             const SizedBox(width: 6.0),
             _Chip(
-              label: 'Stock bajo $lowStock',
+              label: 'Stock bajo ($lowStock)',
               isSelected: selected == 'Stock bajo',
               dotColor: const Color(0xFFE65100),
               onTap: () => onSelected('Stock bajo'),
             ),
             const SizedBox(width: 6.0),
             _Chip(
-              label: 'Agotado $outOfStock',
+              label: 'Agotado ($outOfStock)',
               isSelected: selected == 'Agotado',
               dotColor: const Color(0xFFC62828),
               onTap: () => onSelected('Agotado'),
@@ -885,23 +608,59 @@ class _StatusStyle {
 }
 
 class CategoriesTab extends StatelessWidget {
-  const CategoriesTab({super.key});
+  final CatalogProvider provider;
+
+  const CategoriesTab({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {
-    final List<ProductModel> products = CatalogService().getProducts();
-    final List<String> categories = products
-        .map((p) => p.categoryName)
-        .toSet()
-        .toList();
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        if (provider.categoriesStatus == CatalogStatus.loading) {
+          return const LoadingView(message: 'Cargando categorías...');
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final String cat = categories[index];
-        final int count = products.where((p) => p.categoryName == cat).length;
-        return _CategoryCard(categoryName: cat, productCount: count);
+        if (provider.categoriesStatus == CatalogStatus.error) {
+          return ErrorView(
+            message: provider.categoriesError ?? 'Error al cargar categorías.',
+            onRetry: () => provider.fetchCategories(),
+          );
+        }
+
+        final categories = provider.categories;
+
+        if (categories.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchCategories(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 80),
+                Center(
+                  child: Text(
+                    'No hay categorías registradas.',
+                    style: TextStyle(color: Color(0xFF90A4AE)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => provider.fetchCategories(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final CategoryModel cat = categories[index];
+              final int count = provider.getProductCountByCategory(cat.name);
+              return _CategoryCard(categoryName: cat.name, productCount: count);
+            },
+          ),
+        );
       },
     );
   }
@@ -953,15 +712,56 @@ class _CategoryCard extends StatelessWidget {
 }
 
 class BrandsTab extends StatelessWidget {
-  const BrandsTab({super.key});
+  final CatalogProvider provider;
+
+  const BrandsTab({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {
-    final List<BrandModel> brands = CatalogService().getBrands();
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-      itemCount: brands.length,
-      itemBuilder: (context, index) => _BrandCard(brand: brands[index]),
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        if (provider.brandsStatus == CatalogStatus.loading) {
+          return const LoadingView(message: 'Cargando marcas...');
+        }
+
+        if (provider.brandsStatus == CatalogStatus.error) {
+          return ErrorView(
+            message: provider.brandsError ?? 'Error al cargar marcas.',
+            onRetry: () => provider.fetchBrands(),
+          );
+        }
+
+        final brands = provider.brands;
+
+        if (brands.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchBrands(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 80),
+                Center(
+                  child: Text(
+                    'No hay marcas registradas.',
+                    style: TextStyle(color: Color(0xFF90A4AE)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => provider.fetchBrands(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+            itemCount: brands.length,
+            itemBuilder: (context, index) => _BrandCard(brand: brands[index]),
+          ),
+        );
+      },
     );
   }
 }
@@ -1017,14 +817,16 @@ class _BrandCard extends StatelessWidget {
                     color: Color(0xFF1A1A2E),
                   ),
                 ),
-                const SizedBox(height: 2.0),
-                Text(
-                  brand.brandDescription,
-                  style: const TextStyle(
-                    color: Color(0xFF78909C),
-                    fontSize: 12.0,
+                if (brand.brandDescription.isNotEmpty) ...[
+                  const SizedBox(height: 2.0),
+                  Text(
+                    brand.brandDescription,
+                    style: const TextStyle(
+                      color: Color(0xFF78909C),
+                      fontSize: 12.0,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
