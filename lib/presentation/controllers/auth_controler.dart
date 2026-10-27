@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:farma_di_mobile/core/errors/app_exception.dart';
 import 'package:farma_di_mobile/data/models/auth_model/user_model.dart';
-import 'package:farma_di_mobile/data/repositories/auth_repository/user_repository.dart';
+import 'package:farma_di_mobile/data/repositories/user_repository.dart';
 
 enum AuthStatus { initial, loading, success, error }
 
