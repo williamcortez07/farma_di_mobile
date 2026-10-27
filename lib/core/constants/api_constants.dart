@@ -19,5 +19,9 @@ class ApiConstants {
   static const String logsDateRange = '/api/Logs/date-range';
   static String logsByLevel(String level) => '/api/Logs/level/$level';
 
+  // User endpoints
+  static const String user = '/api/User';
+  static String userById(int id) => '/api/User/$id';
+
   static const timeoutduration = Duration(seconds: 30);
 }
