@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:farma_di_mobile/core/network/api_client.dart';
 import 'package:farma_di_mobile/data/repositories/auth_repository/user_repository.dart';
 import 'package:farma_di_mobile/data/repositories/log_repository.dart';
+import 'package:farma_di_mobile/data/repositories/user_repository.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
 import 'package:farma_di_mobile/services/token_storage.dart';
@@ -19,6 +20,11 @@ void setupDependencies() {
     () => AuthRepository(getIt<ApiClient>(), getIt<TokenStorage>()),
   );
   getIt.registerFactory<AuthController>(() => AuthController(getIt<AuthRepository>()));
+
+  // Usuario / Perfil
+  getIt.registerLazySingleton<UserRepository>(
+    () => UserRepository(getIt<ApiClient>()),
+  );
 
   // Logs
   getIt.registerLazySingleton<LogRepository>(

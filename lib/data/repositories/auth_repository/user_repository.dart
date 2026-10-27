@@ -19,6 +19,8 @@ class AuthRepository {
       );
       final response = LoginResponse.fromJson(json as Map<String, dynamic>);
       await _tokenStorage.save(response.token);
+      await _tokenStorage.saveUserId(response.user.id);
+      await _tokenStorage.saveUser(response.user);
       return response;
     } on UnauthorizedException {
       throw const InvalidCredentialsException();
