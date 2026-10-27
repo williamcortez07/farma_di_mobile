@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 import 'package:flutter/services.dart';
+import 'package:farma_di_mobile/core/di/injection.dart';
+import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
+import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 
 import '../theme/app_colors.dart';
 
@@ -22,27 +24,43 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _email = TextEditingController();
+  final _user = TextEditingController();
   final _password = TextEditingController();
-  bool _loading = false;
+  late final AuthController _auth = getIt<AuthController>();
 
   @override
   void dispose() {
-    _email.dispose();
+    _user.dispose();
     _password.dispose();
+    _auth.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
-    if (_loading) return;
+    if (_auth.status == AuthStatus.loading) return;
     FocusScope.of(context).unfocus();
-    setState(() => _loading = true);
 
-    // Simulación visual: aquí irá la autenticación real.
-    await Future<void>.delayed(const Duration(milliseconds: 700));
+    final user = _user.text.trim();
+    final password = _password.text;
+
+    if (user.isEmpty || password.isEmpty) {
+      _showError('Ingresa tu nombre de usuario y contraseña.');
+      return;
+    }
+    final ok = await _auth.login(user, password);
     if (!mounted) return;
 
-    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    if (ok) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    } else {
+      _showError(_auth.errorMessage ?? 'Ocurrió un error inesperado.');
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -67,10 +85,10 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                         child: _FormSheet(
                           bottomInset: bottomInset,
-                          email: _email,
+                          user: _user,
                           password: _password,
                           onSubmit: _submit,
-                          loading: _loading,
+                          loading: _auth.status == AuthStatus.loading,
                         ),
                       ),
                     ],
@@ -136,14 +154,14 @@ class _Brand extends StatelessWidget {
 class _FormSheet extends StatelessWidget {
   const _FormSheet({
     required this.bottomInset,
-    required this.email,
+    required this.user,
     required this.password,
     required this.onSubmit,
     required this.loading,
   });
 
   final double bottomInset;
-  final TextEditingController email;
+  final TextEditingController user;
   final TextEditingController password;
   final VoidCallback onSubmit;
   final bool loading;
@@ -171,16 +189,16 @@ class _FormSheet extends StatelessWidget {
           ),
           const SizedBox(height: 22),
 
-          const _FieldLabel('Correo electrónico'),
+          const _FieldLabel('Nombre de usuario'),
           const SizedBox(height: 8),
           TextField(
-            controller: email,
-            keyboardType: TextInputType.emailAddress,
+            controller: user,
+            keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.username],
             cursorColor: _Palette.ink,
             style: _inputTextStyle,
-            decoration: _inputDecoration('usuario@farmadi.com'),
+            decoration: _inputDecoration('nombre_de_usuario'),
           ),
           const SizedBox(height: 18),
 
