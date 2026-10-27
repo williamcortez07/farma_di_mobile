@@ -657,7 +657,20 @@ class CategoriesTab extends StatelessWidget {
             itemBuilder: (context, index) {
               final CategoryModel cat = categories[index];
               final int count = provider.getProductCountByCategory(cat.name);
-              return _CategoryCard(categoryName: cat.name, productCount: count);
+              return _CategoryCard(
+                categoryName: cat.name,
+                productCount: count,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CategoryProductsScreen(
+                        categoryName: cat.name,
+                        provider: provider,
+                      ),
+                    ),
+                  );
+                },
+              );
             },
           ),
         );
@@ -669,13 +682,18 @@ class CategoriesTab extends StatelessWidget {
 class _CategoryCard extends StatelessWidget {
   final String categoryName;
   final int productCount;
-  const _CategoryCard({required this.categoryName, required this.productCount});
+  final VoidCallback? onTap;
+
+  const _CategoryCard({
+    required this.categoryName,
+    required this.productCount,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
-      padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
@@ -687,25 +705,45 @@ class _CategoryCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          _PillIcon(categoryName: categoryName),
-          const SizedBox(width: 12.0),
-          Expanded(
-            child: Text(
-              categoryName,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14.0,
-                color: Color(0xFF1A1A2E),
-              ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12.0),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.0),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Row(
+              children: [
+                _PillIcon(categoryName: categoryName),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Text(
+                    categoryName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.0,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                  ),
+                ),
+                Text(
+                  '$productCount productos',
+                  style: const TextStyle(
+                    color: Color(0xFF78909C),
+                    fontSize: 12.0,
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14.0,
+                  color: Color(0xFFB0BEC5),
+                ),
+              ],
             ),
           ),
-          Text(
-            '$productCount productos',
-            style: const TextStyle(color: Color(0xFF78909C), fontSize: 12.0),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -855,6 +893,105 @@ class _BrandCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CategoryProductsScreen extends StatelessWidget {
+  final String categoryName;
+  final CatalogProvider provider;
+
+  const CategoryProductsScreen({
+    super.key,
+    required this.categoryName,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        final products = provider.getProductsByCategory(categoryName);
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F7FA),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0.5,
+            shadowColor: const Color(0x1A000000),
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18.0,
+                color: Color(0xFF1A1A2E),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            titleSpacing: 0.0,
+            title: Row(
+              children: [
+                _PillIcon(categoryName: categoryName),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        categoryName,
+                        style: const TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A1A2E),
+                        ),
+                      ),
+                      Text(
+                        '${products.length} medicamentos disponibles',
+                        style: const TextStyle(
+                          fontSize: 11.0,
+                          color: Color(0xFF78909C),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          body: products.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.inventory_2_outlined,
+                          size: 48,
+                          color: Color(0xFFB0BEC5),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No hay medicamentos registrados en la categoría "$categoryName".',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF78909C),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16.0, 14.0, 16.0, 14.0),
+                  itemCount: products.length,
+                  itemBuilder: (BuildContext context, int index) =>
+                      _ProductCard(product: products[index]),
+                ),
+        );
+      },
     );
   }
 }

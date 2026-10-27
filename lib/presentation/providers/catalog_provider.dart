@@ -73,6 +73,13 @@ class CatalogProvider extends ChangeNotifier {
         .length;
   }
 
+  List<CatalogProductViewModel> getProductsByCategory(String categoryName) {
+    final target = categoryName.trim().toLowerCase();
+    return products
+        .where((p) => p.categoryName.trim().toLowerCase() == target)
+        .toList();
+  }
+
   Future<void> fetchProducts() async {
     productsStatus = CatalogStatus.loading;
     productsError = null;
