@@ -5,6 +5,7 @@ import 'package:farma_di_mobile/data/repositories/log_repository.dart';
 import 'package:farma_di_mobile/data/repositories/user_repository.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
+import 'package:farma_di_mobile/presentation/providers/user_provider.dart';
 import 'package:farma_di_mobile/services/token_storage.dart';
 
 final getIt = GetIt.instance;
@@ -19,11 +20,23 @@ void setupDependencies() {
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepository(getIt<ApiClient>(), getIt<TokenStorage>()),
   );
-  getIt.registerFactory<AuthController>(() => AuthController(getIt<AuthRepository>()));
 
   // Usuario / Perfil
   getIt.registerLazySingleton<UserRepository>(
     () => UserRepository(getIt<ApiClient>()),
+  );
+
+  // Provider de estado del usuario compartido
+  getIt.registerLazySingleton<UserProvider>(
+    () => UserProvider(
+      userRepository: getIt<UserRepository>(),
+      authRepository: getIt<AuthRepository>(),
+      tokenStorage: getIt<TokenStorage>(),
+    ),
+  );
+
+  getIt.registerFactory<AuthController>(
+    () => AuthController(getIt<AuthRepository>(), userProvider: getIt<UserProvider>()),
   );
 
   // Logs
