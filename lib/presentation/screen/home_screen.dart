@@ -1,6 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/di/injection.dart';
+import '../../data/models/auth_model/user_model.dart';
+import '../providers/user_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/botton_Navigation.dart';
 import '../widgets/routes.dart';
@@ -36,32 +39,51 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  late final UserProvider _userProvider;
 
-  final _screens = const <Widget>[
-    _HomeOverview(),
-    CatalogScreen(),
-    MetricsScreen(),
-    LogsScreen(),
-    RolesScreen(),
-    SettingsScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _userProvider = getIt<UserProvider>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _userProvider.loadProfile();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppNavbar(
-        profileImageUrl: null,
-        onProfileTap: () {
-          Navigator.of(context).pushNamed(AppRoutes.profile);
-        },
-      ),
-      body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: buildBottomNavigationBar(
-        context,
-        _currentIndex,
-        (index) => setState(() => _currentIndex = index),
-      ),
+    return ListenableBuilder(
+      listenable: _userProvider,
+      builder: (context, _) {
+        final user = _userProvider.user;
+
+        final screens = <Widget>[
+          _HomeOverview(user: user),
+          const CatalogScreen(),
+          const MetricsScreen(),
+          const LogsScreen(),
+          const RolesScreen(),
+          const SettingsScreen(),
+        ];
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppNavbar(
+            profileImageUrl: null,
+            userInitials: user?.initials,
+            userName: user?.userName,
+            onProfileTap: () {
+              Navigator.of(context).pushNamed(AppRoutes.profile);
+            },
+          ),
+          body: IndexedStack(index: _currentIndex, children: screens),
+          bottomNavigationBar: buildBottomNavigationBar(
+            context,
+            _currentIndex,
+            (index) => setState(() => _currentIndex = index),
+          ),
+        );
+      },
     );
   }
 }
@@ -71,7 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
 // ============================================================
 
 class _HomeOverview extends StatelessWidget {
-  const _HomeOverview();
+  const _HomeOverview({this.user});
+
+  final UserModel? user;
 
   @override
   Widget build(BuildContext context) {
@@ -89,11 +113,11 @@ class _HomeOverview extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Panel general',
                         style: TextStyle(
                           fontSize: 28,
@@ -101,6 +125,17 @@ class _HomeOverview extends StatelessWidget {
                           color: AppColors.primaryDark,
                         ),
                       ),
+                      if (user != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Bienvenido, ${user!.fullName} • ${user!.primaryRole}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: _mutedTextColor,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

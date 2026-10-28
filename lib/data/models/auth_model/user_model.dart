@@ -9,8 +9,8 @@ class UserRoleModel {
 
   factory UserRoleModel.fromJson(Map<String, dynamic> json) {
     return UserRoleModel(
-      rolId: (json['rolId'] as num?)?.toInt() ?? 0,
-      rolName: (json['rolName'] as String?) ?? '',
+      rolId: (json['rolId'] ?? json['RolId'] as num?)?.toInt() ?? 0,
+      rolName: (json['rolName'] ?? json['RolName'] as String?) ?? '',
     );
   }
 
@@ -87,7 +87,46 @@ class UserModel {
     );
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+  static String? _extractString(Map<dynamic, dynamic> map, List<String> keys) {
+    for (final key in keys) {
+      if (map.containsKey(key) && map[key] != null) {
+        final val = map[key];
+        final str = val.toString().trim();
+        if (str.isNotEmpty && str != 'null') {
+          return str;
+        }
+      }
+    }
+    return null;
+  }
+
+  static int _extractInt(Map<dynamic, dynamic> map, List<String> keys) {
+    for (final key in keys) {
+      if (map.containsKey(key) && map[key] != null) {
+        final val = map[key];
+        if (val is num) return val.toInt();
+        final parsed = int.tryParse(val.toString().trim());
+        if (parsed != null) return parsed;
+      }
+    }
+    return 0;
+  }
+
+  factory UserModel.fromJson(Map<String, dynamic> rawJson) {
+    // Si la respuesta viene envuelta en 'user', 'data', 'result', etc.
+    final dynamic unwrapped = rawJson['user'] ??
+        rawJson['User'] ??
+        rawJson['usuario'] ??
+        rawJson['Usuario'] ??
+        rawJson['data'] ??
+        rawJson['Data'] ??
+        rawJson['result'] ??
+        rawJson['Result'] ??
+        rawJson;
+
+    final Map<dynamic, dynamic> json =
+        unwrapped is Map ? unwrapped : rawJson;
+
     final rawRoles = json['roles'] ?? json['Roles'];
     final rolesList = <UserRoleModel>[];
     if (rawRoles is List) {
@@ -100,17 +139,73 @@ class UserModel {
       }
     }
 
-    final rawId = json['id'] ?? json['Id'];
-    final idInt = rawId is num ? rawId.toInt() : (int.tryParse(rawId?.toString() ?? '0') ?? 0);
+    final id = _extractInt(json, ['id', 'Id', 'userId', 'UserId', 'idUser', 'IdUser']);
+
+    String? userName = _extractString(
+      json,
+      ['userName', 'UserName', 'username', 'Username', 'name', 'Name', 'nombre', 'nombres', 'Nombre'],
+    );
+
+    String? userLastName = _extractString(
+      json,
+      [
+        'userLastName',
+        'UserLastName',
+        'lastName',
+        'LastName',
+        'lastname',
+        'Lastname',
+        'apellido',
+        'apellidos',
+        'Apellido',
+        'Apellidos',
+      ],
+    );
+
+    final mail = _extractString(
+      json,
+      ['mail', 'Mail', 'email', 'Email', 'correo', 'Correo'],
+    ) ?? '';
+
+    final userPhone = _extractString(
+      json,
+      [
+        'userPhone',
+        'UserPhone',
+        'phone',
+        'Phone',
+        'phoneNumber',
+        'PhoneNumber',
+        'phonenumber',
+        'telephone',
+        'Telephone',
+        'telefono',
+        'Telefono',
+        'celular',
+        'Celular',
+      ],
+    );
+
+    final rolId = (json['rolId'] ?? json['RolId'] as num?)?.toInt();
+    final isActive = (json['isActive'] ?? json['IsActive'] ?? true) as bool;
+
+    // Si userLastName no viene provisto pero userName tiene espacios, separar limpiamente
+    if ((userLastName == null || userLastName.isEmpty) && userName != null && userName.contains(' ')) {
+      final parts = userName.split(RegExp(r'\s+'));
+      if (parts.length > 1) {
+        userName = parts.first;
+        userLastName = parts.sublist(1).join(' ');
+      }
+    }
 
     return UserModel(
-      id: idInt,
-      userName: (json['userName'] ?? json['UserName'] ?? json['name'] ?? '').toString(),
-      userLastName: json['userLastName'] as String? ?? json['UserLastName'] as String?,
-      mail: (json['mail'] ?? json['Mail'] ?? json['email'] ?? json['Email'] ?? '').toString(),
-      userPhone: json['userPhone'] as String? ?? json['UserPhone'] as String?,
-      rolId: (json['rolId'] as num?)?.toInt() ?? (json['RolId'] as num?)?.toInt(),
-      isActive: (json['isActive'] ?? json['IsActive'] ?? true) as bool,
+      id: id,
+      userName: userName ?? '',
+      userLastName: userLastName,
+      mail: mail,
+      userPhone: userPhone,
+      rolId: rolId,
+      isActive: isActive,
       roles: rolesList,
     );
   }

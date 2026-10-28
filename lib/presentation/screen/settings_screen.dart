@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../core/di/injection.dart';
+import '../providers/user_provider.dart';
 import '../theme/app_colors.dart';
+import '../widgets/routes.dart';
 
 const Color _dividerColor = Color(0xFFEDEFF3);
 
@@ -12,90 +15,103 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late final UserProvider _userProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProvider = getIt<UserProvider>();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        children: [
-          const Text(
-            'Preferencias',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Personaliza tu experiencia en Farma-Di',
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.profileCard,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
-                  child: const Text(
-                    'AG',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+    return ListenableBuilder(
+      listenable: _userProvider,
+      builder: (context, _) {
+        final user = _userProvider.user;
+
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            children: [
+              const Text(
+                'Preferencias',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryDark,
                 ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'William Cortez',
-                        style: TextStyle(
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Personaliza tu experiencia en Farma-Di',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.profileCard,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.white.withValues(alpha: 0.15),
+                      child: Text(
+                        user?.initials ?? 'U',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14.5,
                         ),
                       ),
-                      SizedBox(height: 2),
-                      Text(
-                        'wil.cortez@farmadi.com',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Administrador · Activo',
-                        style: TextStyle(
-                          color: AppColors.success,
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => _openEditProfileModal(context),
-                  style: TextButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  child: const Text('Editar', style: TextStyle(fontSize: 12.5)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.fullName ?? 'Usuario Farma-Di',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            user?.mail ?? 'correo@farmadi.com',
+                            style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${user?.primaryRole ?? "Usuario"} · ${user?.isActive == true ? "Activo" : "Inactivo"}',
+                            style: TextStyle(
+                              color: user?.isActive == true ? AppColors.success : AppColors.red,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.profile),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Editar', style: TextStyle(fontSize: 12.5)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
           const SizedBox(height: 20),
           const _SectionHeader('NOTIFICACIONES'),
           _SettingsCard(
@@ -183,7 +199,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SizedBox(
             width: double.infinity,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                await _userProvider.logout();
+                if (context.mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                }
+              },
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.redSoft,
                 foregroundColor: AppColors.red,
@@ -200,6 +221,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+      },
     );
   }
 

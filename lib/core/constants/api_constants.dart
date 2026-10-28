@@ -1,8 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConstants {
-  String get baseUrl => dotenv.env['BASE_API_URL'] ?? '';
-  String get environment => dotenv.env['ENVIRONMENT'] ?? '';
+  String get baseUrl => dotenv.env['BASE_API_URL']?.trim() ?? '';
+  String get environment => dotenv.env['ENVIRONMENT']?.trim() ?? '';
 
   ApiConstants._privateConstructor();
   static final ApiConstants _instance = ApiConstants._privateConstructor();
@@ -20,8 +20,8 @@ class ApiConstants {
   static String logsByLevel(String level) => '/api/Logs/level/$level';
 
   // User endpoints
-  static const String user = '/api/User';
-  static String userById(int id) => '/api/User/$id';
+  static const String user = '/User';
+  static String userById(int id) => '/User/$id';
 
   static const timeoutduration = Duration(seconds: 30);
 }
