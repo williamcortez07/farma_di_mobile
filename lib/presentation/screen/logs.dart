@@ -1,10 +1,12 @@
+
 import 'package:flutter/material.dart';
+
 import 'package:farma_di_mobile/core/di/injection.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
-import '../theme/app_colors.dart';
 
-// PANTALLA PRINCIPAL
+import '../settings/app_preferences.dart';
+import '../theme/app_colors.dart';
 
 class LogsScreen extends StatefulWidget {
   const LogsScreen({super.key});
@@ -17,6 +19,11 @@ class _LogsScreenState extends State<LogsScreen> {
   final TextEditingController _searchController = TextEditingController();
   late final LogController _logController;
 
+  bool get _isEnglish =>
+      AppPreferences.locale.value.languageCode == 'en';
+
+  String _t(String es, String en) => _isEnglish ? en : es;
+
   @override
   void initState() {
     super.initState();
@@ -26,9 +33,7 @@ class _LogsScreenState extends State<LogsScreen> {
   }
 
   void _onControllerUpdate() {
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   @override
@@ -49,22 +54,25 @@ class _LogsScreenState extends State<LogsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24.0),
-              _buildHeader(),
-              const SizedBox(height: 16.0),
-              _buildSearchBar(),
-              const SizedBox(height: 16.0),
-              _buildFilters(),
-              const SizedBox(height: 16.0),
-              Expanded(child: _buildLogList()),
+              const SizedBox(height: 24),
+              _buildHeader(context),
+              const SizedBox(height: 16),
+              _buildSearchBar(context),
+              const SizedBox(height: 16),
+              _buildFilters(context),
+              const SizedBox(height: 16),
+              Expanded(child: _buildLogList(context)),
             ],
           ),
         ),
@@ -72,83 +80,122 @@ class _LogsScreenState extends State<LogsScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Logs del sistema',
-          style: TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.bold,
-            color: AppColors.ink,
+        Expanded(
+          child: Text(
+            _t('Logs del sistema', 'System logs'),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: scheme.onSurface,
+            ),
           ),
         ),
         IconButton(
-          tooltip: 'Recargar logs',
-          icon: const Icon(Icons.refresh, color: AppColors.primary),
+          tooltip: _t('Recargar logs', 'Refresh logs'),
+          icon: const Icon(
+            Icons.refresh,
+            color: AppColors.primary,
+          ),
           onPressed: () => _logController.fetchLogs(refresh: true),
         ),
       ],
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return TextField(
       controller: _searchController,
       onChanged: _handleSearchChanged,
+      style: TextStyle(color: scheme.onSurface),
       decoration: InputDecoration(
-        hintText: 'Buscar por ID, ruta, IP, usuario o mensaje...',
-        hintStyle: const TextStyle(color: AppColors.hint, fontSize: 13.5),
-        prefixIcon: const Icon(Icons.search, color: AppColors.hint),
+        hintText: _t(
+          'Buscar por ID, ruta, IP, usuario o mensaje...',
+          'Search by ID, path, IP, user or message...',
+        ),
+        hintStyle: TextStyle(
+          color: scheme.onSurfaceVariant,
+          fontSize: 13.5,
+        ),
+        prefixIcon: Icon(
+          Icons.search,
+          color: scheme.onSurfaceVariant,
+        ),
         suffixIcon: _searchController.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear, color: AppColors.hint, size: 18),
+                tooltip: _t('Limpiar búsqueda', 'Clear search'),
+                icon: Icon(
+                  Icons.clear,
+                  color: scheme.onSurfaceVariant,
+                  size: 18,
+                ),
                 onPressed: () {
                   _searchController.clear();
                   _handleSearchChanged('');
+                  setState(() {});
                 },
               )
             : null,
         filled: true,
-        fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 12.0),
+        fillColor: scheme.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 14,
+          horizontal: 12,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: AppColors.primary,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFilterChip('ALL', null, _logController.allLogs.length.toString()),
-          const SizedBox(width: 8.0),
           _buildFilterChip(
+            context,
+            'ALL',
+            null,
+            _logController.allLogs.length.toString(),
+          ),
+          const SizedBox(width: 8),
+          _buildFilterChip(
+            context,
             'ERROR',
             AppColors.red,
             _logController.errorCount.toString(),
           ),
-          const SizedBox(width: 8.0),
+          const SizedBox(width: 8),
           _buildFilterChip(
+            context,
             'WARN',
             AppColors.warning,
             _logController.warningCount.toString(),
           ),
-          const SizedBox(width: 8.0),
+          const SizedBox(width: 8),
           _buildFilterChip(
+            context,
             'INFO',
             AppColors.primary,
             _logController.infoCount.toString(),
@@ -158,85 +205,135 @@ class _LogsScreenState extends State<LogsScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, Color? dotColor, String count) {
-    final bool isSelected = _logController.selectedFilter == label;
+  Widget _buildFilterChip(
+    BuildContext context,
+    String label,
+    Color? dotColor,
+    String count,
+  ) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final selected = _logController.selectedFilter == label;
 
-    return GestureDetector(
-      onTap: () => _handleFilterTap(label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primarySoft : AppColors.surface,
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: () => _handleFilterTap(label),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
           ),
-        ),
-        child: Row(
-          children: [
-            if (dotColor != null) ...[
-              Icon(Icons.circle, size: 8.0, color: dotColor),
-              const SizedBox(width: 6.0),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.primary.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.22 : 0.10,
+                  )
+                : scheme.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected
+                  ? AppColors.primary
+                  : theme.dividerColor,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (dotColor != null) ...[
+                Icon(Icons.circle, size: 8, color: dotColor),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label == 'ALL' ? _t('TODOS', 'ALL') : label,
+                style: TextStyle(
+                  color: selected
+                      ? AppColors.primary
+                      : scheme.onSurface,
+                  fontWeight:
+                      selected ? FontWeight.bold : FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                count,
+                style: TextStyle(
+                  color: selected
+                      ? AppColors.primary
+                      : scheme.onSurfaceVariant,
+                  fontWeight:
+                      selected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 12,
+                ),
+              ),
             ],
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                fontSize: 13.0,
-              ),
-            ),
-            const SizedBox(width: 6.0),
-            Text(
-              count,
-              style: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.textMuted,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 12.0,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildLogList() {
-    if (_logController.status == LogStatus.loading && _logController.logs.isEmpty) {
-      return const Center(
+  Widget _buildLogList(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    if (_logController.status == LogStatus.loading &&
+        _logController.logs.isEmpty) {
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: AppColors.primary),
-            SizedBox(height: 12),
+            const CircularProgressIndicator(color: AppColors.primary),
+            const SizedBox(height: 12),
             Text(
-              'Cargando logs desde la API...',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              _t(
+                'Cargando logs desde la API...',
+                'Loading logs from the API...',
+              ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
       );
     }
 
-    if (_logController.status == LogStatus.error && _logController.logs.isEmpty) {
+    if (_logController.status == LogStatus.error &&
+        _logController.logs.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.red),
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: scheme.error,
+              ),
               const SizedBox(height: 12),
               Text(
-                _logController.errorMessage ?? 'Error al consultar logs.',
+                _logController.errorMessage ??
+                    _t(
+                      'Error al consultar logs.',
+                      'Error retrieving logs.',
+                    ),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () => _logController.fetchLogs(refresh: true),
+                onPressed: () =>
+                    _logController.fetchLogs(refresh: true),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Reintentar'),
+                label: Text(_t('Reintentar', 'Retry')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -253,12 +350,21 @@ class _LogsScreenState extends State<LogsScreen> {
         onRefresh: () => _logController.fetchLogs(refresh: true),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
-            SizedBox(height: 100),
+          children: [
+            const SizedBox(height: 100),
             Center(
-              child: Text(
-                'No hay logs registrados con el filtro actual.',
-                style: TextStyle(color: AppColors.textMuted),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  _t(
+                    'No hay logs registrados con el filtro actual.',
+                    'There are no logs for the current filter.',
+                  ),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ),
           ],
@@ -280,27 +386,34 @@ class _LogsScreenState extends State<LogsScreen> {
   }
 }
 
-/// WIDGET REUTILIZABLE PARA TARJETA DE LOG
 class LogCard extends StatelessWidget {
   final SystemLogModel log;
 
   const LogCard({super.key, required this.log});
 
+  bool get _isEnglish =>
+      AppPreferences.locale.value.languageCode == 'en';
+
+  String _t(String es, String en) => _isEnglish ? en : es;
+
   String _normalizedLevel() {
-    final lvl = (log.level ?? '').toUpperCase();
-    if (lvl.contains('ERROR')) return 'ERROR';
-    if (lvl.contains('WARN')) return 'WARN';
+    final level = (log.level ?? '').toUpperCase();
+
+    if (level.contains('ERROR')) return 'ERROR';
+    if (level.contains('WARN')) return 'WARN';
     return 'INFO';
   }
 
-  Color _getBadgeBackgroundColor() {
+  Color _getBadgeBackgroundColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     switch (_normalizedLevel()) {
       case 'ERROR':
-        return AppColors.redSoft;
+        return AppColors.red.withValues(alpha: isDark ? 0.20 : 0.12);
       case 'WARN':
-        return AppColors.warningSoft;
+        return AppColors.warning.withValues(alpha: isDark ? 0.20 : 0.12);
       default:
-        return AppColors.primarySoft;
+        return AppColors.primary.withValues(alpha: isDark ? 0.20 : 0.10);
     }
   }
 
@@ -315,155 +428,233 @@ class LogCard extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime? dt) {
-    if (dt == null) return 'N/D';
-    final y = dt.year.toString();
-    final m = dt.month.toString().padLeft(2, '0');
-    final d = dt.day.toString().padLeft(2, '0');
-    final h = dt.hour.toString().padLeft(2, '0');
-    final min = dt.minute.toString().padLeft(2, '0');
-    final s = dt.second.toString().padLeft(2, '0');
-    return '$y-$m-$d $h:$min:$s';
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'N/D';
+
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    final second = date.second.toString().padLeft(2, '0');
+
+    return '$day/$month/$year $hour:$minute:$second';
   }
 
   void _showDetailsModal(BuildContext context) {
-    showModalBottomSheet(
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
       ),
-      builder: (BuildContext context) {
+      builder: (modalContext) {
         return DraggableScrollableSheet(
           initialChildSize: 0.7,
           minChildSize: 0.4,
           maxChildSize: 0.95,
           expand: false,
           builder: (context, scrollController) {
+            final modalTheme = Theme.of(context);
+            final modalScheme = modalTheme.colorScheme;
+
             return SingleChildScrollView(
               controller: scrollController,
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
-                          'Detalles del Log: ${log.id ?? log.traceId ?? "N/D"}',
-                          maxLines: 1,
+                          '${_t('Detalles del log', 'Log details')}: '
+                          '${log.id ?? log.traceId ?? "N/D"}',
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 17.0,
+                          style: modalTheme.textTheme.titleMedium?.copyWith(
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: modalScheme.onSurface,
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                        tooltip: _t('Cerrar', 'Close'),
+                        icon: const Icon(Icons.close),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
                   ),
-                  const Divider(color: AppColors.border),
-                  const SizedBox(height: 12.0),
-
-                  _buildDetailRow('Nivel', _normalizedLevel(), _getBadgeTextColor()),
-                  _buildDetailRow('Fecha', _formatDate(log.timestamp), AppColors.textPrimary),
-                  _buildDetailRow('Entorno', log.environment ?? 'N/D', AppColors.textPrimary),
-                  _buildDetailRow('Usuario', log.userId ?? 'Anónimo', AppColors.textPrimary),
-                  _buildDetailRow('IP Cliente', log.clientIp ?? '::1', AppColors.textPrimary),
-                  _buildDetailRow('Trace ID', log.traceId ?? 'N/D', AppColors.textSecondary),
-
+                  Divider(color: modalTheme.dividerColor),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    context,
+                    _t('Nivel', 'Level'),
+                    _normalizedLevel(),
+                    _getBadgeTextColor(),
+                  ),
+                  _buildDetailRow(
+                    context,
+                    _t('Fecha', 'Date'),
+                    _formatDate(log.timestamp),
+                    modalScheme.onSurface,
+                  ),
+                  _buildDetailRow(
+                    context,
+                    _t('Entorno', 'Environment'),
+                    log.environment ?? 'N/D',
+                    modalScheme.onSurface,
+                  ),
+                  _buildDetailRow(
+                    context,
+                    _t('Usuario', 'User'),
+                    log.userId ?? _t('Anónimo', 'Anonymous'),
+                    modalScheme.onSurface,
+                  ),
+                  _buildDetailRow(
+                    context,
+                    _t('IP del cliente', 'Client IP'),
+                    log.clientIp ?? '::1',
+                    modalScheme.onSurface,
+                  ),
+                  _buildDetailRow(
+                    context,
+                    'Trace ID',
+                    log.traceId ?? 'N/D',
+                    modalScheme.onSurfaceVariant,
+                  ),
                   if (log.request != null) ...[
-                    _buildDetailRow('Método', log.request!.method ?? 'N/D', AppColors.primary),
-                    _buildDetailRow('Ruta', log.request!.path ?? 'N/D', AppColors.textPrimary),
-                    if (log.request!.queryString != null && log.request!.queryString!.isNotEmpty)
-                      _buildDetailRow('Query', log.request!.queryString!, AppColors.textSecondary),
-                    if (log.request!.payload != null && log.request!.payload!.isNotEmpty)
-                      _buildDetailRow('Payload', log.request!.payload!, AppColors.textSecondary),
-                  ],
-
-                  if (log.response != null) ...[
                     _buildDetailRow(
-                      'Código HTTP',
-                      '${log.response!.statusCode ?? "N/D"} (${log.response!.elapsedMilliseconds ?? 0} ms)',
-                      (log.response!.statusCode ?? 200) >= 400 ? AppColors.red : AppColors.primary,
+                      context,
+                      _t('Método', 'Method'),
+                      log.request!.method ?? 'N/D',
+                      AppColors.primary,
                     ),
+                    _buildDetailRow(
+                      context,
+                      _t('Ruta', 'Path'),
+                      log.request!.path ?? 'N/D',
+                      modalScheme.onSurface,
+                    ),
+                    if (log.request!.queryString != null &&
+                        log.request!.queryString!.isNotEmpty)
+                      _buildDetailRow(
+                        context,
+                        'Query',
+                        log.request!.queryString!,
+                        modalScheme.onSurfaceVariant,
+                      ),
+                    if (log.request!.payload != null &&
+                        log.request!.payload!.isNotEmpty)
+                      _buildDetailRow(
+                        context,
+                        'Payload',
+                        log.request!.payload!,
+                        modalScheme.onSurfaceVariant,
+                      ),
                   ],
-
+                  if (log.response != null)
+                    _buildDetailRow(
+                      context,
+                      _t('Código HTTP', 'HTTP status'),
+                      '${log.response!.statusCode ?? "N/D"} '
+                      '(${log.response!.elapsedMilliseconds ?? 0} ms)',
+                      (log.response!.statusCode ?? 200) >= 400
+                          ? scheme.error
+                          : AppColors.primary,
+                    ),
                   if (log.exception != null) ...[
-                    const SizedBox(height: 12.0),
-                    const Text(
-                      'Excepción técnica:',
-                      style: TextStyle(
+                    const SizedBox(height: 12),
+                    Text(
+                      _t('Excepción técnica:', 'Technical exception:'),
+                      style: modalTheme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.red,
+                        color: modalScheme.error,
                       ),
                     ),
-                    const SizedBox(height: 6.0),
+                    const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.redSoft,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+                        color: modalScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: modalScheme.error.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (log.exception!.message != null)
                             Text(
-                              'Mensaje: ${log.exception!.message}',
-                              style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w600),
+                              '${_t('Mensaje', 'Message')}: '
+                              '${log.exception!.message}',
+                              style: TextStyle(
+                                color: modalScheme.onErrorContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          if (log.exception!.source != null && log.exception!.source!.isNotEmpty) ...[
+                          if (log.exception!.source != null &&
+                              log.exception!.source!.isNotEmpty) ...[
                             const SizedBox(height: 4),
                             Text(
-                              'Origen: ${log.exception!.source}',
-                              style: const TextStyle(color: AppColors.ink, fontSize: 12),
+                              '${_t('Origen', 'Source')}: '
+                              '${log.exception!.source}',
+                              style: TextStyle(
+                                color: modalScheme.onErrorContainer,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
-                          if (log.exception!.stackTrace != null && log.exception!.stackTrace!.isNotEmpty) ...[
+                          if (log.exception!.stackTrace != null &&
+                              log.exception!.stackTrace!.isNotEmpty) ...[
                             const SizedBox(height: 6),
-                            Text(
+                            SelectableText(
                               'StackTrace:\n${log.exception!.stackTrace}',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                              style: TextStyle(
+                                color: modalScheme.onErrorContainer,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ],
                       ),
                     ),
                   ],
-
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    'Información del log:',
-                    style: TextStyle(
+                  const SizedBox(height: 16),
+                  Text(
+                    _t('Información del log:', 'Log information:'),
+                    style: modalTheme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary,
+                      color: modalScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 8.0),
+                  const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: AppColors.border),
+                      color: modalScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: modalTheme.dividerColor,
+                      ),
                     ),
-                    child: Text(
+                    child: SelectableText(
                       log.displayMessage,
-                      style: const TextStyle(color: AppColors.textPrimary),
+                      style: TextStyle(color: modalScheme.onSurface),
                     ),
                   ),
-                  const SizedBox(height: 24.0),
+                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -473,27 +664,39 @@ class LogCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, Color valueColor) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value,
+    Color valueColor,
+  ) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 95.0,
+            width: 105,
             child: Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: scheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
-                fontSize: 13.0,
+                fontSize: 13,
               ),
             ),
           ),
           Expanded(
-            child: Text(
+            child: SelectableText(
               value,
-              style: TextStyle(color: valueColor, fontWeight: FontWeight.w500, fontSize: 13.0),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: valueColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+              ),
             ),
           ),
         ],
@@ -503,114 +706,127 @@ class LogCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     final shortId = (log.id != null && log.id!.length > 10)
         ? log.id!.substring(0, 10)
         : (log.id ?? log.traceId ?? 'LOG');
 
     final path = log.request?.path ?? 'Sistema';
-    final user = log.userId ?? 'Anónimo';
+    final user = log.userId ?? _t('Anónimo', 'Anonymous');
     final code = log.response?.statusCode;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
-      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: AppColors.border, width: 1),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 4.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getBadgeBackgroundColor(),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Text(
-                      _normalizedLevel(),
-                      style: TextStyle(
-                        color: _getBadgeTextColor(),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12.0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    shortId,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13.0,
-                    ),
-                  ),
-                  if (code != null) ...[
-                    const SizedBox(width: 8.0),
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: code >= 400 ? AppColors.redSoft : AppColors.primarySoft,
-                        borderRadius: BorderRadius.circular(6.0),
+                        color: _getBadgeBackgroundColor(context),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        code.toString(),
+                        _normalizedLevel(),
                         style: TextStyle(
-                          color: code >= 400 ? AppColors.red : AppColors.primary,
+                          color: _getBadgeTextColor(),
                           fontWeight: FontWeight.bold,
-                          fontSize: 11.0,
+                          fontSize: 12,
                         ),
                       ),
                     ),
+                    Text(
+                      shortId,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (code != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: code >= 400
+                              ? scheme.errorContainer
+                              : AppColors.primary.withValues(
+                                  alpha: theme.brightness == Brightness.dark
+                                      ? 0.20
+                                      : 0.10,
+                                ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          code.toString(),
+                          style: TextStyle(
+                            color: code >= 400
+                                ? scheme.onErrorContainer
+                                : AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
                   ],
-                ],
+                ),
               ),
-              InkWell(
-                onTap: () => _showDetailsModal(context),
-                borderRadius: BorderRadius.circular(8.0),
-                child: const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Icon(
-                    Icons.open_in_new,
-                    size: 20.0,
-                    color: AppColors.ink,
-                  ),
+              IconButton(
+                tooltip: _t('Ver detalles', 'View details'),
+                onPressed: () => _showDetailsModal(context),
+                icon: Icon(
+                  Icons.open_in_new,
+                  size: 20,
+                  color: scheme.onSurface,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10.0),
+          const SizedBox(height: 10),
           Text(
             log.displayMessage,
-            maxLines: 2,
+            maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppColors.ink,
-              fontSize: 14.0,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: scheme.onSurface,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 10.0),
-          Row(
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              _buildChip(path),
-              const SizedBox(width: 8.0),
-              _buildChip(user),
-              const Spacer(),
+              _buildChip(context, path),
+              _buildChip(context, user),
               Text(
                 _formatDate(log.timestamp),
-                style: const TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 11.0,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  fontSize: 11,
                 ),
               ),
             ],
@@ -620,21 +836,30 @@ class LogCard extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(6.0),
-      ),
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: AppColors.textSecondary,
-          fontSize: 11.5,
-          fontWeight: FontWeight.w500,
+  Widget _buildChip(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 180),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 4,
+        ),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: scheme.onSurfaceVariant,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

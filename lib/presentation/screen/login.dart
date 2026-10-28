@@ -1,20 +1,12 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 import 'package:farma_di_mobile/core/di/injection.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 
+import '../settings/app_preferences.dart';
 import '../theme/app_colors.dart';
-
-abstract final class _Palette {
-  static const ink = AppColors.ink;
-  static const sheet = AppColors.sheet;
-  static const accent = AppColors.accent;
-  static const border = AppColors.border;
-  static const muted = AppColors.muted;
-  static const hint = AppColors.hint;
-  static const onInkMuted = AppColors.onInkMuted;
-}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,6 +20,11 @@ class _LoginPageState extends State<LoginPage> {
   final _password = TextEditingController();
   late final AuthController _auth = getIt<AuthController>();
 
+  bool get _isEnglish =>
+      AppPreferences.locale.value.languageCode == 'en';
+
+  String _t(String es, String en) => _isEnglish ? en : es;
+
   @override
   void dispose() {
     _user.dispose();
@@ -38,22 +35,36 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _submit() async {
     if (_auth.status == AuthStatus.loading) return;
+
     FocusScope.of(context).unfocus();
 
     final user = _user.text.trim();
     final password = _password.text;
 
     if (user.isEmpty || password.isEmpty) {
-      _showError('Ingresa tu nombre de usuario y contraseña.');
+      _showError(
+        _t(
+          'Ingresa tu nombre de usuario y contraseña.',
+          'Enter your username and password.',
+        ),
+      );
       return;
     }
-  final ok = await _auth.login(user, password);
+
+    final ok = await _auth.login(user, password);
+
     if (!mounted) return;
 
     if (ok) {
       Navigator.of(context).pushReplacementNamed(AppRoutes.home);
     } else {
-      _showError(_auth.errorMessage ?? 'Ocurrió un error inesperado.');
+      _showError(
+        _auth.errorMessage ??
+            _t(
+              'Ocurrió un error inesperado.',
+              'An unexpected error occurred.',
+            ),
+      );
     }
   }
 
@@ -65,23 +76,31 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final isDark = theme.brightness == Brightness.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: isDark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: _Palette.ink,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           bottom: false,
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior.onDrag,
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
                 child: IntrinsicHeight(
                   child: Column(
                     children: [
-                      const _Brand(),
+                      _Brand(isEnglish: _isEnglish),
                       Expanded(
                         child: _FormSheet(
                           bottomInset: bottomInset,
@@ -89,6 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                           password: _password,
                           onSubmit: _submit,
                           loading: _auth.status == AuthStatus.loading,
+                          isEnglish: _isEnglish,
                         ),
                       ),
                     ],
@@ -104,10 +124,15 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class _Brand extends StatelessWidget {
-  const _Brand();
+  const _Brand({required this.isEnglish});
+
+  final bool isEnglish;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 32),
       child: Column(
@@ -116,7 +141,7 @@ class _Brand extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: _Palette.accent,
+              color: AppColors.accent,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
@@ -126,21 +151,23 @@ class _Brand extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Farma-Di',
-            style: TextStyle(
-              color: Colors.white,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: scheme.onSurface,
               fontSize: 26,
               fontWeight: FontWeight.w700,
               letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Sistema de Gestión Farmacéutica',
+          Text(
+            isEnglish
+                ? 'Pharmacy Management System'
+                : 'Sistema de Gestión Farmacéutica',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _Palette.onInkMuted,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: scheme.onSurfaceVariant,
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -158,6 +185,7 @@ class _FormSheet extends StatelessWidget {
     required this.password,
     required this.onSubmit,
     required this.loading,
+    required this.isEnglish,
   });
 
   final double bottomInset;
@@ -165,44 +193,102 @@ class _FormSheet extends StatelessWidget {
   final TextEditingController password;
   final VoidCallback onSubmit;
   final bool loading;
+  final bool isEnglish;
+
+  String _t(String es, String en) => isEnglish ? en : es;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final fieldFill = isDark
+        ? scheme.surfaceContainerHighest
+        : Colors.white;
+
+    final fieldBorder = theme.dividerColor;
+    final textColor = scheme.onSurface;
+    final mutedColor = scheme.onSurfaceVariant;
+
+    OutlineInputBorder border(Color color, [double width = 1]) {
+      return OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: color, width: width),
+      );
+    }
+
+    InputDecoration decoration(String hint) {
+      return InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(
+          color: mutedColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+        filled: true,
+        fillColor: fieldFill,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 17,
+        ),
+        enabledBorder: border(fieldBorder),
+        focusedBorder: border(AppColors.primary, 1.5),
+      );
+    }
+
+    final inputStyle = TextStyle(
+      color: textColor,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    );
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, 24, 20, 24 + bottomInset),
-      decoration: const BoxDecoration(
-        color: _Palette.sheet,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        24,
+        20,
+        24 + bottomInset,
+      ),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(28),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ACCEDER',
-            style: TextStyle(
-              color: _Palette.muted,
+          Text(
+            _t('ACCEDER', 'SIGN IN'),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: mutedColor,
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.9,
             ),
           ),
           const SizedBox(height: 22),
-
-          const _FieldLabel('Nombre de usuario'),
+          _FieldLabel(
+            _t('Nombre de usuario', 'Username'),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: user,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.username],
-            cursorColor: _Palette.ink,
-            style: _inputTextStyle,
-            decoration: _inputDecoration('nombre_de_usuario'),
+            cursorColor: AppColors.primary,
+            style: inputStyle,
+            decoration: decoration(
+              _t('nombre_de_usuario', 'username'),
+            ),
           ),
           const SizedBox(height: 18),
-
-          const _FieldLabel('Contraseña'),
+          _FieldLabel(
+            _t('Contraseña', 'Password'),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: password,
@@ -210,21 +296,20 @@ class _FormSheet extends StatelessWidget {
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
             onSubmitted: (_) => onSubmit(),
-            cursorColor: _Palette.ink,
-            style: _inputTextStyle,
-            decoration: _inputDecoration('••••••••'),
+            cursorColor: AppColors.primary,
+            style: inputStyle,
+            decoration: decoration('••••••••'),
           ),
-
           const SizedBox(height: 10),
-
           SizedBox(
             width: double.infinity,
             height: 52,
             child: FilledButton(
               onPressed: loading ? null : onSubmit,
               style: FilledButton.styleFrom(
-                backgroundColor: _Palette.ink,
-                disabledBackgroundColor: _Palette.ink.withValues(alpha: 0.85),
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor:
+                    AppColors.primary.withValues(alpha: 0.65),
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -247,18 +332,23 @@ class _FormSheet extends StatelessWidget {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Iniciar sesión', key: ValueKey('label')),
+                    : Text(
+                        _t('Iniciar sesión', 'Sign in'),
+                        key: const ValueKey('label'),
+                      ),
               ),
             ),
           ),
           const SizedBox(height: 22),
-
-          const Center(
+          Center(
             child: Text(
-              '¿Problemas para acceder? Contacta al administrador.',
+              _t(
+                '¿Problemas para acceder? Contacta al administrador.',
+                'Having trouble signing in? Contact your administrator.',
+              ),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _Palette.muted,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: mutedColor,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w500,
               ),
@@ -270,47 +360,20 @@ class _FormSheet extends StatelessWidget {
   }
 }
 
-const _inputTextStyle = TextStyle(
-  color: _Palette.ink,
-  fontSize: 14,
-  fontWeight: FontWeight.w500,
-);
-
-InputDecoration _inputDecoration(String hint) {
-  OutlineInputBorder border(Color color, [double width = 1]) =>
-      OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: color, width: width),
-      );
-
-  return InputDecoration(
-    hintText: hint,
-    hintStyle: const TextStyle(
-      color: _Palette.hint,
-      fontSize: 14,
-      fontWeight: FontWeight.w400,
-    ),
-    filled: true,
-    fillColor: Colors.white,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
-    enabledBorder: border(_Palette.border),
-    focusedBorder: border(_Palette.ink, 1.5),
-  );
-}
-
 class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
+
   final String text;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
-        color: _Palette.ink,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-      ),
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
     );
   }
 }

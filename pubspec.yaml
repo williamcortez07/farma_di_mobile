@@ -1,3 +1,4 @@
+
 name: farma_di_mobile
 description: "A new Flutter project."
 publish_to: "none"
@@ -10,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
@@ -18,19 +21,16 @@ dependencies:
   http: ^1.6.0
   flutter_secure_storage: ^11.2.0
   get_it: ^9.3.0
+  shared_preferences: ^2.5.3
+  package_info_plus: ^10.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^6.0.0
-
 
 flutter:
   uses-material-design: true
 
   assets:
-   - .env
-
-
-
-
+    - .env
