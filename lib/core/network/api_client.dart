@@ -1,110 +1,85 @@
-
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:farma_di_mobile/core/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:farma_di_mobile/core/errors/app_exception.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiClient {
-  ApiClient._();
+  ApiClient({this.tokenProvider, http.Client? client})
+      : _client = client ?? http.Client();
 
-  static final ApiClient instance = ApiClient._();
+  final Future<String?> Function()? tokenProvider;
+  final http.Client _client;
 
-  final http.Client _client = http.Client();
-  String? _token;
+  Future<dynamic> get(String path, { Map<String, String>? query }) async => _send('GET', path, query, null);
+  Future<dynamic> post(String path, { Object? body }) async => _send('POST', path, null, body);
+  Future<dynamic> put(String path, { Object? body }) async => _send('PUT', path, null, body);
+  Future<dynamic> delete(String path) async => _send('DELETE', path, null, null);
 
-  void setToken(String? token) {
-    _token = token;
-  }
-
-  Future<dynamic> get(String path) {
-    return _send('GET', path);
-  }
-
-  Future<dynamic> post(
-    String path, {
-    Object? body,
-  }) {
-    return _send('POST', path, body: body);
-  }
-
-  Future<dynamic> put(
-    String path, {
-    Object? body,
-  }) {
-    return _send('PUT', path, body: body);
-  }
-
-  Future<dynamic> delete(String path) {
-    return _send('DELETE', path);
-  }
-
-  Future<dynamic> _send(
-    String method,
-    String path, {
-    Object? body,
-  }) async {
-    final baseUrl = ApiConstants.instance.baseUrl.trim();
-
-    if (baseUrl.isEmpty) {
-      throw Exception('La URL de la API no est├í configurada.');
+  Future<dynamic> _send(String method, String path, Map<String, String>? query, Object? body) async {
+    final baseUrl = ApiConstants.instance.baseUrl;
+    final uri = Uri.parse('$baseUrl$path').replace(queryParameters: query);
+    final headers = {'Content-Type': 'application/json'};
+    final token = await tokenProvider?.call();
+    if (token != null) headers['Authorization'] = 'Bearer $token';
+    if (body != null) {
+      headers['Content-Type'] = 'application/json';
     }
 
-    final uri = Uri.parse(baseUrl).resolve(path);
-
-    final headers = <String, String>{
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-
-    if (_token != null && _token!.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $_token';
-    }
-
-    final request = http.Request(method, uri)
-      ..headers.addAll(headers);
-
+    final request = http.Request(method, uri)..headers.addAll(headers);
     if (body != null) {
       request.body = jsonEncode(body);
     }
 
+    final http.Response response;
     try {
-      final streamed = await _client
-          .send(request)
-          .timeout(ApiConstants.timeoutduration);
+      response = await _client.send(request)
+        .timeout(ApiConstants.timeoutduration)
+        .then(http.Response.fromStream);
+    } on TimeoutException {
+      throw const NetworkException('Request timed out. Please try again later.');
+    } on http.ClientException {
+      throw const NetworkException();
+    }
 
-      final response = await http.Response.fromStream(streamed);
+    debugPrint('→ $method $uri');
+    debugPrint('→ body: ${request.body}');
+    debugPrint('← ${response.statusCode}: ${response.body}');
 
-      dynamic data;
+    if (response.statusCode == 401) {
+      throw const UnauthorizedException();
+    }
 
-      if (response.body.trim().isNotEmpty) {
-        try {
-          data = jsonDecode(response.body);
-        } on FormatException {
-          data = response.body;
-        }
-      }
+    if (response.statusCode == 404) {
+      throw const NotFoundException();
+    }
 
-      if (response.statusCode < 200 ||
-          response.statusCode >= 300) {
-        var message = 'Error HTTP ${response.statusCode}';
+    return _decode(response);
+  }
 
-        if (data is Map) {
-          message = (data['message'] ??
-                  data['Message'] ??
-                  data['title'] ??
-                  data['detail'] ??
-                  message)
-              .toString();
-        }
+  dynamic _decode(http.Response response) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ServerException(_extractMessage(response), statusCode: response.statusCode);
+    }
 
-        throw Exception(message);
-      }
+    if (response.body.isEmpty) return null;
 
-      return data;
-    } on http.ClientException catch (e) {
-      throw Exception('Error de conexi├│n con la API: $e');
-    } on FormatException catch (e) {
-      throw Exception('Respuesta JSON inv├ílida: $e');
+    try {
+      return jsonDecode(response.body);
+    } on FormatException {
+      throw const ParsingException();
     }
   }
+
+  String _extractMessage(http.Response response){
+    try {
+      final data = jsonDecode(response.body);
+      if (data is Map && data['message'] is String) return data['message'] as String;
+    } catch(_){}
+    return 'Respuesta fallida del servidor con código de estado ${response.statusCode}.';
+  }
+
+  void dispose() => _client.close();
 }

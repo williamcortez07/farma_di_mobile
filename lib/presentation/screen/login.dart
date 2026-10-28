@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:farma_di_mobile/presentation/widgets/routes.dart';
-import 'package:farma_di_mobile/data/repositories/user_repository.dart';
+import 'package:farma_di_mobile/core/di/injection.dart';
+import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 
 import '../theme/app_colors.dart';
 
@@ -23,66 +24,44 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _email = TextEditingController();
+  final _user = TextEditingController();
   final _password = TextEditingController();
-  bool _loading = false;
-  final UserRepository _userRepository = UserRepository();
+  late final AuthController _auth = getIt<AuthController>();
 
   @override
   void dispose() {
-    _email.dispose();
+    _user.dispose();
     _password.dispose();
+    _auth.dispose();
     super.dispose();
   }
 
-  
-Future<void> _submit() async {
-  if (_loading) return;
+  Future<void> _submit() async {
+    if (_auth.status == AuthStatus.loading) return;
+    FocusScope.of(context).unfocus();
 
-  FocusScope.of(context).unfocus();
+    final user = _user.text.trim();
+    final password = _password.text;
 
-  final userName = _email.text.trim();
-  final password = _password.text;
-
-  if (userName.isEmpty || password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Ingresa tu usuario y contrase├▒a.'),
-      ),
-    );
-    return;
-  }
-
-  setState(() => _loading = true);
-
-  try {
-    final user = await _userRepository.login(
-      userName: userName,
-      password: password,
-    );
-
+    if (user.isEmpty || password.isEmpty) {
+      _showError('Ingresa tu nombre de usuario y contraseña.');
+      return;
+    }
+  final ok = await _auth.login(user, password);
     if (!mounted) return;
 
-    Navigator.of(context).pushReplacementNamed(
-      AppRoutes.home,
-    );
-  } catch (e) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString().replaceFirst('Exception: ', ''),
-        ),
-      ),
-    );
-  } finally {
-    if (mounted) {
-      setState(() => _loading = false);
+    if (ok) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    } else {
+      _showError(_auth.errorMessage ?? 'Ocurrió un error inesperado.');
     }
   }
-}
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,10 +85,10 @@ Future<void> _submit() async {
                       Expanded(
                         child: _FormSheet(
                           bottomInset: bottomInset,
-                          email: _email,
+                          user: _user,
                           password: _password,
                           onSubmit: _submit,
-                          loading: _loading,
+                          loading: _auth.status == AuthStatus.loading,
                         ),
                       ),
                     ],
@@ -158,7 +137,7 @@ class _Brand extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Sistema de Gesti├│n Farmac├⌐utica',
+            'Sistema de Gestión Farmacéutica',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _Palette.onInkMuted,
@@ -175,14 +154,14 @@ class _Brand extends StatelessWidget {
 class _FormSheet extends StatelessWidget {
   const _FormSheet({
     required this.bottomInset,
-    required this.email,
+    required this.user,
     required this.password,
     required this.onSubmit,
     required this.loading,
   });
 
   final double bottomInset;
-  final TextEditingController email;
+  final TextEditingController user;
   final TextEditingController password;
   final VoidCallback onSubmit;
   final bool loading;
@@ -210,20 +189,20 @@ class _FormSheet extends StatelessWidget {
           ),
           const SizedBox(height: 22),
 
-          const _FieldLabel('Correo electr├│nico'),
+          const _FieldLabel('Nombre de usuario'),
           const SizedBox(height: 8),
           TextField(
-            controller: email,
-            keyboardType: TextInputType.emailAddress,
+            controller: user,
+            keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.username],
             cursorColor: _Palette.ink,
             style: _inputTextStyle,
-            decoration: _inputDecoration('usuario@farmadi.com'),
+            decoration: _inputDecoration('nombre_de_usuario'),
           ),
           const SizedBox(height: 18),
 
-          const _FieldLabel('Contrase├▒a'),
+          const _FieldLabel('Contraseña'),
           const SizedBox(height: 8),
           TextField(
             controller: password,
@@ -233,7 +212,7 @@ class _FormSheet extends StatelessWidget {
             onSubmitted: (_) => onSubmit(),
             cursorColor: _Palette.ink,
             style: _inputTextStyle,
-            decoration: _inputDecoration('ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó'),
+            decoration: _inputDecoration('••••••••'),
           ),
 
           const SizedBox(height: 10),
@@ -268,7 +247,7 @@ class _FormSheet extends StatelessWidget {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Iniciar sesi├│n', key: ValueKey('label')),
+                    : const Text('Iniciar sesión', key: ValueKey('label')),
               ),
             ),
           ),
@@ -276,7 +255,7 @@ class _FormSheet extends StatelessWidget {
 
           const Center(
             child: Text(
-              '┬┐Problemas para acceder? Contacta al administrador.',
+              '¿Problemas para acceder? Contacta al administrador.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _Palette.muted,
