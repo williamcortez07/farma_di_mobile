@@ -11,13 +11,13 @@ class ApiConstants {
   static const String login = '/Auth/login';
 
   // Logs endpoints
-  static const String logs = '/Logs';
-  static const String logsInformation = '/Logs/information';
-  static const String logsWarning = '/Logs/warning';
-  static const String logsError = '/Logs/error';
-  static const String logsToday = '/Logs/today';
-  static const String logsDateRange = '/Logs/date-range';
-  static String logsByLevel(String level) => '/Logs/level/$level';
+  static const String logs = '/api/Logs';
+  static const String logsInformation = '/api/Logs/information';
+  static const String logsWarning = '/api/Logs/warning';
+  static const String logsError = '/api/Logs/error';
+  static const String logsToday = '/api/Logs/today';
+  static const String logsDateRange = '/api/Logs/date-range';
+  static String logsByLevel(String level) => '/api/Logs/level/$level';
 
   // User endpoints
   static const String user = '/User';

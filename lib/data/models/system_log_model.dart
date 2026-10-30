@@ -162,12 +162,20 @@ class SystemLogModel {
     'exception': exception?.toJson(),
   };
 
-  /// Severidad normalizada: 'Information', 'Warning', 'Error'
+  /// Severidad normalizada completa: 'Information', 'Warning', 'Error'
   String get normalizedLevel {
     final lvl = (level ?? '').trim().toUpperCase();
     if (lvl.contains('ERROR')) return 'Error';
     if (lvl.contains('WARN')) return 'Warning';
     return 'Information';
+  }
+
+  /// Severidad normalizada abreviada: 'INFO', 'WARN', 'ERROR'
+  String get normalizedShortLevel {
+    final lvl = (level ?? '').trim().toUpperCase();
+    if (lvl.contains('ERROR')) return 'ERROR';
+    if (lvl.contains('WARN')) return 'WARN';
+    return 'INFO';
   }
 
   /// Mensaje legible o resumen para presentar en listas o tarjetas

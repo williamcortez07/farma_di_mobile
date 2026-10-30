@@ -71,7 +71,7 @@ void main() {
 
     test('computes counts correctly', () {
       final service = LogService(
-        _MockLogRepository((_, __) async => const PagedLogResponse(data: [])),
+        _MockLogRepository((endpoint, params) async => const PagedLogResponse(data: [])),
       );
 
       final counts = service.computeCounts([sampleInfoLog, sampleErrorLog]);

@@ -66,22 +66,37 @@ class LogRepository {
   Future<PagedLogResponse> getInformationLogs({
     int page = 1,
     int limit = 10,
-  }) =>
-      getLogsByLevel('Information', page: page, limit: limit);
+  }) async {
+    final response = await _api.get(
+      ApiConstants.logsInformation,
+      query: {'page': page.toString(), 'limit': limit.toString()},
+    );
+    return _parsePagedResponse(response);
+  }
 
   /// Obtiene exclusivamente los logs de advertencia.
   Future<PagedLogResponse> getWarningLogs({
     int page = 1,
     int limit = 10,
-  }) =>
-      getLogsByLevel('Warning', page: page, limit: limit);
+  }) async {
+    final response = await _api.get(
+      ApiConstants.logsWarning,
+      query: {'page': page.toString(), 'limit': limit.toString()},
+    );
+    return _parsePagedResponse(response);
+  }
 
   /// Obtiene exclusivamente los logs de error.
   Future<PagedLogResponse> getErrorLogs({
     int page = 1,
     int limit = 10,
-  }) =>
-      getLogsByLevel('Error', page: page, limit: limit);
+  }) async {
+    final response = await _api.get(
+      ApiConstants.logsError,
+      query: {'page': page.toString(), 'limit': limit.toString()},
+    );
+    return _parsePagedResponse(response);
+  }
 
   /// Obtiene los logs registrados en el día en curso.
   Future<PagedLogResponse> getTodayLogs({
