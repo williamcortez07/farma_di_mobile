@@ -6,7 +6,9 @@ import 'package:farma_di_mobile/data/repositories/user_repository.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
 import 'package:farma_di_mobile/presentation/controllers/profile_controller.dart';
+import 'package:farma_di_mobile/presentation/providers/log_provider.dart';
 import 'package:farma_di_mobile/presentation/providers/user_provider.dart';
+import 'package:farma_di_mobile/services/log_service.dart';
 import 'package:farma_di_mobile/services/token_storage.dart';
 import 'package:farma_di_mobile/services/user_service.dart';
 
@@ -18,9 +20,17 @@ void setupDependencies() {
     () => ApiClient(tokenProvider: getIt<TokenStorage>().read),
   );
 
+  // Repositorios de datos
+  getIt.registerLazySingleton<LogRepository>(
+    () => LogRepository(getIt<ApiClient>()),
+  );
+
   // Servicios
   getIt.registerLazySingleton<UserService>(
     () => UserService(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<LogService>(
+    () => LogService(getIt<LogRepository>()),
   );
 
   // Autenticación
@@ -33,7 +43,7 @@ void setupDependencies() {
     () => UserRepository(getIt<UserService>()),
   );
 
-  // Provider de estado del usuario compartido
+  // Providers de estado compartido
   getIt.registerLazySingleton<UserProvider>(
     () => UserProvider(
       userRepository: getIt<UserRepository>(),
@@ -41,7 +51,11 @@ void setupDependencies() {
       tokenStorage: getIt<TokenStorage>(),
     ),
   );
+  getIt.registerLazySingleton<LogProvider>(
+    () => LogProvider(logService: getIt<LogService>()),
+  );
 
+  // Controladores
   getIt.registerFactory<AuthController>(
     () => AuthController(
       getIt<AuthRepository>(),
@@ -57,10 +71,7 @@ void setupDependencies() {
   );
 
   // Logs
-  getIt.registerLazySingleton<LogRepository>(
-    () => LogRepository(getIt<ApiClient>()),
-  );
   getIt.registerFactory<LogController>(
-    () => LogController(getIt<LogRepository>()),
+    () => LogController(getIt<LogProvider>()),
   );
 }
