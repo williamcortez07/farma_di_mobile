@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 import 'package:farma_di_mobile/core/di/injection.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
+import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 
 import '../theme/app_colors.dart';
 
@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       _showError('Ingresa tu nombre de usuario y contraseña.');
       return;
     }
-  final ok = await _auth.login(user, password);
+    final ok = await _auth.login(user, password);
     if (!mounted) return;
 
     if (ok) {

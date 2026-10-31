@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-import '../widgets/logout_button.dart';
 import '../widgets/notification_widget.dart';
-import '../widgets/routes.dart';
 
 enum _UserFormStatus { saved, cancelled }
 
@@ -24,7 +22,7 @@ class _UserFormResult {
     required String phone,
     required bool isActive,
   }) : this(
-         status: _UserFormStatus.saved,
+         status: _UserFormStatus.cancelled,
          name: name,
          email: email,
          role: role,
@@ -161,6 +159,16 @@ class _RolesScreenState extends State<RolesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+
+      /* appBar: AppNavbar(
+        profileImageUrl: null,
+        onProfileTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.profile);
+        },
+      ),
+
+      */
+      // comentariado porque  esto lo maneja home_screen con el IdexedStack, line 58
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -190,14 +198,9 @@ class _RolesScreenState extends State<RolesScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'LUNES, 28 DE SEPTIEMBRE',
-                style: TextStyle(fontSize: 11, color: AppColors.mutedText),
-              ),
-              SizedBox(height: 4),
-              Text(
                 'Roles y permisos',
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 28,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primaryDark,
                 ),
@@ -210,10 +213,6 @@ class _RolesScreenState extends State<RolesScreen> {
           ),
         ),
         const SizedBox(width: 8),
-        LogoutButton(
-          onPressed: () =>
-              Navigator.of(context).pushReplacementNamed(AppRoutes.login),
-        ),
       ],
     );
   }

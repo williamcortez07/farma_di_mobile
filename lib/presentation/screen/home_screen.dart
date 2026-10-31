@@ -1,15 +1,19 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/di/injection.dart';
+import '../../data/models/auth_model/user_model.dart';
+import '../providers/user_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/botton_Navigation.dart';
-import '../widgets/logout_button.dart';
 import '../widgets/routes.dart';
-import 'catalog.dart';
-import 'logs.dart';
-import 'metrics.dart';
-import 'roles.dart';
-import 'settings.dart';
+import '../widgets/app_navbar.dart';
+
+import 'catalog_screen.dart';
+import 'logs_screen.dart';
+import 'metrics_screen.dart';
+import 'roles_screen.dart';
+import 'settings_screen.dart';
 
 //-----------------------------------------------------------------------------
 // Colores propios de esta pantalla
@@ -23,7 +27,8 @@ const Color _warningColor = Color(0xFFE67E22);
 const Color _criticalColor = Color(0xFFE74C3C);
 const Color _chartAccentColor = Color(0xFF3498DB);
 const Color _chartLabelColor = Color(0xFF8A959D);
-const Color _newUserColor = Color(0xFF6845A5);
+
+//====> estos colores deberian de ir en app_colors.dart
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,35 +39,53 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  late final UserProvider _userProvider;
 
-  final _screens = const <Widget>[
-    _HomeOverview(),
-    CatalogScreen(),
-    MetricsScreen(),
-    LogsScreen(),
-    RolesScreen(),
-    SettingsScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _userProvider = getIt<UserProvider>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _userProvider.loadProfile();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: buildBottomNavigationBar(
-        context,
-        _currentIndex,
-        (index) => setState(() => _currentIndex = index),
-      ),
+    return ListenableBuilder(
+      listenable: _userProvider,
+      builder: (context, _) {
+        final user = _userProvider.user;
+
+        final screens = <Widget>[
+          _HomeOverview(user: user),
+          const CatalogScreen(),
+          const MetricsScreen(),
+          const LogsScreen(),
+          const RolesScreen(),
+          const SettingsScreen(),
+        ];
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppNavbar(
+            profileImageUrl: null,
+            userInitials: user?.initials,
+            userName: user?.userName,
+            onProfileTap: () {
+              Navigator.of(context).pushNamed(AppRoutes.profile);
+            },
+          ),
+          body: IndexedStack(index: _currentIndex, children: screens),
+          bottomNavigationBar: buildBottomNavigationBar(
+            context,
+            _currentIndex,
+            (index) => setState(() => _currentIndex = index),
+          ),
+        );
+      },
     );
   }
-}
-
-void _handleLogout(BuildContext context) {
-  Navigator.of(context).pushReplacementNamed(AppRoutes.login);
 }
 
 // ============================================================
@@ -70,7 +93,9 @@ void _handleLogout(BuildContext context) {
 // ============================================================
 
 class _HomeOverview extends StatelessWidget {
-  const _HomeOverview();
+  const _HomeOverview({this.user});
+
+  final UserModel? user;
 
   @override
   Widget build(BuildContext context) {
@@ -88,32 +113,32 @@ class _HomeOverview extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'LUNES, 28 DE SEPTIEMBRE',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: _titleColor,
-                          letterSpacing: 0.4,
-                        ),
-                      ),
-                      SizedBox(height: 3),
-                      Text(
+                      const Text(
                         'Panel general',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: FontWeight.w800,
-                          color: _titleColor,
+                          color: AppColors.primaryDark,
                         ),
                       ),
+                      if (user != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Bienvenido, ${user!.fullName} • ${user!.primaryRole}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: _mutedTextColor,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-                LogoutButton(onPressed: () => _handleLogout(context)),
               ],
             ),
 
@@ -278,7 +303,10 @@ class _DashboardCard extends StatelessWidget {
               Icon(icon, size: 17, color: iconColor),
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: badgeColor.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(10),
@@ -380,9 +408,15 @@ class _SalesChartCard extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 gridData: const FlGridData(show: false),
                 titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -401,8 +435,12 @@ class _SalesChartCard extends StatelessWidget {
                             days[index],
                             style: TextStyle(
                               fontSize: 8,
-                              color: isSelected ? _chartAccentColor : _chartLabelColor,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                              color: isSelected
+                                  ? _chartAccentColor
+                                  : _chartLabelColor,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
                             ),
                           ),
                         );
@@ -429,12 +467,13 @@ class _SalesChartCard extends StatelessWidget {
                     dotData: FlDotData(
                       show: true,
                       checkToShowDot: (spot, barData) => spot.x == 5,
-                      getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
-                        radius: 3,
-                        color: _chartAccentColor,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      ),
+                      getDotPainter: (spot, percent, bar, index) =>
+                          FlDotCirclePainter(
+                            radius: 3,
+                            color: _chartAccentColor,
+                            strokeWidth: 2,
+                            strokeColor: Colors.white,
+                          ),
                     ),
                     belowBarData: BarAreaData(
                       show: true,
@@ -500,14 +539,20 @@ class _ActivityCard extends StatelessWidget {
                   ),
                   TextSpan(
                     text: description,
-                    style: const TextStyle(fontSize: 9, color: Color(0xFF687780)),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: Color(0xFF687780),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 6),
-          Text(time, style: const TextStyle(fontSize: 8, color: _chartLabelColor)),
+          Text(
+            time,
+            style: const TextStyle(fontSize: 8, color: _chartLabelColor),
+          ),
         ],
       ),
     );

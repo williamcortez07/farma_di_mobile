@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../core/di/injection.dart';
+import '../providers/user_provider.dart';
 import '../theme/app_colors.dart';
-
+import '../widgets/routes.dart';
 
 const Color _dividerColor = Color(0xFFEDEFF3);
 
@@ -13,102 +15,214 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late final UserProvider _userProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProvider = getIt<UserProvider>();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        children: [
-          const Text('Preferencias', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          const Text('Personaliza tu experiencia en Farma-Di', style: TextStyle(fontSize: 13, color: Colors.grey)),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: AppColors.profileCard, borderRadius: BorderRadius.circular(18)),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
-                  child: const Text('AG', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+    return ListenableBuilder(
+      listenable: _userProvider,
+      builder: (context, _) {
+        final user = _userProvider.user;
+
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            children: [
+              const Text(
+                'Preferencias',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryDark,
                 ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('William Cortez', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.5)),
-                      SizedBox(height: 2),
-                      Text('wil.cortez@farmadi.com', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      SizedBox(height: 2),
-                      Text('Administrador · Activo',
-                          style: TextStyle(color: AppColors.success, fontSize: 11.5, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Personaliza tu experiencia en Farma-Di',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.profileCard,
+                  borderRadius: BorderRadius.circular(18),
                 ),
-                TextButton(
-                  onPressed: () => _openEditProfileModal(context),
-                  style: TextButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: const Text('Editar', style: TextStyle(fontSize: 12.5)),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.white.withValues(alpha: 0.15),
+                      child: Text(
+                        user?.initials ?? 'U',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.fullName ?? 'Usuario Farma-Di',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            user?.mail ?? 'correo@farmadi.com',
+                            style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${user?.primaryRole ?? "Usuario"} · ${user?.isActive == true ? "Activo" : "Inactivo"}',
+                            style: TextStyle(
+                              color: user?.isActive == true ? AppColors.success : AppColors.red,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.profile),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Editar', style: TextStyle(fontSize: 12.5)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
           const SizedBox(height: 20),
           const _SectionHeader('NOTIFICACIONES'),
-          _SettingsCard(children: [
-            _SwitchRow('Notificaciones push', 'Alertas en tiempo real en la app', true),
-            _SwitchRow('Alertas de stock bajo', 'Avisar cuando el stock caiga por debajo del mínimo', true),
-            _SwitchRow('Reportes por correo', 'Resumen diario enviado a tu email', false),
-          ]),
+          _SettingsCard(
+            children: [
+              _SwitchRow(
+                'Notificaciones push',
+                'Alertas en tiempo real en la app',
+                true,
+              ),
+              _SwitchRow(
+                'Alertas de stock bajo',
+                'Avisar cuando el stock caiga por debajo del mínimo',
+                true,
+              ),
+              _SwitchRow(
+                'Reportes por correo',
+                'Resumen diario enviado a tu email',
+                false,
+              ),
+            ],
+          ),
           const SizedBox(height: 18),
           const _SectionHeader('APARIENCIA'),
-          _SettingsCard(children: [
-            _SwitchRow('Modo oscuro', 'Cambiar al tema oscuro del sistema', false),
-            _SwitchRow('Vista compacta', 'Reducir espaciado en listas y tablas', false),
-          ]),
+          _SettingsCard(
+            children: [
+              _SwitchRow(
+                'Modo oscuro',
+                'Cambiar al tema oscuro del sistema',
+                false,
+              ),
+              _SwitchRow(
+                'Vista compacta',
+                'Reducir espaciado en listas y tablas',
+                false,
+              ),
+            ],
+          ),
           const SizedBox(height: 18),
           const _SectionHeader('SISTEMA'),
-          _SettingsCard(children: [
-            _SwitchRow('Backup automático', 'Respaldo diario a las 01:00 a.m.', true),
-            _SwitchRow('Telemetría de uso', 'Enviar datos de uso para mejorar el sistema', true),
-          ]),
+          _SettingsCard(
+            children: [
+              _SwitchRow(
+                'Backup automático',
+                'Respaldo diario a las 01:00 a.m.',
+                true,
+              ),
+              _SwitchRow(
+                'Telemetría de uso',
+                'Enviar datos de uso para mejorar el sistema',
+                true,
+              ),
+            ],
+          ),
           const SizedBox(height: 18),
           const _SectionHeader('SEGURIDAD'),
-          _SettingsCard(children: [
-            _SwitchRow('Autenticación en 2 pasos', 'Requiere código por SMS al iniciar sesión', false),
-            _SwitchRow('Cierre de sesión automático', 'Tras 30 min de inactividad', true),
-          ]),
+          _SettingsCard(
+            children: [
+              _SwitchRow(
+                'Autenticación en 2 pasos',
+                'Requiere código por SMS al iniciar sesión',
+                false,
+              ),
+              _SwitchRow(
+                'Cierre de sesión automático',
+                'Tras 30 min de inactividad',
+                true,
+              ),
+            ],
+          ),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-              Text('Farma-Di v2.4.1', style: TextStyle(fontSize: 11, color: Colors.grey)),
-              Text('build 20250823', style: TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(
+                'Farma-Di v2.4.1',
+                style: TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+              Text(
+                'build 20250823',
+                style: TextStyle(fontSize: 11, color: Colors.grey),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                await _userProvider.logout();
+                if (context.mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                }
+              },
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.redSoft,
                 foregroundColor: AppColors.red,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-              child: const Text('Cerrar sesión', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              child: const Text(
+                'Cerrar sesión',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],
       ),
+    );
+      },
     );
   }
 
@@ -130,8 +244,15 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 4),
-      child: Text(title,
-          style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.grey, letterSpacing: 0.5)),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
+          color: Colors.grey,
+          letterSpacing: 0.5,
+        ),
+      ),
     );
   }
 }
@@ -152,7 +273,10 @@ class _SettingsCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: Column(children: withDividers),
     );
   }
@@ -181,9 +305,18 @@ class _SwitchRowState extends State<_SwitchRow> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.title, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(widget.subtitle, style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
+                Text(
+                  widget.subtitle,
+                  style: const TextStyle(fontSize: 12.5, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -264,10 +397,19 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.circle, size: 8, color: AppColors.primary),
+                              Icon(
+                                Icons.circle,
+                                size: 8,
+                                color: AppColors.primary,
+                              ),
                               SizedBox(width: 8),
-                              Text('Detalle log',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                              Text(
+                                'Detalle log',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ],
                           ),
                           IconButton(
@@ -290,22 +432,41 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                           const CircleAvatar(
                             radius: 26,
                             backgroundColor: AppColors.profileCard,
-                            child: Text('WC',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            child: Text(
+                              'WC',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
-                              Text('William Cortez',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              Text(
+                                'William Cortez',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               SizedBox(height: 3),
                               Row(
                                 children: [
-                                  Icon(Icons.calendar_today, size: 11, color: _modalMuted),
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 11,
+                                    color: _modalMuted,
+                                  ),
                                   SizedBox(width: 4),
-                                  Text('Miembro desde: Ene 2023',
-                                      style: TextStyle(fontSize: 11.5, color: _modalMuted)),
+                                  Text(
+                                    'Miembro desde: Ene 2023',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: _modalMuted,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -315,24 +476,36 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                       const SizedBox(height: 22),
                       Row(
                         children: [
-                          Expanded(child: _FieldLabel('Nombre', required: true)),
+                          Expanded(
+                            child: _FieldLabel('Nombre', required: true),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(child: _FieldLabel('Apellido', required: true)),
+                          Expanded(
+                            child: _FieldLabel('Apellido', required: true),
+                          ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(child: _TextField(controller: _nombreCtrl)),
                           const SizedBox(width: 12),
-                          Expanded(child: _TextField(controller: _apellidoCtrl)),
+                          Expanded(
+                            child: _TextField(controller: _apellidoCtrl),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
                       const _FieldLabel('Correo institucional', required: true),
-                      _TextField(controller: _correoCtrl, icon: Icons.mail_outline),
+                      _TextField(
+                        controller: _correoCtrl,
+                        icon: Icons.mail_outline,
+                      ),
                       const SizedBox(height: 16),
                       const _FieldLabel('Teléfono corporativo'),
-                      _TextField(controller: _telefonoCtrl, icon: Icons.phone_outlined),
+                      _TextField(
+                        controller: _telefonoCtrl,
+                        icon: Icons.phone_outlined,
+                      ),
                       const SizedBox(height: 16),
                       const _FieldLabel('Rol en farmacia', required: true),
                       _RoleDropdown(
@@ -354,7 +527,10 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                           Expanded(
                             child: Text(
                               'Última sesión: Hoy a las 08:05 AM (Mostrador Principal)',
-                              style: TextStyle(fontSize: 11.5, color: _modalMuted),
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: _modalMuted,
+                              ),
                             ),
                           ),
                         ],
@@ -368,8 +544,12 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: _modalMuted,
                                 side: const BorderSide(color: _modalBorder),
-                                padding: const EdgeInsets.symmetric(vertical: 13),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
                               child: const Text('Cancelar'),
                             ),
@@ -383,8 +563,12 @@ class _EditProfileModalState extends State<_EditProfileModal> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.profileCard,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 13),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
                             ),
                           ),
@@ -415,7 +599,14 @@ class _Pill extends StatelessWidget {
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: color)),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
     );
   }
 }
@@ -431,10 +622,18 @@ class _FieldLabel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.black87),
+          style: const TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
           children: [
             TextSpan(text: text),
-            if (required) const TextSpan(text: ' *', style: TextStyle(color: AppColors.red)),
+            if (required)
+              const TextSpan(
+                text: ' *',
+                style: TextStyle(color: AppColors.red),
+              ),
           ],
         ),
       ),
@@ -455,8 +654,13 @@ class _TextField extends StatelessWidget {
         controller: controller,
         style: const TextStyle(fontSize: 13.5),
         decoration: InputDecoration(
-          prefixIcon: icon != null ? Icon(icon, size: 18, color: _modalMuted) : null,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          prefixIcon: icon != null
+              ? Icon(icon, size: 18, color: _modalMuted)
+              : null,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 12,
+          ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(color: _modalBorder),
@@ -492,16 +696,28 @@ class _RoleDropdown extends StatelessWidget {
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, color: _modalMuted),
           items: _roles
-              .map((r) => DropdownMenuItem(
-                    value: r,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.badge_outlined, size: 16, color: _modalMuted),
-                        const SizedBox(width: 8),
-                        Text(r, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                  ))
+              .map(
+                (r) => DropdownMenuItem(
+                  value: r,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.badge_outlined,
+                        size: 16,
+                        color: _modalMuted,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        r,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
               .toList(),
           onChanged: (v) {
             if (v != null) onChanged(v);
@@ -533,10 +749,14 @@ class _AccountStatusRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Estado de cuenta',
-                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
+                const Text(
+                  'Estado de cuenta',
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
+                ),
                 Text(
-                  active ? 'Activo - Acceso permitido' : 'Inactivo - Acceso bloqueado',
+                  active
+                      ? 'Activo - Acceso permitido'
+                      : 'Inactivo - Acceso bloqueado',
                   style: const TextStyle(fontSize: 11.5, color: _modalMuted),
                 ),
               ],
@@ -569,8 +789,14 @@ class _PermissionsInfo extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Permisos asignados',
-                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Text(
+                  'Permisos asignados',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
                 SizedBox(height: 3),
                 Text(
                   'Acceso total: Ventas, Compras, Catálogo, Métricas, Logs y Configuración.',

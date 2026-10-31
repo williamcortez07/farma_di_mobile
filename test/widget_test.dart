@@ -8,7 +8,7 @@ import 'package:farma_di_mobile/core/network/api_client.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
 import 'package:farma_di_mobile/data/repositories/log_repository.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
-import 'package:farma_di_mobile/presentation/screen/logs.dart';
+import 'package:farma_di_mobile/presentation/screen/logs_screen.dart';
 
 class _MockLogRepository extends LogRepository {
   _MockLogRepository(this._logs)
