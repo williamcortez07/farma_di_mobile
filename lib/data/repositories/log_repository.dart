@@ -1,5 +1,4 @@
 import 'package:farma_di_mobile/core/constants/api_constants.dart';
-import 'package:farma_di_mobile/core/errors/app_exception.dart';
 import 'package:farma_di_mobile/core/network/api_client.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
 
@@ -11,7 +10,7 @@ class LogRepository {
   /// Obtiene los logs registrados con paginación y filtros opcionales.
   Future<PagedLogResponse> getLogs({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
     String? level,
     DateTime? startDate,
     DateTime? endDate,
@@ -37,24 +36,36 @@ class LogRepository {
     return _parsePagedResponse(response);
   }
 
-  /// Obtiene logs filtrados por severidad (Information, Warning, Error).
+  /// Obtiene logs filtrados por severidad (Information, Warning, Error)
+  /// mediante el endpoint: /api/Logs/level/{level}?page={page}&limit={limit}
   Future<PagedLogResponse> getLogsByLevel(
     String level, {
     int page = 1,
-    int limit = 20,
+    int limit = 10,
   }) async {
     final normalized = _normalizeLevel(level);
-    final response = await _api.get(
-      ApiConstants.logsByLevel(normalized),
-      query: {'page': page.toString(), 'limit': limit.toString()},
-    );
-    return _parsePagedResponse(response);
+    try {
+      final response = await _api.get(
+        ApiConstants.logsByLevel(normalized),
+        query: {
+          'page': page.toString(),
+          'limit': limit.toString(),
+        },
+      );
+      final paged = _parsePagedResponse(response);
+      if (paged.data.isNotEmpty) {
+        return paged;
+      }
+    } catch (_) {}
+
+    // Fallback al endpoint general filtrando por nivel
+    return getLogs(page: page, limit: limit, level: normalized);
   }
 
   /// Obtiene exclusivamente los logs de información.
   Future<PagedLogResponse> getInformationLogs({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
   }) async {
     final response = await _api.get(
       ApiConstants.logsInformation,
@@ -66,7 +77,7 @@ class LogRepository {
   /// Obtiene exclusivamente los logs de advertencia.
   Future<PagedLogResponse> getWarningLogs({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
   }) async {
     final response = await _api.get(
       ApiConstants.logsWarning,
@@ -78,7 +89,7 @@ class LogRepository {
   /// Obtiene exclusivamente los logs de error.
   Future<PagedLogResponse> getErrorLogs({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
   }) async {
     final response = await _api.get(
       ApiConstants.logsError,
@@ -87,16 +98,35 @@ class LogRepository {
     return _parsePagedResponse(response);
   }
 
-  /// Obtiene los logs registrados en el día en curso (UTC).
+  /// Obtiene los logs registrados en el día en curso.
   Future<PagedLogResponse> getTodayLogs({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
   }) async {
-    final response = await _api.get(
-      ApiConstants.logsToday,
-      query: {'page': page.toString(), 'limit': limit.toString()},
+    try {
+      final response = await _api.get(
+        ApiConstants.logsToday,
+        query: {
+          'page': page.toString(),
+          'limit': limit.toString(),
+        },
+      );
+      final paged = _parsePagedResponse(response);
+      if (paged.data.isNotEmpty) {
+        return paged;
+      }
+    } catch (_) {}
+
+    // Fallback al endpoint general con el rango del día actual
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+    return getLogs(
+      page: page,
+      limit: limit,
+      startDate: startOfDay,
+      endDate: endOfDay,
     );
-    return _parsePagedResponse(response);
   }
 
   /// Obtiene los logs registrados dentro de un rango de fechas.
@@ -104,7 +134,7 @@ class LogRepository {
     DateTime startDate,
     DateTime endDate, {
     int page = 1,
-    int limit = 20,
+    int limit = 10,
   }) async {
     final response = await _api.get(
       ApiConstants.logsDateRange,
@@ -119,10 +149,10 @@ class LogRepository {
   }
 
   PagedLogResponse _parsePagedResponse(dynamic response) {
-    if (response is! Map<String, dynamic>) {
-      throw const ParsingException();
+    if (response == null) {
+      return const PagedLogResponse(data: []);
     }
-    return PagedLogResponse.fromJson(response);
+    return PagedLogResponse.fromDynamic(response);
   }
 
   String _normalizeLevel(String level) {

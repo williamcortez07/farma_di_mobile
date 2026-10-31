@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 
 class ApiClient {
   ApiClient({this.tokenProvider, http.Client? client})
-    : _client = client ?? http.Client();
+      : _client = client ?? http.Client();
 
   final Future<String?> Function()? tokenProvider;
   final http.Client _client;
@@ -28,8 +28,20 @@ class ApiClient {
     Map<String, String>? query,
     Object? body,
   ) async {
-    final baseUrl = ApiConstants.instance.baseUrl;
-    final uri = Uri.parse('$baseUrl$path').replace(queryParameters: query);
+    final rawBaseUrl = ApiConstants.instance.baseUrl.trim();
+    final baseUrl = rawBaseUrl.endsWith('/')
+        ? rawBaseUrl.substring(0, rawBaseUrl.length - 1)
+        : rawBaseUrl;
+
+    var cleanPath = path.trim();
+    if (baseUrl.endsWith('/api') && cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(4);
+    }
+    if (!cleanPath.startsWith('/')) {
+      cleanPath = '/$cleanPath';
+    }
+
+    final uri = Uri.parse('$baseUrl$cleanPath').replace(queryParameters: query);
     final headers = {'Content-Type': 'application/json'};
     final token = await tokenProvider?.call();
     if (token != null) headers['Authorization'] = 'Bearer $token';
@@ -91,8 +103,9 @@ class ApiClient {
   String _extractMessage(http.Response response) {
     try {
       final data = jsonDecode(response.body);
-      if (data is Map && data['message'] is String)
+      if (data is Map && data['message'] is String) {
         return data['message'] as String;
+      }
     } catch (_) {}
     return 'Respuesta fallida del servidor con código de estado ${response.statusCode}.';
   }

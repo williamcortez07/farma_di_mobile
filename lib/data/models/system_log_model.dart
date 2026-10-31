@@ -7,8 +7,26 @@ class PagedLogResponse {
     this.meta,
   });
 
+  factory PagedLogResponse.fromDynamic(dynamic json) {
+    if (json is List) {
+      final items = <SystemLogModel>[];
+      for (final item in json) {
+        if (item is Map<String, dynamic>) {
+          items.add(SystemLogModel.fromJson(item));
+        }
+      }
+      return PagedLogResponse(data: items);
+    }
+
+    if (json is Map<String, dynamic>) {
+      return PagedLogResponse.fromJson(json);
+    }
+
+    return const PagedLogResponse(data: []);
+  }
+
   factory PagedLogResponse.fromJson(Map<String, dynamic> json) {
-    final list = json['data'];
+    final list = json['data'] ?? json['Data'] ?? json['items'] ?? json['results'];
     final items = <SystemLogModel>[];
     if (list is List) {
       for (final item in list) {
@@ -17,10 +35,11 @@ class PagedLogResponse {
         }
       }
     }
+    final metaData = json['meta'] ?? json['Meta'];
     return PagedLogResponse(
       data: items,
-      meta: json['meta'] is Map<String, dynamic>
-          ? LogMetaModel.fromJson(json['meta'] as Map<String, dynamic>)
+      meta: metaData is Map<String, dynamic>
+          ? LogMetaModel.fromJson(metaData)
           : null,
     );
   }
@@ -46,10 +65,18 @@ class LogMetaModel {
 
   factory LogMetaModel.fromJson(Map<String, dynamic> json) {
     return LogMetaModel(
-      totalItems: (json['totalItems'] as num?)?.toInt(),
-      totalPages: (json['totalPages'] as num?)?.toInt(),
-      currentPage: (json['currentPage'] as num?)?.toInt(),
-      pageSize: (json['pageSize'] as num?)?.toInt(),
+      totalItems: (json['totalItems'] ?? json['TotalItems']) is num
+          ? (json['totalItems'] ?? json['TotalItems'] as num).toInt()
+          : null,
+      totalPages: (json['totalPages'] ?? json['TotalPages']) is num
+          ? (json['totalPages'] ?? json['TotalPages'] as num).toInt()
+          : null,
+      currentPage: (json['currentPage'] ?? json['CurrentPage']) is num
+          ? (json['currentPage'] ?? json['CurrentPage'] as num).toInt()
+          : null,
+      pageSize: (json['pageSize'] ?? json['PageSize']) is num
+          ? (json['pageSize'] ?? json['PageSize'] as num).toInt()
+          : null,
     );
   }
 
@@ -88,28 +115,37 @@ class SystemLogModel {
 
   factory SystemLogModel.fromJson(Map<String, dynamic> json) {
     DateTime? parsedTimestamp;
-    final tsRaw = json['timestamp'];
+    final tsRaw = json['timestamp'] ?? json['Timestamp'];
     if (tsRaw is String && tsRaw.isNotEmpty) {
       parsedTimestamp = DateTime.tryParse(tsRaw);
     }
 
+    final rawRequest = json['request'] ?? json['Request'];
+    final rawResponse = json['response'] ?? json['Response'];
+    final rawException = json['exception'] ?? json['Exception'];
+
+    LogExceptionModel? parsedException;
+    if (rawException is Map<String, dynamic>) {
+      parsedException = LogExceptionModel.fromJson(rawException);
+    } else if (rawException is String && rawException.isNotEmpty) {
+      parsedException = LogExceptionModel(message: rawException);
+    }
+
     return SystemLogModel(
-      id: json['id'] as String?,
-      traceId: json['traceId'] as String?,
+      id: (json['id'] ?? json['Id']) as String?,
+      traceId: (json['traceId'] ?? json['TraceId']) as String?,
       timestamp: parsedTimestamp,
-      level: json['level'] as String?,
-      environment: json['environment'] as String?,
-      clientIp: json['clientIp'] as String?,
-      userId: json['userId'] as String?,
-      request: json['request'] is Map<String, dynamic>
-          ? LogRequestModel.fromJson(json['request'] as Map<String, dynamic>)
+      level: (json['level'] ?? json['Level']) as String?,
+      environment: (json['environment'] ?? json['Environment']) as String?,
+      clientIp: (json['clientIp'] ?? json['ClientIp']) as String?,
+      userId: (json['userId'] ?? json['UserId']) as String?,
+      request: rawRequest is Map<String, dynamic>
+          ? LogRequestModel.fromJson(rawRequest)
           : null,
-      response: json['response'] is Map<String, dynamic>
-          ? LogResponseModel.fromJson(json['response'] as Map<String, dynamic>)
+      response: rawResponse is Map<String, dynamic>
+          ? LogResponseModel.fromJson(rawResponse)
           : null,
-      exception: json['exception'] is Map<String, dynamic>
-          ? LogExceptionModel.fromJson(json['exception'] as Map<String, dynamic>)
-          : null,
+      exception: parsedException,
     );
   }
 
@@ -126,10 +162,26 @@ class SystemLogModel {
     'exception': exception?.toJson(),
   };
 
+  /// Severidad normalizada completa: 'Information', 'Warning', 'Error'
+  String get normalizedLevel {
+    final lvl = (level ?? '').trim().toUpperCase();
+    if (lvl.contains('ERROR')) return 'Error';
+    if (lvl.contains('WARN')) return 'Warning';
+    return 'Information';
+  }
+
+  /// Severidad normalizada abreviada: 'INFO', 'WARN', 'ERROR'
+  String get normalizedShortLevel {
+    final lvl = (level ?? '').trim().toUpperCase();
+    if (lvl.contains('ERROR')) return 'ERROR';
+    if (lvl.contains('WARN')) return 'WARN';
+    return 'INFO';
+  }
+
   /// Mensaje legible o resumen para presentar en listas o tarjetas
   String get displayMessage {
-    if (exception?.message != null && exception!.message!.isNotEmpty) {
-      return exception!.message!;
+    if (exception?.message != null && exception!.message!.trim().isNotEmpty) {
+      return exception!.message!.trim();
     }
     final method = request?.method ?? 'REQ';
     final path = request?.path ?? '';
@@ -142,7 +194,7 @@ class SystemLogModel {
       }
       return '$method $path';
     }
-    return 'Evento registrado ($level)';
+    return 'Evento registrado ($normalizedLevel)';
   }
 }
 
@@ -161,10 +213,10 @@ class LogRequestModel {
 
   factory LogRequestModel.fromJson(Map<String, dynamic> json) {
     return LogRequestModel(
-      method: json['method'] as String?,
-      path: json['path'] as String?,
-      queryString: json['queryString'] as String?,
-      payload: json['payload'] as String?,
+      method: (json['method'] ?? json['Method']) as String?,
+      path: (json['path'] ?? json['Path']) as String?,
+      queryString: (json['queryString'] ?? json['QueryString']) as String?,
+      payload: (json['payload'] ?? json['Payload']) as String?,
     );
   }
 
@@ -186,9 +238,12 @@ class LogResponseModel {
   });
 
   factory LogResponseModel.fromJson(Map<String, dynamic> json) {
+    final rawStatusCode = json['statusCode'] ?? json['StatusCode'];
+    final rawElapsed = json['elapsedMilliseconds'] ?? json['ElapsedMilliseconds'];
+
     return LogResponseModel(
-      statusCode: (json['statusCode'] as num?)?.toInt(),
-      elapsedMilliseconds: (json['elapsedMilliseconds'] as num?)?.toInt(),
+      statusCode: (rawStatusCode as num?)?.toInt(),
+      elapsedMilliseconds: (rawElapsed as num?)?.toInt(),
     );
   }
 
@@ -211,9 +266,9 @@ class LogExceptionModel {
 
   factory LogExceptionModel.fromJson(Map<String, dynamic> json) {
     return LogExceptionModel(
-      message: json['message'] as String?,
-      stackTrace: json['stackTrace'] as String?,
-      source: json['source'] as String?,
+      message: (json['message'] ?? json['Message']) as String?,
+      stackTrace: (json['stackTrace'] ?? json['StackTrace']) as String?,
+      source: (json['source'] ?? json['Source']) as String?,
     );
   }
 

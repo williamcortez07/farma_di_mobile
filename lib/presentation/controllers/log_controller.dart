@@ -1,143 +1,97 @@
-import 'package:flutter/foundation.dart';
-import 'package:farma_di_mobile/core/errors/app_exception.dart';
+import 'package:flutter/material.dart';
+import 'package:farma_di_mobile/core/di/injection.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
 import 'package:farma_di_mobile/data/repositories/log_repository.dart';
+import 'package:farma_di_mobile/presentation/providers/log_provider.dart';
+import 'package:farma_di_mobile/services/log_service.dart';
 
 enum LogStatus { initial, loading, success, error }
 
+/// Controlador de presentación para el módulo de Logs.
+/// Coordina las interacciones de la interfaz de usuario con el provider
+/// sin asumir responsabilidades de acceso a datos ni llamadas HTTP.
 class LogController extends ChangeNotifier {
-  LogController(this._repository);
+  LogController([dynamic source]) : _logProvider = _resolveProvider(source) {
+    _logProvider.addListener(_onProviderUpdated);
+  }
 
-  final LogRepository _repository;
+  static LogProvider _resolveProvider(dynamic source) {
+    if (source is LogProvider) {
+      return source;
+    }
+    if (source is LogRepository) {
+      return LogProvider(logService: LogService(source));
+    }
+    if (source is LogService) {
+      return LogProvider(logService: source);
+    }
+    if (getIt.isRegistered<LogProvider>()) {
+      return getIt<LogProvider>();
+    }
+    if (getIt.isRegistered<LogService>()) {
+      return LogProvider(logService: getIt<LogService>());
+    }
+    if (getIt.isRegistered<LogRepository>()) {
+      return LogProvider(logService: LogService(getIt<LogRepository>()));
+    }
+    throw StateError('No se pudo resolver LogProvider para LogController');
+  }
 
-  LogStatus status = LogStatus.initial;
-  String? errorMessage;
-
-  List<SystemLogModel> _allLogs = [];
-  List<SystemLogModel> _filteredLogs = [];
+  final LogProvider _logProvider;
 
   String _selectedFilter = 'ALL';
   String _searchQuery = '';
+  ScrollController? _scrollController;
 
-  int _errorCount = 0;
-  int _warningCount = 0;
-  int _infoCount = 0;
-
-  List<SystemLogModel> get logs => _filteredLogs;
-  List<SystemLogModel> get allLogs => _allLogs;
-  String get selectedFilter => _selectedFilter;
+  // Getters de estado delegados al provider
+  LogProvider get provider => _logProvider;
+  LogCategory get selectedCategory => _logProvider.selectedCategory;
+  bool get isLoading => _logProvider.isLoading;
+  bool get isLoadingMore => _logProvider.isLoadingMore;
+  String? get errorMessage => _logProvider.errorMessage;
+  bool get hasMore => _logProvider.hasMore;
   String get searchQuery => _searchQuery;
+  String get selectedFilter => _selectedFilter;
 
-  int get errorCount => _errorCount;
-  int get warningCount => _warningCount;
-  int get infoCount => _infoCount;
-
-  int getCountForFilter(String filter) {
-    switch (filter.toUpperCase()) {
-      case 'ERROR':
-        return _errorCount;
-      case 'WARN':
-      case 'WARNING':
-        return _warningCount;
-      case 'INFO':
-      case 'INFORMATION':
-        return _infoCount;
-      default:
-        return _allLogs.length;
+  LogStatus get status {
+    switch (_logProvider.status) {
+      case LogProviderStatus.initial:
+        return LogStatus.initial;
+      case LogProviderStatus.loading:
+        return LogStatus.loading;
+      case LogProviderStatus.success:
+        return LogStatus.success;
+      case LogProviderStatus.error:
+        return LogStatus.error;
     }
   }
 
-  Future<void> fetchLogs({String? level, bool refresh = false}) async {
-    if (!refresh && status == LogStatus.loading) return;
+  /// Retorna los logs listados aplicando filtros locales y de búsqueda
+  List<SystemLogModel> get visibleLogs {
+    var list = _logProvider.logs;
 
-    status = LogStatus.loading;
-    errorMessage = null;
-    notifyListeners();
-
-    try {
-      final response = await _repository.getLogs(
-        page: 1,
-        limit: 100,
-        level: level,
-      );
-
-      _allLogs = response.data;
-      _calculateCounts();
-      _applyFilters();
-
-      status = LogStatus.success;
-      notifyListeners();
-    } on AppException catch (e) {
-      errorMessage = e.message;
-      status = LogStatus.error;
-      notifyListeners();
-    } catch (_) {
-      errorMessage = 'Error inesperado al cargar los logs del sistema.';
-      status = LogStatus.error;
-      notifyListeners();
-    }
-  }
-
-  void setFilter(String filter) {
-    _selectedFilter = filter;
-    _applyFilters();
-    notifyListeners();
-  }
-
-  void setSearchQuery(String query) {
-    _searchQuery = query.trim().toLowerCase();
-    _applyFilters();
-    notifyListeners();
-  }
-
-  void _calculateCounts() {
-    int errors = 0;
-    int warnings = 0;
-    int infos = 0;
-
-    for (final log in _allLogs) {
-      final lvl = (log.level ?? '').toUpperCase();
-      if (lvl.contains('ERROR')) {
-        errors++;
-      } else if (lvl.contains('WARN')) {
-        warnings++;
-      } else if (lvl.contains('INFO')) {
-        infos++;
-      }
+    if (_selectedFilter != 'ALL') {
+      list = list.where((log) {
+        final lvl = log.normalizedLevel.toUpperCase();
+        if (_selectedFilter == 'ERROR') return lvl.contains('ERROR');
+        if (_selectedFilter == 'WARN' || _selectedFilter == 'WARNING') return lvl.contains('WARN');
+        if (_selectedFilter == 'INFO' || _selectedFilter == 'INFORMATION') return lvl.contains('INFO');
+        return true;
+      }).toList();
     }
 
-    _errorCount = errors;
-    _warningCount = warnings;
-    _infoCount = infos;
-  }
-
-  void _applyFilters() {
-    _filteredLogs = _allLogs.where((log) {
-      // 1. Filtro por severidad
-      if (_selectedFilter != 'ALL') {
-        final lvl = (log.level ?? '').toUpperCase();
-        if (_selectedFilter == 'ERROR' && !lvl.contains('ERROR')) {
-          return false;
-        }
-        if (_selectedFilter == 'WARN' && !lvl.contains('WARN')) {
-          return false;
-        }
-        if (_selectedFilter == 'INFO' && !lvl.contains('INFO')) {
-          return false;
-        }
-      }
-
-      // 2. Filtro por texto de búsqueda
-      if (_searchQuery.isNotEmpty) {
-        final idMatch = (log.id ?? '').toLowerCase().contains(_searchQuery);
-        final traceMatch = (log.traceId ?? '').toLowerCase().contains(_searchQuery);
-        final userMatch = (log.userId ?? '').toLowerCase().contains(_searchQuery);
-        final ipMatch = (log.clientIp ?? '').toLowerCase().contains(_searchQuery);
-        final methodMatch = (log.request?.method ?? '').toLowerCase().contains(_searchQuery);
-        final pathMatch = (log.request?.path ?? '').toLowerCase().contains(_searchQuery);
-        final msgMatch = log.displayMessage.toLowerCase().contains(_searchQuery);
-        final excMatch = (log.exception?.message ?? '').toLowerCase().contains(_searchQuery);
-        final codeMatch = (log.response?.statusCode?.toString() ?? '').contains(_searchQuery);
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      list = list.where((log) {
+        final idMatch = (log.id ?? '').toLowerCase().contains(q);
+        final traceMatch = (log.traceId ?? '').toLowerCase().contains(q);
+        final userMatch = (log.userId ?? '').toLowerCase().contains(q);
+        final ipMatch = (log.clientIp ?? '').toLowerCase().contains(q);
+        final methodMatch = (log.request?.method ?? '').toLowerCase().contains(q);
+        final pathMatch = (log.request?.path ?? '').toLowerCase().contains(q);
+        final msgMatch = log.displayMessage.toLowerCase().contains(q);
+        final excMatch = (log.exception?.message ?? '').toLowerCase().contains(q);
+        final codeMatch = (log.response?.statusCode?.toString() ?? '').contains(q);
 
         return idMatch ||
             traceMatch ||
@@ -148,9 +102,114 @@ class LogController extends ChangeNotifier {
             msgMatch ||
             excMatch ||
             codeMatch;
-      }
+      }).toList();
+    }
 
-      return true;
-    }).toList();
+    return list;
+  }
+
+  // Compatibilidad con vistas y tests existentes
+  List<SystemLogModel> get logs => visibleLogs;
+  List<SystemLogModel> get allLogs => _logProvider.logs;
+
+  int get errorCount => _countByLevel('Error');
+  int get warningCount => _countByLevel('Warning');
+  int get infoCount => _countByLevel('Information');
+
+  int _countByLevel(String level) {
+    return _logProvider.logs.where((l) => l.normalizedLevel == level).length;
+  }
+
+  /// Inicializa la carga de logs (por defecto los del día actual)
+  Future<void> init({LogCategory category = LogCategory.today}) {
+    return _logProvider.fetchLogs(category: category);
+  }
+
+  /// Consulta de logs
+  Future<void> fetchLogs({String? level, bool refresh = false}) {
+    if (level != null && level.isNotEmpty && level.toUpperCase() != 'ALL') {
+      _selectedFilter = level.toUpperCase();
+      final category = LogCategory.fromString(level);
+      return _logProvider.fetchLogs(category: category, refresh: refresh);
+    }
+    _selectedFilter = 'ALL';
+    return _logProvider.fetchLogs(category: LogCategory.today, refresh: refresh);
+  }
+
+  /// Refresca la lista actual
+  Future<void> refresh() {
+    return _logProvider.fetchLogs(refresh: true);
+  }
+
+  /// Carga la siguiente página
+  Future<void> loadMore() {
+    return _logProvider.loadMore();
+  }
+
+  /// Selecciona una categoría e invoca la petición correspondiente
+  void selectCategory(LogCategory category) {
+    switch (category) {
+      case LogCategory.today:
+        _selectedFilter = 'ALL';
+        break;
+      case LogCategory.error:
+        _selectedFilter = 'ERROR';
+        break;
+      case LogCategory.warning:
+        _selectedFilter = 'WARN';
+        break;
+      case LogCategory.information:
+        _selectedFilter = 'INFO';
+        break;
+    }
+    _logProvider.setCategory(category);
+    notifyListeners();
+  }
+
+  /// Compatibilidad para setFilter por string
+  void setFilter(String filter) {
+    _selectedFilter = filter.toUpperCase();
+    final cat = LogCategory.fromString(filter);
+    _logProvider.setCategory(cat);
+    notifyListeners();
+  }
+
+  /// Actualiza el término de búsqueda
+  void setSearchQuery(String query) {
+    _searchQuery = query.trim();
+    notifyListeners();
+  }
+
+  /// Limpia el campo de búsqueda
+  void clearSearch() {
+    _searchQuery = '';
+    notifyListeners();
+  }
+
+  /// Adjunta un ScrollController para disparar paginación infinita al llegar al final
+  void attachScrollController(ScrollController controller) {
+    _scrollController?.removeListener(_onScroll);
+    _scrollController = controller;
+    _scrollController?.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController == null || !_scrollController!.hasClients) return;
+    final maxScroll = _scrollController!.position.maxScrollExtent;
+    final currentScroll = _scrollController!.position.pixels;
+    if (maxScroll - currentScroll <= 200) {
+      _logProvider.loadMore();
+    }
+  }
+
+  void _onProviderUpdated() {
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _scrollController?.removeListener(_onScroll);
+    _logProvider.removeListener(_onProviderUpdated);
+    super.dispose();
   }
 }
