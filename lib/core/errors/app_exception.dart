@@ -25,13 +25,19 @@ class ParsingException extends AppException {
 }
 
 class UnauthorizedException extends AppException {
-  const UnauthorizedException([super.message = 'Tu sesion ha expirado. Por favor, inicia sesion de nuevo.']);
+  const UnauthorizedException([
+    super.message = 'Tu sesion ha expirado. Por favor, inicia sesion de nuevo.',
+  ]);
 }
 
 class NotFoundException extends AppException {
-  const NotFoundException([super.message = 'El recurso solicitado no fue encontrado.']);
+  const NotFoundException([
+    super.message = 'El recurso solicitado no fue encontrado.',
+  ]);
 }
 
 class InvalidCredentialsException extends AppException {
-  const InvalidCredentialsException([super.message = 'Correo o contraseña incorrectos.']);
+  const InvalidCredentialsException([
+    super.message = 'Correo o contraseña incorrectos.',
+  ]);
 }

@@ -1,31 +1,16 @@
-import 'package:farma_di_mobile/core/constants/api_constants.dart';
-import 'package:farma_di_mobile/core/errors/app_exception.dart';
-import 'package:farma_di_mobile/core/network/api_client.dart';
-import 'package:farma_di_mobile/data/models/auth_model/login_request.dart';
-import 'package:farma_di_mobile/data/models/auth_model/login_response.dart';
-import 'package:farma_di_mobile/services/token_storage.dart';
+import 'package:farma_di_mobile/data/models/auth_model/update_user_dto.dart';
+import 'package:farma_di_mobile/data/models/auth_model/user_model.dart';
+import 'package:farma_di_mobile/services/user_service.dart';
 
-class AuthRepository {
-  AuthRepository(this._api, this._tokenStorage);
+class UserRepository {
+  UserRepository(this._userService);
 
-  final ApiClient _api;
-  final TokenStorage _tokenStorage;
+  final UserService _userService;
 
-  Future<LoginResponse> login(String userName, String password) async {
-    try {
-      final json = await _api.post(
-        ApiConstants.login,
-        body: LoginRequest(userName: userName, password: password).toJson(),
-      );
-      final response = LoginResponse.fromJson(json as Map<String, dynamic>);
-      await _tokenStorage.save(response.token);
-      return response;
-    } on UnauthorizedException {
-      throw const InvalidCredentialsException();
-    } on TypeError {
-      throw const ParsingException();
-    }
-  }
+  /// Obtiene los datos del usuario especificado por su [id].
+  Future<UserModel> getUser(int id) => _userService.getUser(id);
 
-  Future<void> logout() => _tokenStorage.clear();
+  /// Actualiza los datos permitidos del usuario especificado por su [id].
+  Future<UserModel> updateUser(int id, UpdateUserDto dto) =>
+      _userService.updateUser(id, dto);
 }

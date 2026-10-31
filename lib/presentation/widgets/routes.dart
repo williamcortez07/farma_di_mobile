@@ -6,6 +6,7 @@ final class AppRoutes {
   static const logs = '/logs';
   static const roles = '/roles';
   static const settings = '/settings';
+  static const profile = '/profile';
 
   AppRoutes._();
 }
