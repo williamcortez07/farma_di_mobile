@@ -10,13 +10,6 @@ class ApiConstants {
 
   static const String login = '/Auth/login';
 
-  // Catálogos
-  static const String products = '/Products';
-  static const String categories = '/Categories';
-  static const String brands = '/Brands';
-  static const String inventory = '/Inventory';
-  static const String stock = '/Stock';
-
   // Logs endpoints
   static const String logs = '/api/Logs';
   static const String logsInformation = '/api/Logs/information';
