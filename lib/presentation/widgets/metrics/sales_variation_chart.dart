@@ -11,10 +11,7 @@ import '../../theme/app_colors.dart';
 /// de variación porcentual sobre cada barra (excepto el primer periodo que
 /// no tiene referencia anterior).
 class SalesVariationChart extends StatelessWidget {
-  const SalesVariationChart({
-    super.key,
-    required this.data,
-  });
+  const SalesVariationChart({super.key, required this.data});
 
   final List<SalesVariationModel> data;
 
@@ -48,10 +45,8 @@ class SalesVariationChart extends StatelessWidget {
                 show: true,
                 drawVerticalLine: false,
                 horizontalInterval: maxY / 4,
-                getDrawingHorizontalLine: (_) => FlLine(
-                  color: AppColors.trackBackground,
-                  strokeWidth: 1,
-                ),
+                getDrawingHorizontalLine: (_) =>
+                    FlLine(color: AppColors.trackBackground, strokeWidth: 1),
               ),
               borderData: FlBorderData(show: false),
               barTouchData: BarTouchData(
@@ -153,8 +148,9 @@ class SalesVariationChart extends StatelessWidget {
   }
 
   Widget _buildVariationLegend() {
-    final withVariation =
-        data.where((e) => e.variationPercentage != null).toList();
+    final withVariation = data
+        .where((e) => e.variationPercentage != null)
+        .toList();
     if (withVariation.isEmpty) return const SizedBox.shrink();
 
     return Wrap(
@@ -169,8 +165,7 @@ class SalesVariationChart extends StatelessWidget {
             Icon(
               isPositive ? Icons.trending_up : Icons.trending_down,
               size: 14,
-              color:
-                  isPositive ? AppColors.positiveGreen : Colors.redAccent,
+              color: isPositive ? AppColors.positiveGreen : Colors.redAccent,
             ),
             const SizedBox(width: 4),
             Text(
@@ -178,8 +173,7 @@ class SalesVariationChart extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color:
-                    isPositive ? AppColors.positiveGreen : Colors.redAccent,
+                color: isPositive ? AppColors.positiveGreen : Colors.redAccent,
               ),
             ),
           ],

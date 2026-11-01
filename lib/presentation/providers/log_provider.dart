@@ -38,14 +38,13 @@ class LogProvider extends ChangeNotifier {
   bool get isEmpty => _status == LogProviderStatus.success && _logs.isEmpty;
 
   /// Consulta inicial o recarga de logs según la categoría seleccionada
-  Future<void> fetchLogs({
-    LogCategory? category,
-    bool refresh = false,
-  }) async {
+  Future<void> fetchLogs({LogCategory? category, bool refresh = false}) async {
     final targetCategory = category ?? _selectedCategory;
 
     // Si ya estamos cargando y no es refresco explícito, evitar duplicar
-    if (!refresh && _status == LogProviderStatus.loading && targetCategory == _selectedCategory) {
+    if (!refresh &&
+        _status == LogProviderStatus.loading &&
+        targetCategory == _selectedCategory) {
       return;
     }
 
@@ -71,7 +70,8 @@ class LogProvider extends ChangeNotifier {
       _logs = response.data;
 
       // Determinar si hay más páginas por consultar
-      if (response.meta?.totalPages != null && response.meta?.currentPage != null) {
+      if (response.meta?.totalPages != null &&
+          response.meta?.currentPage != null) {
         _hasMore = response.meta!.currentPage! < response.meta!.totalPages!;
       } else {
         _hasMore = response.data.length >= _pageSize;

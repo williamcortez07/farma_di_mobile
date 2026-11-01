@@ -10,16 +10,9 @@ import '../../theme/app_colors.dart';
 /// de margen bruto por producto.  Las barras se presentan de mayor a menor
 /// margen según el ordenamiento aplicado en [SalesMetricsService].
 class GrossMarginChart extends StatelessWidget {
-  const GrossMarginChart({
-    super.key,
-    required this.data,
-  });
+  const GrossMarginChart({super.key, required this.data});
 
   final List<GrossMarginModel> data;
-
-  // Todos los productos comparten el mismo margen % en el data mart (4.76 %).
-  // El chart muestra el margen absoluto (grossMargin) para diferenciarlos
-  // visualmente, y el % se muestra como etiqueta.
   static const double _barHeight = 14;
   static const double _rowSpacing = 28;
 
@@ -27,8 +20,9 @@ class GrossMarginChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.isEmpty) return const _EmptyState();
 
-    final maxValue =
-        data.map((e) => e.grossMargin).reduce((a, b) => a > b ? a : b);
+    final maxValue = data
+        .map((e) => e.grossMargin)
+        .reduce((a, b) => a > b ? a : b);
 
     return SizedBox(
       height: data.length * _rowSpacing + 20,

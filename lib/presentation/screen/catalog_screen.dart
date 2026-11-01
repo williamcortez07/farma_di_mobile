@@ -1,7 +1,5 @@
-import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/app_navbar.dart';
 
 class ProductModel {
   final int productId;
