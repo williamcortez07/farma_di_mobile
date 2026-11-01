@@ -1,0 +1,312 @@
+{
+  "salesVariations": [
+    {
+      "period": "2025-10",
+      "currentSales": 133848.75,
+      "previousSales": null,
+      "variationPercentage": null
+    },
+    {
+      "period": "2025-11",
+      "currentSales": 1073221.65,
+      "previousSales": 133848.75,
+      "variationPercentage": 701.82
+    },
+    {
+      "period": "2025-12",
+      "currentSales": 1233200.65,
+      "previousSales": 1073221.65,
+      "variationPercentage": 14.91
+    }
+  ],
+  "grossMargins": [
+    {
+      "productName": "ASPIRINA BAYER",
+      "period": "ASPIRINA BAYER",
+      "totalRevenue": 395847.9,
+      "totalCost": 376998,
+      "grossMargin": 18849.9,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "ADVIL",
+      "period": "ADVIL",
+      "totalRevenue": 263571,
+      "totalCost": 251020,
+      "grossMargin": 12551,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "AUGMENTIN",
+      "period": "AUGMENTIN",
+      "totalRevenue": 252686.7,
+      "totalCost": 240654,
+      "grossMargin": 12032.7,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "FLAGYL",
+      "period": "FLAGYL",
+      "totalRevenue": 245164.5,
+      "totalCost": 233490,
+      "grossMargin": 11674.5,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "LAMISIL",
+      "period": "LAMISIL",
+      "totalRevenue": 189963.9,
+      "totalCost": 180918,
+      "grossMargin": 9045.9,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "TENORMIN",
+      "period": "TENORMIN",
+      "totalRevenue": 163447.2,
+      "totalCost": 155664,
+      "grossMargin": 7783.2,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "DUSPATALIN",
+      "period": "DUSPATALIN",
+      "totalRevenue": 127484.4,
+      "totalCost": 121413.71,
+      "grossMargin": 6070.69,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "MOTRIN",
+      "period": "MOTRIN",
+      "totalRevenue": 119808.15,
+      "totalCost": 114103,
+      "grossMargin": 5705.15,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "ZOLOFT",
+      "period": "ZOLOFT",
+      "totalRevenue": 104857.2,
+      "totalCost": 99864,
+      "grossMargin": 4993.2,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "CIPRO",
+      "period": "CIPRO",
+      "totalRevenue": 83097,
+      "totalCost": 79140,
+      "grossMargin": 3957,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "ZITHROMAX",
+      "period": "ZITHROMAX",
+      "totalRevenue": 80514,
+      "totalCost": 76680,
+      "grossMargin": 3834,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "DIFLUCAN",
+      "period": "DIFLUCAN",
+      "totalRevenue": 63453.6,
+      "totalCost": 60432,
+      "grossMargin": 3021.6,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "TYLENOL",
+      "period": "TYLENOL",
+      "totalRevenue": 56080.5,
+      "totalCost": 53410,
+      "grossMargin": 2670.5,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "PULMICORT",
+      "period": "PULMICORT",
+      "totalRevenue": 52012.8,
+      "totalCost": 49536,
+      "grossMargin": 2476.8,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "XANAX",
+      "period": "XANAX",
+      "totalRevenue": 51156,
+      "totalCost": 48720,
+      "grossMargin": 2436,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "KEFLEX",
+      "period": "KEFLEX",
+      "totalRevenue": 41731.2,
+      "totalCost": 39744,
+      "grossMargin": 1987.2,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "DOLGENAL",
+      "period": "DOLGENAL",
+      "totalRevenue": 41202,
+      "totalCost": 39240,
+      "grossMargin": 1962,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "PANADOL",
+      "period": "PANADOL",
+      "totalRevenue": 38597.95,
+      "totalCost": 36759.95,
+      "grossMargin": 1838,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "PANADOL NINOS",
+      "period": "PANADOL NINOS",
+      "totalRevenue": 33684,
+      "totalCost": 32080,
+      "grossMargin": 1604,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "LEXAPRO",
+      "period": "LEXAPRO",
+      "totalRevenue": 17919.3,
+      "totalCost": 17066,
+      "grossMargin": 853.3,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "PARACETAMOL",
+      "period": "PARACETAMOL",
+      "totalRevenue": 11639.25,
+      "totalCost": 11085,
+      "grossMargin": 554.25,
+      "grossMarginPercentage": 4.76
+    },
+    {
+      "productName": "VOLTAREN",
+      "period": "VOLTAREN",
+      "totalRevenue": 6352.5,
+      "totalCost": 6050,
+      "grossMargin": 302.5,
+      "grossMarginPercentage": 4.76
+    }
+  ],
+  "categoryShares": [
+    {
+      "categoryName": "ANTIDIARREICOS",
+      "totalRevenue": 395847.9,
+      "totalQuantity": 9921,
+      "sharePercentage": 16.22
+    },
+    {
+      "categoryName": "ANTIINFLAMATORIOS",
+      "totalRevenue": 263571,
+      "totalQuantity": 3586,
+      "sharePercentage": 10.8
+    },
+    {
+      "categoryName": "VITAMINAS Y SUPLEMENTOS",
+      "totalRevenue": 252686.7,
+      "totalQuantity": 6333,
+      "sharePercentage": 10.35
+    },
+    {
+      "categoryName": "SALUD CARDIOVASCULAR",
+      "totalRevenue": 245164.5,
+      "totalQuantity": 7783,
+      "sharePercentage": 10.05
+    },
+    {
+      "categoryName": "ANTIHISTAMÍNICOS",
+      "totalRevenue": 231017.85,
+      "totalQuantity": 8340,
+      "sharePercentage": 9.47
+    },
+    {
+      "categoryName": "CUIDADO BUCAL",
+      "totalRevenue": 189963.9,
+      "totalQuantity": 7866,
+      "sharePercentage": 7.78
+    },
+    {
+      "categoryName": "SALUD SEXUAL",
+      "totalRevenue": 163447.2,
+      "totalQuantity": 3243,
+      "sharePercentage": 6.7
+    },
+    {
+      "categoryName": "SUPLEMENTOS DEPORTIVOS",
+      "totalRevenue": 127484.4,
+      "totalQuantity": 1788,
+      "sharePercentage": 5.22
+    },
+    {
+      "categoryName": "SALUD RESPIRATORIA",
+      "totalRevenue": 83097,
+      "totalQuantity": 2638,
+      "sharePercentage": 3.41
+    },
+    {
+      "categoryName": "CUIDADO DEL BEBÉ",
+      "totalRevenue": 80514,
+      "totalQuantity": 2556,
+      "sharePercentage": 3.3
+    },
+    {
+      "categoryName": "ANALGÉSICOS",
+      "totalRevenue": 72281.95,
+      "totalQuantity": 4975,
+      "sharePercentage": 2.96
+    },
+    {
+      "categoryName": "ANTIBIÓTICOS",
+      "totalRevenue": 67719.75,
+      "totalQuantity": 6080,
+      "sharePercentage": 2.78
+    },
+    {
+      "categoryName": "DIABETES",
+      "totalRevenue": 63453.6,
+      "totalQuantity": 1259,
+      "sharePercentage": 2.6
+    },
+    {
+      "categoryName": "MATERIAL ORTOPÉDICO",
+      "totalRevenue": 52012.8,
+      "totalQuantity": 1152,
+      "sharePercentage": 2.13
+    },
+    {
+      "categoryName": "ANTIÁCIDOS",
+      "totalRevenue": 51156,
+      "totalQuantity": 870,
+      "sharePercentage": 2.1
+    },
+    {
+      "categoryName": "DERMATOLÓGICOS",
+      "totalRevenue": 41731.2,
+      "totalQuantity": 828,
+      "sharePercentage": 1.71
+    },
+    {
+      "categoryName": "DISPOSITIVOS MÉDICOS",
+      "totalRevenue": 41202,
+      "totalQuantity": 1962,
+      "sharePercentage": 1.69
+    },
+    {
+      "categoryName": "LAXANTES",
+      "totalRevenue": 17919.3,
+      "totalQuantity": 742,
+      "sharePercentage": 0.73
+    }
+  ],
+  "totalOverallRevenue": 2440271.05,
+  "totalItemsSold": 71922
+}

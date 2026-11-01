@@ -1,0 +1,759 @@
+{
+  "productTurnovers": [
+    {
+      "productName": "DUSPATALIN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 200,
+      "dispatchedQuantity": 200,
+      "turnoverRatio": 2
+    },
+    {
+      "productName": "PARACETAMOL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 9,
+      "dispatchedQuantity": 9,
+      "turnoverRatio": 2
+    },
+    {
+      "productName": "DOLGENAL",
+      "availableQuantity": 3,
+      "batchInitialQuantity": 35,
+      "dispatchedQuantity": 32,
+      "turnoverRatio": 1.68
+    },
+    {
+      "productName": "PANADOL NINOS",
+      "availableQuantity": 5,
+      "batchInitialQuantity": 30,
+      "dispatchedQuantity": 25,
+      "turnoverRatio": 1.43
+    },
+    {
+      "productName": "CIPRO",
+      "availableQuantity": 140,
+      "batchInitialQuantity": 500,
+      "dispatchedQuantity": 360,
+      "turnoverRatio": 1.12
+    },
+    {
+      "productName": "AUGMENTIN",
+      "availableQuantity": 570,
+      "batchInitialQuantity": 1400,
+      "dispatchedQuantity": 830,
+      "turnoverRatio": 0.84
+    },
+    {
+      "productName": "PANADOL",
+      "availableQuantity": 700,
+      "batchInitialQuantity": 1500,
+      "dispatchedQuantity": 800,
+      "turnoverRatio": 0.73
+    },
+    {
+      "productName": "TYLENOL",
+      "availableQuantity": 977,
+      "batchInitialQuantity": 1700,
+      "dispatchedQuantity": 723,
+      "turnoverRatio": 0.54
+    },
+    {
+      "productName": "DIFLUCAN",
+      "availableQuantity": 199,
+      "batchInitialQuantity": 300,
+      "dispatchedQuantity": 101,
+      "turnoverRatio": 0.4
+    },
+    {
+      "productName": "PULMICORT",
+      "availableQuantity": 67,
+      "batchInitialQuantity": 100,
+      "dispatchedQuantity": 33,
+      "turnoverRatio": 0.4
+    },
+    {
+      "productName": "XANAX",
+      "availableQuantity": 77,
+      "batchInitialQuantity": 100,
+      "dispatchedQuantity": 23,
+      "turnoverRatio": 0.26
+    },
+    {
+      "productName": "ADVIL",
+      "availableQuantity": 1465,
+      "batchInitialQuantity": 1880,
+      "dispatchedQuantity": 415,
+      "turnoverRatio": 0.25
+    },
+    {
+      "productName": "MOTRIN",
+      "availableQuantity": 2181,
+      "batchInitialQuantity": 2600,
+      "dispatchedQuantity": 419,
+      "turnoverRatio": 0.18
+    },
+    {
+      "productName": "LAMISIL",
+      "availableQuantity": 8038,
+      "batchInitialQuantity": 9300,
+      "dispatchedQuantity": 1262,
+      "turnoverRatio": 0.15
+    },
+    {
+      "productName": "LEXAPRO",
+      "availableQuantity": 87,
+      "batchInitialQuantity": 100,
+      "dispatchedQuantity": 13,
+      "turnoverRatio": 0.14
+    },
+    {
+      "productName": "ZOLOFT",
+      "availableQuantity": 870,
+      "batchInitialQuantity": 1000,
+      "dispatchedQuantity": 130,
+      "turnoverRatio": 0.14
+    },
+    {
+      "productName": "VOLTAREN",
+      "availableQuantity": 8,
+      "batchInitialQuantity": 9,
+      "dispatchedQuantity": 1,
+      "turnoverRatio": 0.12
+    },
+    {
+      "productName": "ZITHROMAX",
+      "availableQuantity": 1677,
+      "batchInitialQuantity": 1800,
+      "dispatchedQuantity": 123,
+      "turnoverRatio": 0.07
+    },
+    {
+      "productName": "ASPIRINA BAYER",
+      "availableQuantity": 42767,
+      "batchInitialQuantity": 45400,
+      "dispatchedQuantity": 2633,
+      "turnoverRatio": 0.06
+    },
+    {
+      "productName": "TENORMIN",
+      "availableQuantity": 8775,
+      "batchInitialQuantity": 9200,
+      "dispatchedQuantity": 425,
+      "turnoverRatio": 0.05
+    },
+    {
+      "productName": "KEFLEX",
+      "availableQuantity": 863,
+      "batchInitialQuantity": 900,
+      "dispatchedQuantity": 37,
+      "turnoverRatio": 0.04
+    },
+    {
+      "productName": "FLAGYL",
+      "availableQuantity": 45424,
+      "batchInitialQuantity": 46500,
+      "dispatchedQuantity": 1076,
+      "turnoverRatio": 0.02
+    },
+    {
+      "productName": "ALLEGRA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ALLERGODIL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "AMOXIL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ARCOXIA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ATARAX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "AVAMYS",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "AZOPT",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "BACTRIM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "BEDOYECTA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "BENADRYL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "BUSCAPINA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CALCIBON",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CALTRATE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CANESTEN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CAPOTEN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CATAFLAM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CELEBREX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CENTRUM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CLARITIN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "COLACE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "CONTRAMAL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "COZAAR",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "DECADRON",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "DEPAKINE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "DOLAC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "DOXICICLINA MK",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "DUPHALAC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ENANTYUM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ERIUS",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "EUTIROX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "FEFOL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "FERROGRAD",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "FLIXONASE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "FORLAX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "GLUCOPHAGE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "HYABAK",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "IMODIUM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "JANUVIA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "LAMICTAL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "LANTUS",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "LEVAQUIN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "LOSEC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "LYRICA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "MACRODANTINA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "MELATONIN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "MOVICOL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "NEUROBION",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "NEURONTIN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "NEXIUM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "NIZORAL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "NOLOTIL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "NORVASC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "OPATANOL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "OPTIVE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "PANTOLOC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "PEPTO BISMOL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "PHARMATON",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "PREDNISONA MK",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "PROZAC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "REDOXON",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "REFRESH TEARS",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "SINGULAIR",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "SOLU-MEDROL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "SPIRIVA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "SYMBICORT",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "SYSTANE",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TAPAZOL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TELFAST",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TEMPRA",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TIMOLOL MK",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TOBREX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TOPAMAX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TRAMAL",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "TRAVATAN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "VALIUM",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "VENTOLIN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "VIGAMOX",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "XALATAN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ZADITEN",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    },
+    {
+      "productName": "ZYRTEC",
+      "availableQuantity": 0,
+      "batchInitialQuantity": 0,
+      "dispatchedQuantity": 0,
+      "turnoverRatio": 0
+    }
+  ],
+  "expiringBatches": [
+    {
+      "batchNumber": "KL-OP09",
+      "productName": "DOLGENAL",
+      "expirationDate": "2026-11-07T00:00:00",
+      "daysUntilExpiration": 6,
+      "availableQuantity": 0,
+      "batchInitialQuantity": 10,
+      "nearExpirationPercentage": 0,
+      "status": "Próximo a vencer"
+    },
+    {
+      "batchNumber": "LP-012",
+      "productName": "DOLGENAL",
+      "expirationDate": "2026-11-07T00:00:00",
+      "daysUntilExpiration": 6,
+      "availableQuantity": 0,
+      "batchInitialQuantity": 5,
+      "nearExpirationPercentage": 0,
+      "status": "Próximo a vencer"
+    },
+    {
+      "batchNumber": "ÑLOP-9082",
+      "productName": "PANADOL NINOS",
+      "expirationDate": "2026-11-07T00:00:00",
+      "daysUntilExpiration": 6,
+      "availableQuantity": 0,
+      "batchInitialQuantity": 10,
+      "nearExpirationPercentage": 0,
+      "status": "Próximo a vencer"
+    }
+  ],
+  "overallExpiringPercentage": 0,
+  "availability": {
+    "totalProducts": 22,
+    "inStockProducts": 20,
+    "outOfStockProducts": 2,
+    "criticalStockProducts": 3,
+    "availabilityRatePercentage": 90.91
+  },
+  "totalInventoryItems": 22
+}
