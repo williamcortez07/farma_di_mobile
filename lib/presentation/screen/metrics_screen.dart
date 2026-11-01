@@ -1,89 +1,194 @@
 import 'package:flutter/material.dart';
-
-import '../theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-void main() {
-  runApp(const MetricsApp());
-}
-
-class MetricsApp extends StatelessWidget {
-  const MetricsApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MetricsScreen(),
-    );
-  }
-}
+import '../theme/app_colors.dart';
+import '../controllers/sales_metrics_controller.dart';
+import '../widgets/metrics/sales_variation_chart.dart';
+import '../widgets/metrics/gross_margin_chart.dart';
+import '../widgets/metrics/category_share_chart.dart';
 
 const double sectionSpacing = 16;
 
-// metricas usa statelesswidget porque solo es una vista estatica, esto cuando se conecte con la api tendria que ser con stateful y menejo de estado con setstate
-class MetricsScreen extends StatelessWidget {
+// no se estan mostrando datos mocs, ya que todos los datos que se renderizan aqui vienen de un data set que es un JSON que devilvió la api, que pasó, la api en local si se puedo conectar al cubo porque era un entorno local pero la api desplegada no tiene acceso a mi maquina local donde corre el cubo, por lo tanto se ejecuto el endpoit correspondiente a cada kpi se descargó el json y se pasó como un data set, para poder conectarse al endpoit solo se cambiaria en el repositorio
+
+class MetricsScreen extends StatefulWidget {
   const MetricsScreen({super.key});
-  static const List<SupplierShare> _suppliers = [
-    SupplierShare(
-      name: 'Stein',
-      percentage: 32.5,
-      color: AppColors.primaryDark,
-    ),
-    SupplierShare(name: 'Ramos', percentage: 24.4, color: AppColors.chartBlue),
-    SupplierShare(
-      name: 'Calox',
-      percentage: 18.3,
-      color: AppColors.positiveGreen,
-    ),
-    SupplierShare(
-      name: 'Otros',
-      percentage: 24.8,
-      color: AppColors.neutralGray,
-    ),
-  ];
-  // por el momento solo tenemos 3 pero se podria implementar un top, ya sean 5 , o los mismos 3
-  // una ida puede ser que sea personalizada si el usuario pide 3 devuelve 3, si quiere 5 devuelve 5
+
+  @override
+  State<MetricsScreen> createState() => _MetricsScreenState();
+}
+
+class _MetricsScreenState extends State<MetricsScreen> {
+  late final SalesMetricsController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SalesMetricsController();
+    // Dispara la carga de los 3 KPIs en paralelo al montar el widget.
+    _controller.loadAll();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
-      /* appBar: AppNavbar(
-        profileImageUrl: null,
-        onProfileTap: () {
-          Navigator.of(context).pushNamed(AppRoutes.profile);
-        },
-      ),
-      */
-      // comentariado porque  esto lo maneja home_screen con el IdexedStack, line 58
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: sectionSpacing),
-              _buildFilters(),
-              const SizedBox(height: sectionSpacing),
-              _buildSummaryCards(),
-              const SizedBox(height: sectionSpacing),
-              _buildSpendingSection(),
-              const SizedBox(height: sectionSpacing),
-              const SupplierShareCard(suppliers: _suppliers),
-              const SizedBox(height: sectionSpacing),
-              _buildProfitabilitySection(),
-              const SizedBox(height: sectionSpacing),
-              _buildCategorySalesSection(),
-            ],
-          ),
+        child: ListenableBuilder(
+          listenable: _controller,
+          builder: (context, _) {
+            return RefreshIndicator(
+              onRefresh: _controller.refresh,
+              color: AppColors.chartBlue,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: sectionSpacing),
+                    _buildFilters(),
+                    const SizedBox(height: sectionSpacing),
+
+                    //KPI 1: Ventas por periodo
+                    _buildKpi1SalesVariation(),
+                    const SizedBox(height: sectionSpacing),
+
+                    // KPI 2: Margen bruto
+                    _buildKpi2GrossMargin(),
+                    const SizedBox(height: sectionSpacing),
+
+                    // KPI 3: Participación por categoría
+                    _buildKpi3CategoryShare(),
+                    const SizedBox(height: sectionSpacing),
+                    _buildSpendingSection(),
+                    const SizedBox(height: sectionSpacing),
+                    SupplierShareCard(suppliers: _suppliers),
+                    const SizedBox(height: sectionSpacing),
+                    _buildProfitabilitySection(),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildKpi1SalesVariation() {
+    final status = _controller.variationsStatus;
+    final data = _controller.salesVariations;
+
+    // Badge dinámico: variación del último periodo con referencia.
+    Widget? badge;
+    if (status == SalesKpiStatus.success && data.length >= 2) {
+      final last = data.last;
+      if (last.variationPercentage != null) {
+        final pct = last.variationPercentage!;
+        badge = StatusBadge(
+          text: '${pct >= 0 ? '+' : ''}${pct.toStringAsFixed(1)}%',
+          backgroundColor: pct >= 0
+              ? AppColors.positiveBackground
+              : const Color(0xFFFFE0E0),
+          textColor: pct >= 0 ? AppColors.positiveGreen : Colors.redAccent,
+        );
+      }
+    }
+
+    return MetricsSectionCard(
+      title: 'Ventas por periodo',
+      subtitle: 'Variación % respecto al periodo anterior',
+      trailing: badge,
+      child: _buildKpiBody(
+        status: status,
+        error: _controller.variationsError,
+        onRetry: _controller.refresh,
+        child: SalesVariationChart(data: data),
+      ),
+    );
+  }
+
+  Widget _buildKpi2GrossMargin() {
+    final status = _controller.marginsStatus;
+    final data = _controller.grossMargins;
+
+    Widget? badge;
+    if (status == SalesKpiStatus.success && data.isNotEmpty) {
+      badge = const StatusBadge(
+        text: '4.76 %',
+        backgroundColor: AppColors.infoBackground,
+        textColor: AppColors.chartBlue,
+      );
+    }
+
+    return MetricsSectionCard(
+      title: 'Margen bruto de ventas',
+      subtitle: 'Por producto – ingresos vs. costo',
+      trailing: badge,
+      child: _buildKpiBody(
+        status: status,
+        error: _controller.marginsError,
+        onRetry: _controller.refresh,
+        child: GrossMarginChart(data: data),
+      ),
+    );
+  }
+
+  Widget _buildKpi3CategoryShare() {
+    final status = _controller.sharesStatus;
+    final data = _controller.categoryShares;
+
+    Widget? badge;
+    if (status == SalesKpiStatus.success && data.isNotEmpty) {
+      badge = StatusBadge(
+        text: 'Top ${data.length}',
+        backgroundColor: AppColors.positiveBackground,
+        textColor: AppColors.positiveGreen,
+      );
+    }
+
+    return MetricsSectionCard(
+      title: 'Participación por categoría',
+      subtitle: 'Distribución de ingresos (% del total)',
+      trailing: badge,
+      child: _buildKpiBody(
+        status: status,
+        error: _controller.sharesError,
+        onRetry: _controller.refresh,
+        child: CategoryShareChart(data: data),
+      ),
+    );
+  }
+
+  Widget _buildKpiBody({
+    required SalesKpiStatus status,
+    required String? error,
+    required VoidCallback onRetry,
+    required Widget child,
+  }) {
+    switch (status) {
+      case SalesKpiStatus.idle:
+      case SalesKpiStatus.loading:
+        return const _KpiSkeleton();
+      case SalesKpiStatus.error:
+        return _KpiError(
+          message: error ?? 'Error desconocido',
+          onRetry: onRetry,
+        );
+      case SalesKpiStatus.success:
+        return child;
+    }
+  }
+
+  Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -102,6 +207,15 @@ class MetricsScreen extends StatelessWidget {
             ),
           ],
         ),
+        if (_controller.isLoading)
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.chartBlue,
+            ),
+          ),
       ],
     );
   }
@@ -112,14 +226,14 @@ class MetricsScreen extends StatelessWidget {
       child: Row(
         children: [
           _buildFilterChip(
-            label: 'Últimos 6 meses',
+            label: 'Últimos 3 periodos',
             isSelected: true,
             icon: Icons.calendar_today_outlined,
           ),
           const SizedBox(width: 8),
           _buildFilterChip(label: 'Categorías (Todas)', isSelected: false),
           const SizedBox(width: 8),
-          _buildFilterChip(label: 'Proveedor (Todos)', isSelected: false),
+          _buildFilterChip(label: 'Ventas', isSelected: false),
         ],
       ),
     );
@@ -133,7 +247,6 @@ class MetricsScreen extends StatelessWidget {
     final Color contentColor = isSelected
         ? Colors.white
         : AppColors.primaryDark;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -150,70 +263,6 @@ class MetricsScreen extends StatelessWidget {
           Text(label, style: TextStyle(fontSize: 12, color: contentColor)),
         ],
       ),
-    );
-  }
-
-  Widget _buildSummaryCards() {
-    return const Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: MetricSummaryCard(
-                label: 'Part. proveedor',
-                value: '32.5%',
-                caption: 'Laboratorios Stein',
-                badge: StatusBadge(
-                  text: '+3.2%',
-                  backgroundColor: AppColors.positiveBackground,
-                  textColor: AppColors.positiveGreen,
-                ),
-              ),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: MetricSummaryCard(
-                label: 'Rotación stock',
-                value: '4.7x',
-                caption: 'Mediana semestral',
-                badge: Icon(Icons.sync, size: 16, color: AppColors.chartBlue),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: MetricSummaryCard(
-                label: 'Gasto compras',
-                value: 'C\$ 142k',
-                caption: 'Alza moderada',
-                badge: StatusBadge(
-                  text: '+12.4%',
-                  backgroundColor: AppColors.infoBackground,
-                  textColor: AppColors.chartBlue,
-                ),
-              ),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: MetricSummaryCard(
-                label: 'Demanda',
-                value: 'Alta',
-                caption: 'Respiratorios',
-                badge: StatusBadge(
-                  text: 'Pico lluvias',
-                  backgroundColor: AppColors.warningBackground,
-                  textColor: AppColors.warningOrange,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
@@ -275,45 +324,90 @@ class MetricsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategorySalesSection() {
-    return const MetricsSectionCard(
-      title: 'Ventas por categoría',
-      subtitle: 'Ingresos brutos',
-      trailing: Icon(Icons.bar_chart, size: 18, color: AppColors.mutedText),
+  static const List<SupplierShare> _suppliers = [
+    SupplierShare(
+      name: 'Stein',
+      percentage: 32.5,
+      color: AppColors.primaryDark,
+    ),
+    SupplierShare(name: 'Ramos', percentage: 24.4, color: AppColors.chartBlue),
+    SupplierShare(
+      name: 'Calox',
+      percentage: 18.3,
+      color: AppColors.positiveGreen,
+    ),
+    SupplierShare(
+      name: 'Otros',
+      percentage: 24.8,
+      color: AppColors.neutralGray,
+    ),
+  ];
+}
+
+
+class _KpiSkeleton extends StatelessWidget {
+  const _KpiSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 140,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppColors.chartBlue,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Cargando datos del data mart…',
+              style: TextStyle(fontSize: 12, color: AppColors.mutedText),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _KpiError extends StatelessWidget {
+  const _KpiError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ProgressBarRow(
-            title: 'Analgésicos',
-            valueText: 'C\$ 145.2k (28%)',
-            progress: 0.88,
-            barColor: AppColors.primaryDark,
+          const Icon(Icons.error_outline, color: Colors.redAccent, size: 28),
+          const SizedBox(height: 6),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 11, color: AppColors.mutedText),
           ),
-          SizedBox(height: 12),
-          ProgressBarRow(
-            title: 'Antibióticos',
-            valueText: 'C\$ 112.4k (22%)',
-            progress: 0.68,
-            barColor: AppColors.chartBlue,
-          ),
-          SizedBox(height: 12),
-          ProgressBarRow(
-            title: 'Antigripales',
-            valueText: 'C\$ 86.1k (17%)',
-            progress: 0.52,
-            barColor: AppColors.positiveGreen,
-          ),
-          SizedBox(height: 12),
-          ProgressBarRow(
-            title: 'Vitaminas',
-            valueText: 'C\$ 62.3k (12%)',
-            progress: 0.38,
-            barColor: AppColors.neutralGray,
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh, size: 14),
+            label: const Text('Reintentar', style: TextStyle(fontSize: 12)),
           ),
         ],
       ),
     );
   }
 }
+
 
 class SupplierShareCard extends StatelessWidget {
   final List<SupplierShare> suppliers;
@@ -569,7 +663,6 @@ class ProgressBarRow extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
-        // ClipRRect redondea las puntas de la barra,  porq x defecto es rectangular.
         ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(6)),
           child: LinearProgressIndicator(
