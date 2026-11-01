@@ -1,13 +1,16 @@
 import 'package:get_it/get_it.dart';
 import 'package:farma_di_mobile/core/network/api_client.dart';
 import 'package:farma_di_mobile/data/repositories/auth_repository/user_repository.dart';
+import 'package:farma_di_mobile/data/repositories/catalog_repository.dart';
 import 'package:farma_di_mobile/data/repositories/log_repository.dart';
 import 'package:farma_di_mobile/data/repositories/user_repository.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
 import 'package:farma_di_mobile/presentation/controllers/profile_controller.dart';
+import 'package:farma_di_mobile/presentation/providers/catalog_provider.dart';
 import 'package:farma_di_mobile/presentation/providers/log_provider.dart';
 import 'package:farma_di_mobile/presentation/providers/user_provider.dart';
+import 'package:farma_di_mobile/services/catalog_service.dart';
 import 'package:farma_di_mobile/services/log_service.dart';
 import 'package:farma_di_mobile/services/token_storage.dart';
 import 'package:farma_di_mobile/services/user_service.dart';
@@ -73,5 +76,16 @@ void setupDependencies() {
   // Logs
   getIt.registerFactory<LogController>(
     () => LogController(getIt<LogProvider>()),
+  );
+
+  // Catálogos
+  getIt.registerLazySingleton<CatalogRepository>(
+    () => CatalogRepository(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<CatalogService>(
+    () => CatalogService(getIt<CatalogRepository>()),
+  );
+  getIt.registerFactory<CatalogProvider>(
+    () => CatalogProvider(getIt<CatalogService>()),
   );
 }
