@@ -27,12 +27,6 @@ void setupDependencies() {
   getIt.registerLazySingleton<LogRepository>(
     () => LogRepository(getIt<ApiClient>()),
   );
-  getIt.registerLazySingleton<CatalogRepository>(
-    () => CatalogRepository(getIt<ApiClient>()),
-  );
-  getIt.registerLazySingleton<UserRepository>(
-    () => UserRepository(getIt<UserService>()),
-  );
 
   // Servicios
   getIt.registerLazySingleton<UserService>(
@@ -41,13 +35,15 @@ void setupDependencies() {
   getIt.registerLazySingleton<LogService>(
     () => LogService(getIt<LogRepository>()),
   );
-  getIt.registerLazySingleton<CatalogService>(
-    () => CatalogService(getIt<CatalogRepository>()),
-  );
 
   // Autenticación
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepository(getIt<ApiClient>(), getIt<TokenStorage>()),
+  );
+
+  // Usuario / Perfil
+  getIt.registerLazySingleton<UserRepository>(
+    () => UserRepository(getIt<UserService>()),
   );
 
   // Providers de estado compartido
@@ -62,7 +58,7 @@ void setupDependencies() {
     () => LogProvider(logService: getIt<LogService>()),
   );
 
-  // Controladores y Providers de pantalla
+  // Controladores
   getIt.registerFactory<AuthController>(
     () => AuthController(
       getIt<AuthRepository>(),
@@ -77,10 +73,18 @@ void setupDependencies() {
     ),
   );
 
+  // Logs
   getIt.registerFactory<LogController>(
     () => LogController(getIt<LogProvider>()),
   );
 
+  // Catálogos
+  getIt.registerLazySingleton<CatalogRepository>(
+    () => CatalogRepository(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<CatalogService>(
+    () => CatalogService(getIt<CatalogRepository>()),
+  );
   getIt.registerFactory<CatalogProvider>(
     () => CatalogProvider(getIt<CatalogService>()),
   );
