@@ -6,7 +6,6 @@ import 'package:farma_di_mobile/data/models/catalog_view_model.dart';
 import 'package:farma_di_mobile/presentation/providers/catalog_provider.dart';
 import 'package:farma_di_mobile/presentation/widgets/error_view.dart';
 import 'package:farma_di_mobile/presentation/widgets/loading_view.dart';
-import 'package:farma_di_mobile/presentation/widgets/routes.dart';
 
 class _PillIcon extends StatelessWidget {
   final String categoryName;
@@ -75,22 +74,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.dispose();
   }
 
-  String _formatCurrentDate() {
-    final DateTime now = DateTime.now();
-    final String day = now.day.toString().padLeft(2, '0');
-    final String month = now.month.toString().padLeft(2, '0');
-    return 'Fecha actual: $day/$month/${now.year}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
-        appBar: _buildAppBar(),
+        // El AppNavbar (fecha y perfil) lo maneja home_screen con el IndexedStack
         body: Column(
           children: [
+            _buildAppBar(),
             _buildTabBar(),
             Expanded(
               child: TabBarView(
@@ -114,49 +107,21 @@ class _CatalogScreenState extends State<CatalogScreen> {
       shadowColor: const Color(0x1A000000),
       toolbarHeight: 70.0,
       titleSpacing: 16.0,
-      title: Column(
+      automaticallyImplyLeading: false,
+      title: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 1.0),
           Text(
-            _formatCurrentDate(),
-            style: const TextStyle(
-              fontSize: 10.0,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF90A4AE),
-              letterSpacing: 0.8,
-            ),
-          ),
-          const SizedBox(height: 1.0),
-          const Text(
             'Catálogos',
             style: TextStyle(
-              fontSize: 22.0,
-              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
               color: Color(0xFF1A1A2E),
             ),
           ),
         ],
       ),
-      actions: [
-        TextButton.icon(
-          onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              AppRoutes.login,
-              (route) => false,
-            );
-          },
-          icon: const Icon(
-            Icons.logout_rounded,
-            size: 16.0,
-            color: Color(0xFF607D8B),
-          ),
-          label: const Text(
-            'Salir',
-            style: TextStyle(fontSize: 13.0, color: Color(0xFF607D8B)),
-          ),
-        ),
-        const SizedBox(width: 4.0),
-      ],
     );
   }
 
