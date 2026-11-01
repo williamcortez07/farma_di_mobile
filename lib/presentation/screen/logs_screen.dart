@@ -112,7 +112,8 @@ class _LogsScreenState extends State<LogsScreen> {
     }
 
     // 2. Estado de error
-    if (_logController.status == LogStatus.error && _logController.visibleLogs.isEmpty) {
+    if (_logController.status == LogStatus.error &&
+        _logController.visibleLogs.isEmpty) {
       return LogErrorView(
         errorMessage: _logController.errorMessage,
         onRetry: () => _logController.refresh(),
@@ -121,9 +122,7 @@ class _LogsScreenState extends State<LogsScreen> {
 
     // 3. Estado sin registros
     if (_logController.visibleLogs.isEmpty) {
-      return LogEmptyView(
-        onRefresh: () => _logController.refresh(),
-      );
+      return LogEmptyView(onRefresh: () => _logController.refresh());
     }
 
     // 4. Datos disponibles con soporte para paginación continua y pull-to-refresh

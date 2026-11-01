@@ -74,8 +74,10 @@ class LogController extends ChangeNotifier {
       list = list.where((log) {
         final lvl = log.normalizedLevel.toUpperCase();
         if (_selectedFilter == 'ERROR') return lvl.contains('ERROR');
-        if (_selectedFilter == 'WARN' || _selectedFilter == 'WARNING') return lvl.contains('WARN');
-        if (_selectedFilter == 'INFO' || _selectedFilter == 'INFORMATION') return lvl.contains('INFO');
+        if (_selectedFilter == 'WARN' || _selectedFilter == 'WARNING')
+          return lvl.contains('WARN');
+        if (_selectedFilter == 'INFO' || _selectedFilter == 'INFORMATION')
+          return lvl.contains('INFO');
         return true;
       }).toList();
     }
@@ -87,11 +89,17 @@ class LogController extends ChangeNotifier {
         final traceMatch = (log.traceId ?? '').toLowerCase().contains(q);
         final userMatch = (log.userId ?? '').toLowerCase().contains(q);
         final ipMatch = (log.clientIp ?? '').toLowerCase().contains(q);
-        final methodMatch = (log.request?.method ?? '').toLowerCase().contains(q);
+        final methodMatch = (log.request?.method ?? '').toLowerCase().contains(
+          q,
+        );
         final pathMatch = (log.request?.path ?? '').toLowerCase().contains(q);
         final msgMatch = log.displayMessage.toLowerCase().contains(q);
-        final excMatch = (log.exception?.message ?? '').toLowerCase().contains(q);
-        final codeMatch = (log.response?.statusCode?.toString() ?? '').contains(q);
+        final excMatch = (log.exception?.message ?? '').toLowerCase().contains(
+          q,
+        );
+        final codeMatch = (log.response?.statusCode?.toString() ?? '').contains(
+          q,
+        );
 
         return idMatch ||
             traceMatch ||
@@ -133,7 +141,10 @@ class LogController extends ChangeNotifier {
       return _logProvider.fetchLogs(category: category, refresh: refresh);
     }
     _selectedFilter = 'ALL';
-    return _logProvider.fetchLogs(category: LogCategory.today, refresh: refresh);
+    return _logProvider.fetchLogs(
+      category: LogCategory.today,
+      refresh: refresh,
+    );
   }
 
   /// Refresca la lista actual

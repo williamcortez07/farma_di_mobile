@@ -30,4 +30,4 @@ flutter:
 
   assets:
    - .env
-
+   - assets/data_marts/DataMartSales.json
