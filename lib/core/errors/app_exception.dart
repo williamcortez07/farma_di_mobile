@@ -7,19 +7,17 @@ sealed class AppException implements Exception {
   String toString() => '$runtimeType: $message';
 }
 
-/// No connection, DNS failure, timeout, etc.
+/// Sin conexión, fallo de DNS, tiempo de espera agotado, etc.
 class NetworkException extends AppException {
   const NetworkException([super.message = 'Verifica tu conexión a internet.']);
 }
 
-/// The server answered with a non-2xx status code.
 class ServerException extends AppException {
   const ServerException(super.message, {this.statusCode});
 
   final int? statusCode;
 }
 
-/// The response body could not be parsed into our models.
 class ParsingException extends AppException {
   const ParsingException([super.message = 'Inesperado error de formato.']);
 }

@@ -62,7 +62,7 @@ class ApiClient {
           .then(http.Response.fromStream);
     } on TimeoutException {
       throw const NetworkException(
-        'Request timed out. Please try again later.',
+        'Tiempo de espera agotado. Por favor, intenta de nuevo más tarde.',
       );
     } on http.ClientException {
       throw const NetworkException();

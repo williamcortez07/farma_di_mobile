@@ -17,7 +17,7 @@ class ApiConstants {
   static const String inventory = '/Inventory';
   static const String stock = '/Stock';
 
-  // Logs endpoints
+  // Endpoints de Logs
   static const String logs = '/api/Logs';
   static const String logsInformation = '/api/Logs/information';
   static const String logsWarning = '/api/Logs/warning';
@@ -26,7 +26,7 @@ class ApiConstants {
   static const String logsDateRange = '/api/Logs/date-range';
   static String logsByLevel(String level) => '/api/Logs/level/$level';
 
-  // User endpoints
+  // Endpoints de Usuario
   static const String user = '/User';
   static String userById(int id) => '/User/$id';
 
