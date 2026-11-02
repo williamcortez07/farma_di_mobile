@@ -158,7 +158,7 @@ class _RolesScreenState extends State<RolesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       /* appBar: AppNavbar(
         profileImageUrl: null,
@@ -237,7 +237,7 @@ class _RolesScreenState extends State<RolesScreen> {
                 fontWeight: FontWeight.w600,
               ),
               selectedColor: AppColors.primaryDark,
-              backgroundColor: AppColors.surface,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               side: BorderSide(
                 color: isSelected
                     ? AppColors.primaryDark

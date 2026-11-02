@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
 import 'package:farma_di_mobile/presentation/theme/app_colors.dart';
 import 'package:farma_di_mobile/presentation/widgets/logs/log_detail_sheet.dart';
@@ -70,7 +70,7 @@ class LogCard extends StatelessWidget {
 
     final method = log.request?.method ?? 'REQ';
     final path = log.request?.path ?? 'Sistema';
-    final user = log.userId ?? 'Anónimo';
+    final user = log.userId ?? 'AnÃ³nimo';
     final statusCode = log.response?.statusCode;
     final elapsed = log.response?.elapsedMilliseconds;
 
@@ -82,7 +82,7 @@ class LogCard extends StatelessWidget {
         border: Border.all(color: AppColors.border, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: (Theme.of(context).brightness == Brightness.dark ? Colors.black.withValues(alpha: 0.18) : Colors.black.withValues(alpha: 0.02)),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -99,7 +99,7 @@ class LogCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Fila 1: Badge de nivel + ID + Status Code + Botón Detalle
+                // Fila 1: Badge de nivel + ID + Status Code + BotÃ³n Detalle
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -175,7 +175,7 @@ class LogCard extends StatelessWidget {
 
                 const SizedBox(height: 10.0),
 
-                // Fila 3: Chips informativos (Método/Ruta, Usuario, Elapsed, Fecha)
+                // Fila 3: Chips informativos (MÃ©todo/Ruta, Usuario, Elapsed, Fecha)
                 Wrap(
                   spacing: 6.0,
                   runSpacing: 6.0,
@@ -234,3 +234,4 @@ class LogCard extends StatelessWidget {
     );
   }
 }
+

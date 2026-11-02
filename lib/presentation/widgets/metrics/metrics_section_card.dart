@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
 
 class AppDecorations {
   const AppDecorations._();
 
-  static const BoxDecoration card = BoxDecoration(
-    color: AppColors.surface,
-    borderRadius: BorderRadius.all(Radius.circular(16)),
-    boxShadow: [
-      BoxShadow(
-        color: Color(0x0F000000),
-        blurRadius: 12,
-        offset: Offset(0, 4),
+  static BoxDecoration card(BuildContext context) {
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+
+    return BoxDecoration(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: theme.dividerColor.withValues(alpha: dark ? 0.7 : 0.55),
       ),
-    ],
-  );
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: dark ? 0.10 : 0.035),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+  }
 }
 
-/// Contenedor tipo tarjeta estándar para secciones y KPIs de métricas.
 class MetricsSectionCard extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -34,10 +40,13 @@ class MetricsSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: AppDecorations.card,
+      decoration: AppDecorations.card(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -50,24 +59,24 @@ class MetricsSectionCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: theme.textTheme.titleSmall?.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
+                        color: colors.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 12,
-                        color: AppColors.mutedText,
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
               ),
-              ?trailing,
+              if (trailing != null) trailing!,
             ],
           ),
           const SizedBox(height: 16),

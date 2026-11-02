@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:farma_di_mobile/core/di/injection.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: _Palette.ink,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).scaffoldBackgroundColor : _Palette.ink,
         body: SafeArea(
           bottom: false,
           child: LayoutBuilder(
@@ -223,7 +223,7 @@ class _FormSheet extends StatelessWidget {
             child: FilledButton(
               onPressed: loading ? null : onSubmit,
               style: FilledButton.styleFrom(
-                backgroundColor: _Palette.ink,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).scaffoldBackgroundColor : _Palette.ink,
                 disabledBackgroundColor: _Palette.ink.withValues(alpha: 0.85),
                 foregroundColor: Colors.white,
                 elevation: 0,

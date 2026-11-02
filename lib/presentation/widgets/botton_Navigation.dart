@@ -5,12 +5,18 @@ Widget buildBottomNavigationBar(
   int currentIndex,
   ValueChanged<int> onTap,
 ) {
+  final theme = Theme.of(context);
+  final colors = theme.colorScheme;
+
   return Container(
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: colors.surface,
+      border: Border(top: BorderSide(color: theme.dividerColor, width: 0.6)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
+          color: Colors.black.withValues(
+            alpha: theme.brightness == Brightness.dark ? 0.18 : 0.08,
+          ),
           blurRadius: 10,
           offset: const Offset(0, -2),
         ),
@@ -20,9 +26,14 @@ Widget buildBottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+      backgroundColor: colors.surface,
+      selectedItemColor: colors.primary,
+      unselectedItemColor: colors.onSurfaceVariant,
+      selectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 11,
+      ),
+      unselectedLabelStyle: const TextStyle(fontSize: 11),
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
         BottomNavigationBarItem(

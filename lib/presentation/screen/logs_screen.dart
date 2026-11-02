@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/core/di/injection.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
 import 'package:farma_di_mobile/presentation/theme/app_colors.dart';
@@ -51,7 +51,7 @@ class _LogsScreenState extends State<LogsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
