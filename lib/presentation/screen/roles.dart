@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:farma_di_mobile/core/di/injection.dart';
+import 'package:farma_di_mobile/data/models/auth_model/user_model.dart';
+import 'package:farma_di_mobile/presentation/controllers/user_controller.dart';
 
 import '../theme/app_colors.dart';
 import '../widgets/logout_button.dart';
@@ -12,7 +15,8 @@ class _UserFormResult {
     required this.status,
     required this.name,
     required this.email,
-    required this.role,
+    required this.roleId,
+    required this.password,
     required this.phone,
     required this.isActive,
   });
@@ -20,14 +24,16 @@ class _UserFormResult {
   const _UserFormResult.saved({
     required String name,
     required String email,
-    required String role,
+    required int? roleId,
+    required String password,
     required String phone,
     required bool isActive,
   }) : this(
          status: _UserFormStatus.saved,
          name: name,
          email: email,
-         role: role,
+         roleId: roleId,
+         password: password,
          phone: phone,
          isActive: isActive,
        );
@@ -37,7 +43,8 @@ class _UserFormResult {
         status: _UserFormStatus.cancelled,
         name: '',
         email: '',
-        role: '',
+        roleId: null,
+        password: '',
         phone: '',
         isActive: false,
       );
@@ -45,27 +52,21 @@ class _UserFormResult {
   final _UserFormStatus status;
   final String name;
   final String email;
-  final String role;
+  final int? roleId;
+  final String password;
   final String phone;
   final bool isActive;
 }
 
 class AppUser {
-  String name;
-  String email;
-  String role;
-  String phone;
-  String lastSession;
-  bool active;
+  AppUser(this.model);
 
-  AppUser({
-    required this.name,
-    required this.email,
-    required this.role,
-    required this.phone,
-    required this.lastSession,
-    required this.active,
-  });
+  final AppUserModel model;
+  String get name => model.fullName;
+  String get email => model.email;
+  String get role => model.roleLabel;
+  String get phone => model.phone;
+  bool get active => model.isActive;
 }
 
 class RolesScreen extends StatefulWidget {
@@ -76,79 +77,37 @@ class RolesScreen extends StatefulWidget {
 }
 
 class _RolesScreenState extends State<RolesScreen> {
-  static const List<String> _roles = [
-    'Administrador',
-    'Supervisor',
-    'Vendedor',
-  ];
-  static const Map<String, List<String>> _permissionsByRole = {
-    'Administrador': [
-      'Ventas y Facturación',
-      'Catálogo de Productos',
-      'Métricas analíticas',
-      'Logs del sistema',
-      'Configuración global',
-    ],
-    'Supervisor': [
-      'Ventas y Facturación',
-      'Catálogo de Productos',
-      'Métricas analíticas',
-    ],
-    'Vendedor': ['Ventas y Facturación', 'Catálogo de Productos'],
-  };
-
+  late final UserController _userController;
   String _selectedFilter = 'Todos';
 
-  final List<AppUser> _users = [
-    AppUser(
-      name: 'Ana García',
-      email: 'a.garcia@farmadi.com',
-      role: 'Administrador',
-      phone: '+505 8881-2401',
-      lastSession: 'Hoy a las 08:42 AM (Administración)',
-      active: true,
-    ),
-    AppUser(
-      name: 'Carlos Méndez',
-      email: 'c.mendez@farmadi.com',
-      role: 'Vendedor',
-      phone: '+505 8744-1290',
-      lastSession: 'Hoy a las 09:15 AM (Caja Mostrador #2)',
-      active: true,
-    ),
-    AppUser(
-      name: 'Sofía Reyes',
-      email: 's.reyes@farmadi.com',
-      role: 'Supervisor',
-      phone: '+505 8881-3472',
-      lastSession: 'Hoy a las 08:30 AM (Sucursal Central)',
-      active: true,
-    ),
-    AppUser(
-      name: 'Diego López',
-      email: 'd.lopez@farmadi.com',
-      role: 'Vendedor',
-      phone: '+505 8744-2618',
-      lastSession: 'Ayer a las 06:12 PM (Caja Mostrador #1)',
-      active: true,
-    ),
-    AppUser(
-      name: 'Valentina Cruz',
-      email: 'v.cruz@farmadi.com',
-      role: 'Vendedor',
-      phone: '+505 8744-3027',
-      lastSession: 'Ayer a las 04:50 PM (Caja Mostrador #3)',
-      active: false,
-    ),
-    AppUser(
-      name: 'Luis Morales',
-      email: 'l.morales@farmadi.com',
-      role: 'Supervisor',
-      phone: '+505 8881-0954',
-      lastSession: 'Hoy a las 07:55 AM (Sucursal Norte)',
-      active: true,
-    ),
-  ];
+  List<AppUser> get _users =>
+      _userController.users.map(AppUser.new).toList(growable: false);
+
+  @override
+  void initState() {
+    super.initState();
+    _userController = getIt<UserController>()..addListener(_onUsersChanged);
+    _userController.fetchUsers();
+  }
+
+  void _onUsersChanged() {
+    if (!mounted) return;
+    if (_userController.status == UserStatus.success &&
+        _selectedFilter != 'Todos' &&
+        !_userController.users.any(
+          (user) => user.roleLabel == _selectedFilter,
+        )) {
+      _selectedFilter = 'Todos';
+    }
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _userController.removeListener(_onUsersChanged);
+    _userController.dispose();
+    super.dispose();
+  }
 
   List<AppUser> get _filteredUsers {
     if (_selectedFilter == 'Todos') {
@@ -174,6 +133,7 @@ class _RolesScreenState extends State<RolesScreen> {
               _buildPeopleHeading(),
               const SizedBox(height: 8),
               Expanded(child: _buildUserList()),
+              _buildPaginationControls(),
             ],
           ),
         ),
@@ -219,7 +179,7 @@ class _RolesScreenState extends State<RolesScreen> {
   }
 
   Widget _buildRoleFilters() {
-    final filters = ['Todos', ..._roles];
+    final filters = ['Todos', ..._users.map((user) => user.role).toSet()];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -267,17 +227,24 @@ class _RolesScreenState extends State<RolesScreen> {
             ),
           ),
         ),
-        TextButton.icon(
-          onPressed: _showUserForm,
-          icon: const Icon(Icons.person_add_alt_1, size: 16),
-          label: const Text('Agregar'),
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            textStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+        Tooltip(
+          message: _userController.availableRoles.isEmpty
+              ? 'La API no devolvió roles disponibles para asignar.'
+              : 'Agregar usuario',
+          child: TextButton.icon(
+            onPressed: _userController.availableRoles.isEmpty
+                ? null
+                : () => _showUserForm(),
+            icon: const Icon(Icons.person_add_alt_1, size: 16),
+            label: const Text('Agregar'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              textStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              visualDensity: VisualDensity.compact,
             ),
-            visualDensity: VisualDensity.compact,
           ),
         ),
       ],
@@ -285,10 +252,55 @@ class _RolesScreenState extends State<RolesScreen> {
   }
 
   Widget _buildUserList() {
-    return ListView.separated(
-      itemCount: _filteredUsers.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
-      itemBuilder: (context, index) => _buildUserCard(_filteredUsers[index]),
+    if (_users.isEmpty && _userController.status == UserStatus.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_users.isEmpty && _userController.status == UserStatus.error) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _userController.errorMessage ?? 'No se pudo cargar el personal.',
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => _userController.fetchUsers(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_users.isEmpty) {
+      return const Center(child: Text('No hay usuarios registrados.'));
+    }
+    return Column(
+      children: [
+        if (_userController.status == UserStatus.loading)
+          const LinearProgressIndicator(),
+        if (_userController.status == UserStatus.error)
+          TextButton.icon(
+            onPressed: () =>
+                _userController.fetchUsers(page: _userController.currentPage),
+            icon: const Icon(Icons.refresh, size: 16),
+            label: Text(_userController.errorMessage ?? 'Error al actualizar.'),
+          ),
+        Expanded(
+          child: _filteredUsers.isEmpty
+              ? const Center(
+                  child: Text('No hay usuarios con este rol en esta página.'),
+                )
+              : ListView.separated(
+                  itemCount: _filteredUsers.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
+                  itemBuilder: (context, index) =>
+                      _buildUserCard(_filteredUsers[index]),
+                ),
+        ),
+      ],
     );
   }
 
@@ -374,6 +386,7 @@ class _RolesScreenState extends State<RolesScreen> {
   Color _roleColor(String role) {
     switch (role) {
       case 'Administrador':
+      case 'Admin':
         return AppColors.primaryDark;
       case 'Supervisor':
         return AppColors.warning;
@@ -382,6 +395,38 @@ class _RolesScreenState extends State<RolesScreen> {
       default:
         return AppColors.textSecondary;
     }
+  }
+
+  Widget _buildPaginationControls() {
+    final isLoading = _userController.status == UserStatus.loading;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Página ${_userController.currentPage} de ${_userController.totalPages} · '
+          '${_userController.totalItems} usuarios',
+          style: const TextStyle(fontSize: 11, color: AppColors.mutedText),
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: !isLoading && _userController.hasPreviousPage
+                  ? _userController.previousPage
+                  : null,
+              icon: const Icon(Icons.chevron_left),
+              tooltip: 'Página anterior',
+            ),
+            IconButton(
+              onPressed: !isLoading && _userController.hasNextPage
+                  ? _userController.nextPage
+                  : null,
+              icon: const Icon(Icons.chevron_right),
+              tooltip: 'Página siguiente',
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _buildRoleBadge(String role) {
@@ -433,8 +478,15 @@ class _RolesScreenState extends State<RolesScreen> {
     );
     final emailController = TextEditingController(text: user?.email ?? '');
     final phoneController = TextEditingController(text: user?.phone ?? '');
+    final passwordController = TextEditingController();
+    final availableRoles = _userController.availableRoles;
     final formKey = GlobalKey<FormState>();
-    var selectedRole = user?.role ?? 'Vendedor';
+    int? selectedRoleId;
+    if (user != null && user.model.roles.isNotEmpty) {
+      selectedRoleId = user.model.roles.first.id;
+    } else if (user == null && availableRoles.isNotEmpty) {
+      selectedRoleId = availableRoles.first.id;
+    }
     var isActive = user?.active ?? true;
     String? formAlertMessage;
 
@@ -451,9 +503,12 @@ class _RolesScreenState extends State<RolesScreen> {
         expand: false,
         builder: (context, scrollController) => StatefulBuilder(
           builder: (context, setModalState) {
-            final assignedPermissions =
-                _permissionsByRole[selectedRole] ?? const <String>[];
-
+            final matchingRoles = availableRoles
+                .where((role) => role.id == selectedRoleId)
+                .toList();
+            final selectedRole = matchingRoles.isNotEmpty
+                ? matchingRoles.first.name
+                : user?.role ?? 'Sin rol';
             return Container(
               decoration: const BoxDecoration(
                 color: AppColors.surface,
@@ -493,9 +548,7 @@ class _RolesScreenState extends State<RolesScreen> {
                         const SizedBox(width: 7),
                         Expanded(
                           child: Text(
-                            isEditing
-                                ? 'Detalle Rol ${selectedRole.toLowerCase()}'
-                                : 'Nuevo usuario',
+                            isEditing ? 'Detalle de usuario' : 'Nuevo usuario',
                             style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -549,6 +602,7 @@ class _RolesScreenState extends State<RolesScreen> {
                       keyboardType: TextInputType.emailAddress,
                       icon: Icons.mail_outline,
                       isEmail: true,
+                      originalValue: user?.email,
                     ),
                     const SizedBox(height: 10),
                     _buildFormField(
@@ -556,6 +610,15 @@ class _RolesScreenState extends State<RolesScreen> {
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
                       icon: Icons.phone_outlined,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildFormField(
+                      label: isEditing
+                          ? 'Nueva contraseña (opcional)'
+                          : 'Contraseña',
+                      controller: passwordController,
+                      isRequired: !isEditing,
+                      obscureText: true,
                     ),
                     const SizedBox(height: 12),
                     const Text(
@@ -567,39 +630,52 @@ class _RolesScreenState extends State<RolesScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedRole,
-                      decoration: _formDecoration(
-                        prefixIcon: Icons.badge_outlined,
+                    if (isEditing)
+                      InputDecorator(
+                        decoration: _formDecoration(
+                          prefixIcon: Icons.badge_outlined,
+                        ),
+                        child: Text(selectedRole),
+                      )
+                    else
+                      DropdownButtonFormField<int>(
+                        initialValue: selectedRoleId,
+                        decoration: _formDecoration(
+                          prefixIcon: Icons.badge_outlined,
+                        ),
+                        validator: (value) =>
+                            value == null ? 'Selecciona un rol' : null,
+                        items: availableRoles
+                            .map(
+                              (role) => DropdownMenuItem<int>(
+                                value: role.id,
+                                child: Text(role.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setModalState(() => selectedRoleId = value);
+                          }
+                        },
                       ),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.primaryDark,
+                    const Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: Text(
+                        'El cambio de rol requiere confirmar el payload de asignación de la API.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                      items: _roles
-                          .map(
-                            (role) => DropdownMenuItem(
-                              value: role,
-                              child: Text(role),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setModalState(() => selectedRole = value);
-                        }
-                      },
                     ),
-                    const SizedBox(height: 10),
-                    _buildAccountStatus(isActive, (value) {
-                      setModalState(() => isActive = value);
-                    }),
-                    const SizedBox(height: 10),
-                    _buildPermissions(assignedPermissions),
-                    if (user != null) ...[
+                    if (isEditing) ...[
                       const SizedBox(height: 10),
-                      _buildLastSession(user.lastSession),
+                      _buildAccountStatus(isActive, (value) {
+                        setModalState(() => isActive = value);
+                      }),
                     ],
+                    const SizedBox(height: 10),
                     const SizedBox(height: 16),
                     SizedBox(
                       height: 46,
@@ -621,7 +697,8 @@ class _RolesScreenState extends State<RolesScreen> {
                             _UserFormResult.saved(
                               name: name,
                               email: emailController.text.trim(),
-                              role: selectedRole,
+                              roleId: selectedRoleId,
+                              password: passwordController.text,
                               phone: phoneController.text.trim(),
                               isActive: isActive,
                             ),
@@ -671,6 +748,7 @@ class _RolesScreenState extends State<RolesScreen> {
     lastNameController.dispose();
     emailController.dispose();
     phoneController.dispose();
+    passwordController.dispose();
 
     if (!mounted) {
       return;
@@ -678,32 +756,39 @@ class _RolesScreenState extends State<RolesScreen> {
 
     if (result?.status == _UserFormStatus.saved) {
       try {
+        final nameParts = result!.name.trim().split(RegExp(r'\s+'));
         if (user != null) {
-          _updateUser(
-            user,
-            result!.name,
-            result.email,
-            result.role,
-            result.phone,
-            result.isActive,
+          await _userController.updateUser(
+            user.model,
+            name: nameParts.first,
+            lastName: nameParts.length < 2 ? '' : nameParts.skip(1).join(' '),
+            email: result.email,
+            phone: result.phone,
+            isActive: result.isActive,
+            password: result.password.isEmpty ? null : result.password,
           );
         } else {
-          _addUser(
-            result!.name,
-            result.email,
-            result.role,
-            result.phone,
-            result.isActive,
+          final roleId = result.roleId;
+          if (roleId == null) return;
+          await _userController.createUser(
+            name: nameParts.first,
+            lastName: nameParts.length < 2 ? '' : nameParts.skip(1).join(' '),
+            password: result.password,
+            email: result.email,
+            phone: result.phone,
+            roleId: roleId,
           );
         }
-      } catch (_) {
+      } catch (error) {
+        if (!mounted) return;
         NotificationWidget.show(
           context,
           type: NotificationType.error,
-          message: 'No se pudieron guardar los cambios. Inténtalo de nuevo.',
+          message: error.toString().replaceFirst('Exception: ', ''),
         );
         return;
       }
+      if (!mounted) return;
       NotificationWidget.show(
         context,
         type: NotificationType.success,
@@ -723,7 +808,6 @@ class _RolesScreenState extends State<RolesScreen> {
   Widget _buildProfileSummary(AppUser? user, String role, bool isActive) {
     final displayName = user?.name ?? 'Nuevo integrante';
     final initials = user == null ? '?' : _getInitials(user.name);
-    final userIndex = user == null ? -1 : _users.indexOf(user);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -779,9 +863,9 @@ class _RolesScreenState extends State<RolesScreen> {
                           : AppColors.trackBackground,
                       isActive ? AppColors.success : AppColors.textSecondary,
                     ),
-                    if (userIndex >= 0)
+                    if (user != null)
                       _buildCompactTag(
-                        'USR-${(userIndex + 2).toString().padLeft(3, '0')}',
+                        'USR-${user.model.id.toString().padLeft(3, '0')}',
                         AppColors.trackBackground,
                         AppColors.textSecondary,
                       ),
@@ -854,6 +938,9 @@ class _RolesScreenState extends State<RolesScreen> {
     TextInputType? keyboardType,
     IconData? icon,
     bool isEmail = false,
+    String? originalValue,
+    bool isRequired = true,
+    bool obscureText = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -866,26 +953,31 @@ class _RolesScreenState extends State<RolesScreen> {
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
-            children: const [
-              TextSpan(
-                text: ' *',
-                style: TextStyle(color: AppColors.red),
-              ),
-            ],
+            children: isRequired
+                ? const [
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(color: AppColors.red),
+                    ),
+                  ]
+                : const [],
           ),
         ),
         const SizedBox(height: 5),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          obscureText: obscureText,
           style: const TextStyle(fontSize: 12, color: AppColors.primaryDark),
           decoration: _formDecoration(prefixIcon: icon),
           validator: (value) {
             final fieldValue = value?.trim() ?? '';
-            if (fieldValue.isEmpty) {
+            if (isRequired && fieldValue.isEmpty) {
               return 'Campo obligatorio';
             }
-            if (isEmail && !fieldValue.contains('@')) {
+            if (isEmail &&
+                !fieldValue.contains('@') &&
+                fieldValue != originalValue) {
               return 'Correo no válido';
             }
             return null;
@@ -977,199 +1069,5 @@ class _RolesScreenState extends State<RolesScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildPermissions(List<String> assignedPermissions) {
-    const permissions = [
-      'Ventas y Facturación',
-      'Catálogo de Productos',
-      'Métricas analíticas',
-      'Logs del sistema',
-      'Configuración global',
-    ];
-    final restrictedPermissions = permissions
-        .where((permission) => !assignedPermissions.contains(permission))
-        .toList();
-
-    return Container(
-      padding: const EdgeInsets.all(11),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(13),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(
-                Icons.verified_user_outlined,
-                size: 16,
-                color: AppColors.link,
-              ),
-              SizedBox(width: 6),
-              Text(
-                'Permisos asignados',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          Text(
-            'Acceso asignado: ${assignedPermissions.join(', ')}. '
-            'Restringido: ${restrictedPermissions.isEmpty ? 'Ninguno' : restrictedPermissions.join(', ')}.',
-            style: const TextStyle(
-              fontSize: 10,
-              height: 1.4,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 5,
-            runSpacing: 5,
-            children: permissions.map((permission) {
-              final isAssigned = assignedPermissions.contains(permission);
-              return _buildPermissionTag(permission, isAssigned);
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPermissionTag(String permission, bool isAssigned) {
-    final isRestrictedLog = permission == 'Logs del sistema' && !isAssigned;
-    final background = isAssigned
-        ? AppColors.infoBackground
-        : isRestrictedLog
-        ? AppColors.redSoft
-        : AppColors.trackBackground;
-    final foreground = isAssigned
-        ? AppColors.primaryDark
-        : isRestrictedLog
-        ? AppColors.red
-        : AppColors.textSecondary;
-    final icon = isAssigned
-        ? Icons.check_circle_outline
-        : isRestrictedLog
-        ? Icons.block
-        : Icons.remove_circle_outline;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 11, color: foreground),
-          const SizedBox(width: 4),
-          Text(
-            permission,
-            style: TextStyle(
-              fontSize: 9,
-              color: foreground,
-              fontWeight: FontWeight.w600,
-              decoration: permission == 'Configuración global' && !isAssigned
-                  ? TextDecoration.lineThrough
-                  : null,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLastSession(String lastSession) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.trackBackground),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: AppColors.infoBackground,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.history,
-              size: 16,
-              color: AppColors.chartBlue,
-            ),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'ÚLTIMA SESIÓN',
-                  style: TextStyle(fontSize: 9, color: AppColors.textSecondary),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  lastSession,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _addUser(
-    String name,
-    String email,
-    String role,
-    String phone,
-    bool isActive,
-  ) {
-    setState(() {
-      _users.add(
-        AppUser(
-          name: name,
-          email: email,
-          role: role,
-          phone: phone,
-          lastSession: 'Sin sesiones registradas',
-          active: isActive,
-        ),
-      );
-    });
-  }
-
-  void _updateUser(
-    AppUser user,
-    String name,
-    String email,
-    String role,
-    String phone,
-    bool isActive,
-  ) {
-    setState(() {
-      user.name = name;
-      user.email = email;
-      user.role = role;
-      user.phone = phone;
-      user.active = isActive;
-    });
   }
 }

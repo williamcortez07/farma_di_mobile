@@ -1,11 +1,7 @@
 import 'package:farma_di_mobile/core/errors/app_exception.dart';
 
 class UserModel {
-  const UserModel({
-    required this.id,
-    required this.name,
-    required this.email,
-  });
+  const UserModel({required this.id, required this.name, required this.email});
 
   final String id;
   final String name;
@@ -28,6 +24,7 @@ class AppUserModel {
     required this.email,
     required this.phone,
     required this.roleId,
+    required this.roles,
     required this.isActive,
   });
 
@@ -37,10 +34,13 @@ class AppUserModel {
   final String email;
   final String phone;
   final int roleId;
+  final List<AppRoleModel> roles;
   final bool isActive;
 
   String get fullName => '$name $lastName'.trim();
-  String get roleLabel => 'Rol $roleId';
+  String get roleLabel => roles.isEmpty
+      ? (roleId == 0 ? 'Sin rol' : 'Rol $roleId')
+      : roles.map((role) => role.name).join(', ');
 
   factory AppUserModel.fromJson(Map<String, dynamic> json) {
     final id = json['id'];
@@ -48,6 +48,14 @@ class AppUserModel {
     if (id is! num || roleId is! num) {
       throw const ParsingException();
     }
+    final roleData = json['roles'];
+    final roles = roleData is List
+        ? roleData
+              .whereType<Map<String, dynamic>>()
+              .map(AppRoleModel.fromJson)
+              .toList()
+        : <AppRoleModel>[];
+
     return AppUserModel(
       id: id.toInt(),
       name: json['userName'] as String? ?? '',
@@ -55,7 +63,23 @@ class AppUserModel {
       email: json['mail'] as String? ?? '',
       phone: json['userPhone'] as String? ?? '',
       roleId: roleId.toInt(),
+      roles: roles,
       isActive: json['isActive'] as bool? ?? false,
     );
+  }
+}
+
+class AppRoleModel {
+  const AppRoleModel({required this.id, required this.name});
+
+  final int id;
+  final String name;
+
+  factory AppRoleModel.fromJson(Map<String, dynamic> json) {
+    final id = json['rolId'];
+    if (id is! num || json['rolName'] is! String) {
+      throw const ParsingException();
+    }
+    return AppRoleModel(id: id.toInt(), name: json['rolName'] as String);
   }
 }
