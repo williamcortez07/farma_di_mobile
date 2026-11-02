@@ -8,6 +8,17 @@ class UserRepository {
 
   final ApiClient _api;
 
+  Future<List<AppRoleModel>> getRoles() async {
+    final response = await _api.get(ApiConstants.roles);
+    if (response is! Map<String, dynamic> || response['data'] is! List) {
+      throw const ParsingException();
+    }
+    return (response['data'] as List).map((item) {
+      if (item is! Map<String, dynamic>) throw const ParsingException();
+      return AppRoleModel.fromJson(item);
+    }).toList();
+  }
+
   Future<void> createUser({
     required String name,
     required String lastName,

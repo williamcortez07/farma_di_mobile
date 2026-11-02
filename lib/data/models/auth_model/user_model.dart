@@ -76,7 +76,7 @@ class AppRoleModel {
   final String name;
 
   factory AppRoleModel.fromJson(Map<String, dynamic> json) {
-    final id = json['rolId'];
+    final id = json['id'] ?? json['rolId'];
     if (id is! num || json['rolName'] is! String) {
       throw const ParsingException();
     }
