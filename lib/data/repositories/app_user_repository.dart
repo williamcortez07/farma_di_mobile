@@ -65,6 +65,7 @@ class UserRepository {
       users: users,
       meta: UserPaginationMeta.fromJson(
         response['meta'] as Map<String, dynamic>,
+        fallbackTotalItems: users.length,
       ),
     );
   }
@@ -116,9 +117,15 @@ class UserPaginationMeta {
   final bool hasPreviousPage;
   final bool hasNextPage;
 
-  factory UserPaginationMeta.fromJson(Map<String, dynamic> json) {
+  factory UserPaginationMeta.fromJson(
+    Map<String, dynamic> json, {
+    int fallbackTotalItems = 0,
+  }) {
     return UserPaginationMeta(
-      totalItems: (json['totalItems'] as num?)?.toInt() ?? 0,
+      totalItems:
+          (json['totalItems'] as num?)?.toInt() ??
+          (json['totalAmount'] as num?)?.toInt() ??
+          fallbackTotalItems,
       totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
       currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
       itemsPerPage: (json['itemsPerPage'] as num?)?.toInt() ?? 10,
