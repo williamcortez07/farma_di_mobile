@@ -38,14 +38,14 @@ class _PillIcon extends StatelessWidget {
     return Container(
       width: 46.0,
       height: 46.0,
-      decoration: const BoxDecoration(
-        color: Color(0xFFF0F4F8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         shape: BoxShape.circle,
       ),
       child: Center(
         child: Text(
           _resolveEmoji(categoryName),
-          style: const TextStyle(fontSize: 22.0),
+          style: TextStyle(fontSize: 22.0),
         ),
       ),
     );
@@ -79,7 +79,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         // El AppNavbar (fecha y perfil) lo maneja home_screen con el IndexedStack
         body: Column(
           children: [
@@ -102,13 +102,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 0.5,
       shadowColor: const Color(0x1A000000),
       toolbarHeight: 70.0,
       titleSpacing: 16.0,
       automaticallyImplyLeading: false,
-      title: const Column(
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 1.0),
@@ -117,7 +117,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1A2E),
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -127,21 +127,21 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   Widget _buildTabBar() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF0F4F8),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(30.0),
         ),
         child: TabBar(
           indicator: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(30.0),
           ),
           indicatorSize: TabBarIndicatorSize.tab,
-          labelColor: Colors.white,
-          unselectedLabelColor: const Color(0xFF546E7A),
+          labelColor: Theme.of(context).colorScheme.onPrimary,
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
           dividerColor: Colors.transparent,
           labelStyle: const TextStyle(
             fontSize: 13.0,
@@ -267,7 +267,7 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 10.0),
       child: Row(
         children: [
@@ -275,21 +275,21 @@ class _SearchBar extends StatelessWidget {
             child: Container(
               height: 44.0,
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F4F8),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: TextField(
                 controller: controller,
-                style: const TextStyle(fontSize: 13.0),
-                decoration: const InputDecoration(
+                style: TextStyle(fontSize: 13.0),
+                decoration: InputDecoration(
                   hintText: 'Buscar por nombre, marca o categ...',
                   hintStyle: TextStyle(
-                    color: Color(0xFFB0BEC5),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 13.0,
                   ),
                   prefixIcon: Icon(
                     Icons.search,
-                    color: Color(0xFFB0BEC5),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     size: 20.0,
                   ),
                   border: InputBorder.none,
@@ -306,9 +306,9 @@ class _SearchBar extends StatelessWidget {
               color: const Color(0xFF1565C0),
               borderRadius: BorderRadius.circular(10.0),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.tune_rounded,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               size: 20.0,
             ),
           ),
@@ -338,7 +338,7 @@ class _FilterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 10.0),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -399,7 +399,7 @@ class _Chip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 7.0),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF1A1A2E) : const Color(0xFFF0F4F8),
+          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Row(
@@ -421,7 +421,7 @@ class _Chip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : const Color(0xFF546E7A),
+                color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -463,7 +463,7 @@ class _ProductCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10.0),
       padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 10.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: const [
           BoxShadow(
@@ -487,26 +487,26 @@ class _ProductCard extends StatelessWidget {
                   children: [
                     Text(
                       product.tradeName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14.0,
-                        color: Color(0xFF1A1A2E),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2.0),
                     Text(
                       '${product.brandName} · ${product.categoryName}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.0,
-                        color: Color(0xFF78909C),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 2.0),
                     Text(
                       product.barcode,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11.0,
-                        color: Color(0xFFB0BEC5),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -515,7 +515,7 @@ class _ProductCard extends StatelessWidget {
               const SizedBox(width: 8.0),
               Text(
                 'C\$ ${product.unitPrice.toStringAsFixed(2)}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Color(0xFF1565C0),
                   fontWeight: FontWeight.bold,
                   fontSize: 14.0,
@@ -547,15 +547,15 @@ class _ProductCard extends StatelessWidget {
               const SizedBox(width: 8.0),
               Text(
                 '${product.totalQuantity} uds.',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.0,
                   color: Color(0xFF607D8B),
                 ),
               ),
               const Spacer(),
-              const Icon(
+              Icon(
                 Icons.more_horiz,
-                color: Color(0xFFB0BEC5),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 size: 20.0,
               ),
             ],
@@ -600,8 +600,8 @@ class CategoriesTab extends StatelessWidget {
             onRefresh: () => provider.fetchCategories(),
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(height: 80),
+              children: [
+                const SizedBox(height: 80),
                 Center(
                   child: Text(
                     'No hay categorías registradas.',
@@ -660,7 +660,7 @@ class _CategoryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: const [
           BoxShadow(
@@ -685,25 +685,25 @@ class _CategoryCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     categoryName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14.0,
-                      color: Color(0xFF1A1A2E),
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
                 Text(
                   '$productCount productos',
-                  style: const TextStyle(
-                    color: Color(0xFF78909C),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12.0,
                   ),
                 ),
                 const SizedBox(width: 8.0),
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14.0,
-                  color: Color(0xFFB0BEC5),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -742,8 +742,8 @@ class BrandsTab extends StatelessWidget {
             onRefresh: () => provider.fetchBrands(),
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(height: 80),
+              children: [
+                const SizedBox(height: 80),
                 Center(
                   child: Text(
                     'No hay marcas registradas.',
@@ -783,7 +783,7 @@ class _BrandCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10.0),
       padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: const [
           BoxShadow(
@@ -797,10 +797,10 @@ class _BrandCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20.0,
-            backgroundColor: const Color(0xFFF0F4F8),
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             child: Text(
               _initials(),
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFF1565C0),
                 fontWeight: FontWeight.bold,
                 fontSize: 13.0,
@@ -814,18 +814,18 @@ class _BrandCard extends StatelessWidget {
               children: [
                 Text(
                   brand.brandName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14.0,
-                    color: Color(0xFF1A1A2E),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 if (brand.brandDescription.isNotEmpty) ...[
                   const SizedBox(height: 2.0),
                   Text(
                     brand.brandDescription,
-                    style: const TextStyle(
-                      color: Color(0xFF78909C),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12.0,
                     ),
                   ),
@@ -880,16 +880,16 @@ class CategoryProductsScreen extends StatelessWidget {
         final products = provider.getProductsByCategory(categoryName);
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F7FA),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 0.5,
             shadowColor: const Color(0x1A000000),
             leading: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
                 size: 18.0,
-                color: Color(0xFF1A1A2E),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
@@ -905,17 +905,17 @@ class CategoryProductsScreen extends StatelessWidget {
                     children: [
                       Text(
                         categoryName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A2E),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         '${products.length} medicamentos disponibles',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11.0,
-                          color: Color(0xFF78909C),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -931,18 +931,18 @@ class CategoryProductsScreen extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.inventory_2_outlined,
                           size: 48,
-                          color: Color(0xFFB0BEC5),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'No hay medicamentos registrados en la categoría "$categoryName".',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: Color(0xFF78909C),
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

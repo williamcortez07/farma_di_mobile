@@ -15,7 +15,7 @@ class LogoutButton extends StatelessWidget {
       label: const Text('Salir'),
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primaryDark,
-        backgroundColor: AppColors.surface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         side: const BorderSide(color: AppColors.trackBackground),
         shape: const StadiumBorder(),
       ),
