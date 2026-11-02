@@ -59,12 +59,13 @@ class _UserFormResult {
 }
 
 class AppUser {
-  AppUser(this.model);
+  AppUser(this.model, {String? resolvedRole}) : _resolvedRole = resolvedRole;
 
   final AppUserModel model;
+  final String? _resolvedRole;
   String get name => model.fullName;
   String get email => model.email;
-  String get role => model.roleLabel;
+  String get role => _resolvedRole ?? model.roleLabel;
   String get phone => model.phone;
   bool get active => model.isActive;
 }
@@ -81,7 +82,15 @@ class _RolesScreenState extends State<RolesScreen> {
   String _selectedFilter = 'Todos';
 
   List<AppUser> get _users =>
-      _userController.users.map(AppUser.new).toList(growable: false);
+      _userController.users.map((model) {
+        final matchingRoles = _userController.availableRoles
+            .where((role) => role.id == model.roleId)
+            .toList();
+        final resolvedRole = model.roles.isEmpty && model.roleId != 0
+            ? (matchingRoles.isEmpty ? null : matchingRoles.first.name)
+            : null;
+        return AppUser(model, resolvedRole: resolvedRole);
+      }).toList(growable: false);
 
   @override
   void initState() {

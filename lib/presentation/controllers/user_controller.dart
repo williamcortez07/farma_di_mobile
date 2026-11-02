@@ -27,6 +27,12 @@ class UserController extends ChangeNotifier {
     notifyListeners();
 
     try {
+      if (_availableRoles.isEmpty) {
+        final roles = await _repository.getRoles();
+        for (final role in roles) {
+          _availableRoles[role.id] = role;
+        }
+      }
       final response = await _repository.getUsers(page: page, limit: limit);
       users = response.users;
       for (final user in users) {
