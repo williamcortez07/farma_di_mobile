@@ -12,6 +12,7 @@ class UserController extends ChangeNotifier {
   UserStatus status = UserStatus.initial;
   String? errorMessage;
   List<AppUserModel> users = [];
+  List<AppUserModel>? _unpagedUsers;
   final Map<int, AppRoleModel> _availableRoles = {};
   List<AppRoleModel> get availableRoles => _availableRoles.values.toList();
   int currentPage = 1;
@@ -22,6 +23,10 @@ class UserController extends ChangeNotifier {
   bool hasNextPage = false;
 
   Future<void> fetchUsers({int page = 1}) async {
+    if (_unpagedUsers != null) {
+      _showLocalPage(page);
+      return;
+    }
     status = UserStatus.loading;
     errorMessage = null;
     notifyListeners();
@@ -34,18 +39,33 @@ class UserController extends ChangeNotifier {
         }
       }
       final response = await _repository.getUsers(page: page, limit: limit);
-      users = response.users;
-      for (final user in users) {
+      final requestLimit = limit;
+      for (final user in response.users) {
         for (final role in user.roles) {
           _availableRoles[role.id] = role;
         }
       }
-      currentPage = response.meta.currentPage;
-      limit = response.meta.itemsPerPage;
-      totalPages = response.meta.totalPages < 1 ? 1 : response.meta.totalPages;
-      totalItems = response.meta.totalItems;
-      hasPreviousPage = response.meta.hasPreviousPage;
-      hasNextPage = response.meta.hasNextPage;
+      limit = response.meta.itemsPerPage > 0
+          ? response.meta.itemsPerPage
+          : requestLimit;
+      if (response.users.length > limit) {
+        
+        _unpagedUsers = response.users;
+        totalItems = response.meta.totalItems > response.users.length
+            ? response.meta.totalItems
+            : response.users.length;
+        totalPages = (totalItems / limit).ceil();
+        _showLocalPage(page);
+      } else {
+        users = response.users;
+        currentPage = response.meta.currentPage;
+        totalPages = response.meta.totalPages < 1 ? 1 : response.meta.totalPages;
+        totalItems = response.meta.totalItems;
+        hasPreviousPage =
+            response.meta.hasPreviousPage || currentPage > 1;
+        hasNextPage =
+            response.meta.hasNextPage || currentPage < totalPages;
+      }
       status = UserStatus.success;
     } on AppException catch (error) {
       errorMessage = error.message;
@@ -55,6 +75,22 @@ class UserController extends ChangeNotifier {
       status = UserStatus.error;
     }
 
+    notifyListeners();
+  }
+
+  void _showLocalPage(int page) {
+    final allUsers = _unpagedUsers!;
+    totalPages = (allUsers.length / limit).ceil();
+    if (totalPages < 1) totalPages = 1;
+    currentPage = page.clamp(1, totalPages).toInt();
+    totalItems = allUsers.length;
+    final start = (currentPage - 1) * limit;
+    final end = (start + limit).clamp(0, allUsers.length).toInt();
+    users = allUsers.sublist(start, end);
+    hasPreviousPage = currentPage > 1;
+    hasNextPage = currentPage < totalPages;
+    status = UserStatus.success;
+    errorMessage = null;
     notifyListeners();
   }
 
@@ -88,6 +124,7 @@ class UserController extends ChangeNotifier {
       isActive: isActive,
       password: password,
     );
+    _unpagedUsers = null;
     await fetchUsers(page: currentPage);
   }
 
@@ -107,6 +144,7 @@ class UserController extends ChangeNotifier {
       phone: phone,
       roleId: roleId,
     );
+    _unpagedUsers = null;
     await fetchUsers(page: 1);
   }
 }
