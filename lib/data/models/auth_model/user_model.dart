@@ -2,21 +2,28 @@ class UserRoleModel {
   const UserRoleModel({
     required this.rolId,
     required this.rolName,
+    this.isActive = true,
   });
 
   final int rolId;
   final String rolName;
+  final bool isActive;
 
   factory UserRoleModel.fromJson(Map<String, dynamic> json) {
+    final rawId = json['id'] ?? json['rolId'] ?? json['RolId'] ?? json['idRoles'];
+    final parsedId = rawId is num ? rawId.toInt() : int.tryParse('$rawId');
+    final rawName = json['rolName'] ?? json['RolName'];
     return UserRoleModel(
-      rolId: (json['rolId'] ?? json['RolId'] as num?)?.toInt() ?? 0,
-      rolName: (json['rolName'] ?? json['RolName'] as String?) ?? '',
+      rolId: parsedId ?? 0,
+      rolName: rawName is String ? rawName : '',
+      isActive: json['isActive'] is bool ? json['isActive'] as bool : true,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'rolId': rolId,
     'rolName': rolName,
+    'isActive': isActive,
   };
 }
 
@@ -186,8 +193,12 @@ class UserModel {
       ],
     );
 
-    final rolId = (json['rolId'] ?? json['RolId'] as num?)?.toInt();
-    final isActive = (json['isActive'] ?? json['IsActive'] ?? true) as bool;
+    final rawRoleId = json['rolId'] ?? json['RolId'];
+    final rolId = rawRoleId is num
+        ? rawRoleId.toInt()
+        : int.tryParse('$rawRoleId');
+    final rawIsActive = json['isActive'] ?? json['IsActive'];
+    final isActive = rawIsActive is bool ? rawIsActive : true;
 
     // Si userLastName no viene provisto pero userName tiene espacios, separar limpiamente
     if ((userLastName == null || userLastName.isEmpty) && userName != null && userName.contains(' ')) {
