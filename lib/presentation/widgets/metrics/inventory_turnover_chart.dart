@@ -22,7 +22,7 @@ class InventoryTurnoverChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ColorLegend(),
+        const _ColorLegend(),
         const SizedBox(height: 12),
         // Una fila por producto
         ...data.map((item) => _TurnoverRow(item: item, maxRatio: maxRatio)),
@@ -39,6 +39,12 @@ class _TurnoverRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final trackColor = isDark ? const Color(0xFF263342) : AppColors.trackBackground;
+    final onSurface = theme.colorScheme.onSurface;
+    final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
+
     final ratio = item.turnoverRatio;
     final progress = (ratio / maxRatio).clamp(0.0, 1.0);
     final color = _barColor(ratio);
@@ -53,10 +59,10 @@ class _TurnoverRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   item.productName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primaryDark,
+                    color: onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -79,13 +85,13 @@ class _TurnoverRow extends StatelessWidget {
               value: progress,
               minHeight: 7,
               color: color,
-              backgroundColor: AppColors.trackBackground,
+              backgroundColor: trackColor,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             '${item.dispatchedQuantity} despachados / ${item.batchInitialQuantity} inicial',
-            style: const TextStyle(fontSize: 10, color: AppColors.mutedText),
+            style: TextStyle(fontSize: 10, color: onSurfaceVariant),
           ),
         ],
       ),
@@ -100,24 +106,28 @@ class _TurnoverRow extends StatelessWidget {
 }
 
 class _ColorLegend extends StatelessWidget {
+  const _ColorLegend();
+
   @override
   Widget build(BuildContext context) {
+    final labelColor = Theme.of(context).colorScheme.onSurfaceVariant;
+
     return Row(
       children: [
         _dot(AppColors.positiveGreen),
-        const Text(
+        Text(
           'Alta  ',
-          style: TextStyle(fontSize: 10, color: AppColors.mutedText),
+          style: TextStyle(fontSize: 10, color: labelColor),
         ),
         _dot(AppColors.chartBlue),
-        const Text(
+        Text(
           'Media  ',
-          style: TextStyle(fontSize: 10, color: AppColors.mutedText),
+          style: TextStyle(fontSize: 10, color: labelColor),
         ),
         _dot(AppColors.warningOrange),
-        const Text(
+        Text(
           'Baja',
-          style: TextStyle(fontSize: 10, color: AppColors.mutedText),
+          style: TextStyle(fontSize: 10, color: labelColor),
         ),
       ],
     );
@@ -142,7 +152,10 @@ class _EmptyPlaceholder extends StatelessWidget {
       child: Center(
         child: Text(
           label,
-          style: const TextStyle(color: AppColors.mutedText, fontSize: 13),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 13,
+          ),
         ),
       ),
     );

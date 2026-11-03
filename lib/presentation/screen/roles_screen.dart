@@ -782,7 +782,8 @@ class _RolesScreenState extends State<RolesScreen> {
       return;
     }
 
-    if (result?.status == _UserFormStatus.saved) {
+    if (result?.status == _UserFormStatus.saved && result != null) {
+      final formResult = result;
       try {
         if (user != null) {
           await _updateUser(
@@ -796,15 +797,16 @@ class _RolesScreenState extends State<RolesScreen> {
           );
         } else {
           await _addUser(
-            result!.name,
-            result!.lastName,
-            result.email,
-            result.roleId,
-            result.password,
-            result.phone,
+            formResult.name,
+            formResult.lastName,
+            formResult.email,
+            formResult.roleId,
+            formResult.password,
+            formResult.phone,
           );
         }
       } catch (error) {
+        if (!mounted) return;
         NotificationWidget.show(
           context,
           type: NotificationType.error,
@@ -814,6 +816,7 @@ class _RolesScreenState extends State<RolesScreen> {
         );
         return;
       }
+      if (!mounted) return;
       NotificationWidget.show(
         context,
         type: NotificationType.success,
