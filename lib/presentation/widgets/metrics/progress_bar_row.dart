@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
-
 /// Fila con barra de progreso lineal para listas de productos y categorías.
 class ProgressBarRow extends StatelessWidget {
   final String title;
@@ -23,6 +21,7 @@ class ProgressBarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final trackColor = isDark ? const Color(0xFF263342) : AppColors.trackBackground;
@@ -36,6 +35,12 @@ class ProgressBarRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colors.onSurface,
             Expanded(
               child: Text(
                 title,
@@ -53,6 +58,7 @@ class ProgressBarRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
+                color: colors.onSurface,
                 color: onSurface,
               ),
             ),
@@ -65,6 +71,7 @@ class ProgressBarRow extends StatelessWidget {
             value: progress,
             minHeight: 8,
             color: barColor,
+            backgroundColor: colors.surfaceContainerHighest,
             backgroundColor: trackColor,
           ),
         ),
@@ -75,13 +82,11 @@ class ProgressBarRow extends StatelessWidget {
             children: [
               Text(
                 footerStartText ?? '',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.positiveGreen,
-                ),
+                style: TextStyle(fontSize: 11, color: colors.tertiary),
               ),
               Text(
                 footerEndText ?? '',
+                style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
                 style: TextStyle(
                   fontSize: 11,
                   color: onSurfaceVariant,

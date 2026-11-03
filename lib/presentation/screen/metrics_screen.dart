@@ -93,6 +93,8 @@ class _MetricsScreenState extends State<MetricsScreen>
   }
 
   Widget _buildHeader() {
+    final colors = Theme.of(context).colorScheme;
+
     final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,6 +105,18 @@ class _MetricsScreenState extends State<MetricsScreen>
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w800,
+            color: colors.onSurface,
+          ),
+        ),
+        if (_isCurrentTabLoading)
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: colors.primary,
+            ),
+          ),
             color: theme.colorScheme.onSurface,
           ),
         ),
@@ -125,6 +139,7 @@ class _MetricsScreenState extends State<MetricsScreen>
   }
 
   Widget _buildTabBar() {
+    final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final trackColor = isDark
         ? const Color(0xFF1E293B)
@@ -134,17 +149,21 @@ class _MetricsScreenState extends State<MetricsScreen>
     return Container(
       height: 38,
       decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
         color: trackColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: TabBar(
         controller: _tabCtrl,
         indicator: BoxDecoration(
+          color: colors.primary,
           color: indicatorColor,
           borderRadius: BorderRadius.circular(20),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
+        labelColor: colors.onPrimary,
+        unselectedLabelColor: colors.onSurfaceVariant,
         labelColor: Colors.white,
         unselectedLabelColor: isDark
             ? const Color(0xFF94A3B8)
@@ -173,7 +192,7 @@ class _SalesTab extends StatelessWidget {
       builder: (context, _) {
         return RefreshIndicator(
           onRefresh: onRefresh,
-          color: AppColors.chartBlue,
+          color: Theme.of(context).colorScheme.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -188,6 +207,15 @@ class _SalesTab extends StatelessWidget {
                 const SizedBox(height: _kSpacing),
                 // KPI 3 – Participación por categoría
                 _kpiCategoryShare(controller),
+                const SizedBox(height: _kSpacing),
+                // Gasto en compras
+                _buildSpendingSection(context),
+                const SizedBox(height: _kSpacing),
+                // Proveedores
+                const SupplierShareCard(suppliers: _suppliers),
+                const SizedBox(height: _kSpacing),
+                // Rentabilidad de productos
+                _buildProfitabilitySection(),
                 const SizedBox(height: 24),
               ],
             ),
@@ -275,6 +303,85 @@ class _SalesTab extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildSpendingSection(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return MetricsSectionCard(
+      title: 'Gasto en compras',
+      subtitle: 'Total semestral acumulado',
+      trailing: Text(
+        'C\$ 536k',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: colors.onSurface,
+        ),
+      ),
+      child: const SpendingLineChart(),
+    );
+  }
+
+  Widget _buildProfitabilitySection() {
+    return const MetricsSectionCard(
+      title: 'Rentabilidad de productos',
+      subtitle: 'Margen real de contribución',
+      trailing: StatusBadge(
+        text: 'Top 3',
+        backgroundColor: AppColors.positiveBackground,
+        textColor: AppColors.positiveGreen,
+      ),
+      child: Column(
+        children: [
+          ProgressBarRow(
+            title: 'Panadol Forte 500mg',
+            valueText: 'C\$ 35,420',
+            progress: 0.85,
+            barColor: AppColors.positiveGreen,
+            footerStartText: 'Margen: 41.7%',
+            footerEndText: '850 unidades',
+          ),
+          SizedBox(height: 14),
+          ProgressBarRow(
+            title: 'Ciprofloxacino 500mg',
+            valueText: 'C\$ 27,300',
+            progress: 0.65,
+            barColor: AppColors.chartBlue,
+            footerStartText: 'Margen: 48.2%',
+            footerEndText: '420 unidades',
+          ),
+          SizedBox(height: 14),
+          ProgressBarRow(
+            title: 'Tenormin 50mg',
+            valueText: 'C\$ 21,800',
+            progress: 0.52,
+            barColor: AppColors.chartBlue,
+            footerStartText: 'Margen: 39.5%',
+            footerEndText: '310 unidades',
+          ),
+        ],
+      ),
+    );
+  }
+
+  static const List<SupplierShare> _suppliers = [
+    SupplierShare(
+      name: 'Stein',
+      percentage: 32.5,
+      color: AppColors.primaryDark,
+    ),
+    SupplierShare(name: 'Ramos', percentage: 24.4, color: AppColors.chartBlue),
+    SupplierShare(
+      name: 'Calox',
+      percentage: 18.3,
+      color: AppColors.positiveGreen,
+    ),
+    SupplierShare(
+      name: 'Otros',
+      percentage: 24.8,
+      color: AppColors.neutralGray,
+    ),
+  ];
 }
 
 // ============================================================================
@@ -294,7 +401,7 @@ class _InventoryTab extends StatelessWidget {
       builder: (context, _) {
         return RefreshIndicator(
           onRefresh: onRefresh,
-          color: AppColors.chartBlue,
+          color: Theme.of(context).colorScheme.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
