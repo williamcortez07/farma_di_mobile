@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../controllers/inventory_metrics_controller.dart';
 import '../controllers/sales_metrics_controller.dart';
@@ -96,25 +96,27 @@ class _MetricsScreenState extends State<MetricsScreen>
   }
 
   Widget _buildHeader() {
+    final colors = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           'Métricas',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w800,
-            color: AppColors.primaryDark,
+            color: colors.onSurface,
           ),
         ),
         if (_isCurrentTabLoading)
-          const SizedBox(
+          SizedBox(
             width: 18,
             height: 18,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: AppColors.chartBlue,
+              color: colors.primary,
             ),
           ),
       ],
@@ -122,22 +124,24 @@ class _MetricsScreenState extends State<MetricsScreen>
   }
 
   Widget _buildTabBar() {
+    final colors = Theme.of(context).colorScheme;
+
     return Container(
       height: 38,
       decoration: BoxDecoration(
-        color: AppColors.trackBackground,
+        color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
       ),
       child: TabBar(
         controller: _tabCtrl,
         indicator: BoxDecoration(
-          color: AppColors.primaryDark,
+          color: colors.primary,
           borderRadius: BorderRadius.circular(20),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: AppColors.mutedText,
+        labelColor: colors.onPrimary,
+        unselectedLabelColor: colors.onSurfaceVariant,
         labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
         tabs: _tabs.map((t) => Tab(text: t)).toList(),
       ),
@@ -162,7 +166,7 @@ class _SalesTab extends StatelessWidget {
       builder: (context, _) {
         return RefreshIndicator(
           onRefresh: onRefresh,
-          color: AppColors.chartBlue,
+          color: Theme.of(context).colorScheme.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -179,7 +183,7 @@ class _SalesTab extends StatelessWidget {
                 _kpiCategoryShare(controller),
                 const SizedBox(height: _kSpacing),
                 // Gasto en compras
-                _buildSpendingSection(),
+                _buildSpendingSection(context),
                 const SizedBox(height: _kSpacing),
                 // Proveedores
                 const SupplierShareCard(suppliers: _suppliers),
@@ -266,8 +270,10 @@ class _SalesTab extends StatelessWidget {
     );
   }
 
-  Widget _buildSpendingSection() {
-    return const MetricsSectionCard(
+  Widget _buildSpendingSection(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return MetricsSectionCard(
       title: 'Gasto en compras',
       subtitle: 'Total semestral acumulado',
       trailing: Text(
@@ -275,10 +281,10 @@ class _SalesTab extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w700,
-          color: AppColors.primaryDark,
+          color: colors.onSurface,
         ),
       ),
-      child: SpendingLineChart(),
+      child: const SpendingLineChart(),
     );
   }
 
@@ -361,7 +367,7 @@ class _InventoryTab extends StatelessWidget {
       builder: (context, _) {
         return RefreshIndicator(
           onRefresh: onRefresh,
-          color: AppColors.chartBlue,
+          color: Theme.of(context).colorScheme.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),

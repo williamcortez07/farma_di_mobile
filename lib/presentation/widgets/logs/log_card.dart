@@ -1,15 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
-import 'package:farma_di_mobile/presentation/theme/app_colors.dart';
 import 'package:farma_di_mobile/presentation/widgets/logs/log_detail_sheet.dart';
 
 /// Tarjeta visual reutilizable para representar un registro de Log
 class LogCard extends StatelessWidget {
-  const LogCard({
-    super.key,
-    required this.log,
-    this.onTap,
-  });
+  const LogCard({super.key, required this.log, this.onTap});
 
   final SystemLogModel log;
   final VoidCallback? onTap;
@@ -21,25 +16,25 @@ class LogCard extends StatelessWidget {
     return 'INFO';
   }
 
-  Color _getLevelColor() {
+  Color _getLevelColor(BuildContext context) {
     switch (_normalizedLevel()) {
       case 'ERROR':
-        return AppColors.red;
+        return Theme.of(context).colorScheme.error;
       case 'WARN':
-        return AppColors.warning;
+        return Theme.of(context).colorScheme.tertiary;
       default:
-        return AppColors.primary;
+        return Theme.of(context).colorScheme.primary;
     }
   }
 
-  Color _getLevelBgColor() {
+  Color _getLevelBgColor(BuildContext context) {
     switch (_normalizedLevel()) {
       case 'ERROR':
-        return AppColors.redSoft;
+        return Theme.of(context).colorScheme.errorContainer;
       case 'WARN':
-        return AppColors.warningSoft;
+        return Theme.of(context).colorScheme.tertiaryContainer;
       default:
-        return AppColors.primarySoft;
+        return Theme.of(context).colorScheme.primaryContainer;
     }
   }
 
@@ -77,12 +72,14 @@ class LogCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
+        border: Border.all(color: Theme.of(context).dividerColor, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: (Theme.of(context).brightness == Brightness.dark ? Colors.black.withValues(alpha: 0.18) : Colors.black.withValues(alpha: 0.02)),
+            color: (Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.18)
+                : Colors.black.withValues(alpha: 0.02)),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -106,15 +103,18 @@ class LogCard extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 4.0,
+                          ),
                           decoration: BoxDecoration(
-                            color: _getLevelBgColor(),
+                            color: _getLevelBgColor(context),
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           child: Text(
                             _normalizedLevel(),
                             style: TextStyle(
-                              color: _getLevelColor(),
+                              color: _getLevelColor(context),
                               fontWeight: FontWeight.bold,
                               fontSize: 11.5,
                             ),
@@ -123,8 +123,10 @@ class LogCard extends StatelessWidget {
                         const SizedBox(width: 8.0),
                         Text(
                           shortId,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                             fontSize: 13.0,
                           ),
@@ -132,15 +134,24 @@ class LogCard extends StatelessWidget {
                         if (statusCode != null) ...[
                           const SizedBox(width: 8.0),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6.0,
+                              vertical: 2.0,
+                            ),
                             decoration: BoxDecoration(
-                              color: statusCode >= 400 ? AppColors.redSoft : AppColors.primarySoft,
+                              color: statusCode >= 400
+                                  ? Theme.of(context).colorScheme.errorContainer
+                                  : Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
                               borderRadius: BorderRadius.circular(6.0),
                             ),
                             child: Text(
                               statusCode.toString(),
                               style: TextStyle(
-                                color: statusCode >= 400 ? AppColors.red : AppColors.primary,
+                                color: statusCode >= 400
+                                    ? Theme.of(context).colorScheme.error
+                                    : Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11.0,
                               ),
@@ -150,7 +161,11 @@ class LogCard extends StatelessWidget {
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.open_in_new, size: 18.0, color: AppColors.ink),
+                      icon: Icon(
+                        Icons.open_in_new,
+                        size: 18.0,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       tooltip: 'Ver detalles',
@@ -166,8 +181,8 @@ class LogCard extends StatelessWidget {
                   log.displayMessage,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.ink,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 13.5,
                     fontWeight: FontWeight.w500,
                   ),
@@ -181,14 +196,18 @@ class LogCard extends StatelessWidget {
                   runSpacing: 6.0,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    _buildChip('$method $path'),
-                    _buildChip(user, icon: Icons.person_outline),
+                    _buildChip(context, '$method $path'),
+                    _buildChip(context, user, icon: Icons.person_outline),
                     if (elapsed != null)
-                      _buildChip('${elapsed}ms', icon: Icons.timer_outlined),
+                      _buildChip(
+                        context,
+                        '${elapsed}ms',
+                        icon: Icons.timer_outlined,
+                      ),
                     Text(
                       _formatDateTime(log.timestamp),
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 11.0,
                       ),
                     ),
@@ -202,19 +221,23 @@ class LogCard extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(String text, {IconData? icon}) {
+  Widget _buildChip(BuildContext context, String text, {IconData? icon}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.5),
       constraints: const BoxConstraints(maxWidth: 190),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(6.0),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 12.0, color: AppColors.textSecondary),
+            Icon(
+              icon,
+              size: 12.0,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 4.0),
           ],
           Flexible(
@@ -222,8 +245,8 @@ class LogCard extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w500,
               ),
@@ -234,4 +257,3 @@ class LogCard extends StatelessWidget {
     );
   }
 }
-

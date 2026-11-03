@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
 import 'metrics_section_card.dart';
 
 /// Modelo ligero para la distribución de proveedores.
@@ -24,16 +23,21 @@ class SupplierShareCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return MetricsSectionCard(
       title: 'Participación por proveedor',
       subtitle: 'Distribución de volumen',
-      trailing: const Icon(
+      trailing: Icon(
         Icons.pie_chart_outline,
         size: 18,
-        color: AppColors.mutedText,
+        color: colors.onSurfaceVariant,
       ),
       child: Column(
-        children: [_buildBar(), const SizedBox(height: 14), _buildLegend()],
+        children: [
+          _buildBar(),
+          const SizedBox(height: 14),
+          _buildLegend(context),
+        ],
       ),
     );
   }
@@ -57,7 +61,7 @@ class SupplierShareCard extends StatelessWidget {
     );
   }
 
-  Widget _buildLegend() {
+  Widget _buildLegend(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -80,18 +84,18 @@ class SupplierShareCard extends StatelessWidget {
             Expanded(
               child: Text(
                 s.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.primaryDark,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
             Text(
               '${s.percentage.toStringAsFixed(1)}%',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primaryDark,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],

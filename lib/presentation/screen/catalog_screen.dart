@@ -206,9 +206,7 @@ class _ProductsTabState extends State<ProductsTab> {
               outOfStock: provider.outOfStockCount,
               onSelected: (filter) => provider.setSelectedStockFilter(filter),
             ),
-            Expanded(
-              child: _buildBody(provider),
-            ),
+            Expanded(child: _buildBody(provider)),
           ],
         );
       },
@@ -234,12 +232,14 @@ class _ProductsTabState extends State<ProductsTab> {
         onRefresh: () => provider.fetchProducts(),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
-            SizedBox(height: 80),
+          children: [
+            const SizedBox(height: 80),
             Center(
               child: Text(
                 'No se encontraron productos.',
-                style: TextStyle(color: Color(0xFF90A4AE)),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],
@@ -303,7 +303,7 @@ class _SearchBar extends StatelessWidget {
             width: 44.0,
             height: 44.0,
             decoration: BoxDecoration(
-              color: const Color(0xFF1565C0),
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Icon(
@@ -399,7 +399,9 @@ class _Chip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 7.0),
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Row(
@@ -421,7 +423,9 @@ class _Chip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -435,29 +439,28 @@ class _ProductCard extends StatelessWidget {
   final CatalogProductViewModel product;
   const _ProductCard({required this.product});
 
-  _StatusStyle _resolveStyle(String status) {
+  _StatusStyle _resolveStyle(String status, BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     switch (status) {
       case 'En stock':
-        return const _StatusStyle(
-          text: Color(0xFF2E7D32),
-          bg: Color(0xFFE8F5E9),
+        return _StatusStyle(
+          text: scheme.tertiary,
+          bg: scheme.tertiaryContainer,
         );
       case 'Stock bajo':
-        return const _StatusStyle(
-          text: Color(0xFFE65100),
-          bg: Color(0xFFFFF3E0),
+        return _StatusStyle(
+          text: scheme.onSecondaryContainer,
+          bg: scheme.secondaryContainer,
         );
       default:
-        return const _StatusStyle(
-          text: Color(0xFFC62828),
-          bg: Color(0xFFFFEBEE),
-        );
+        return _StatusStyle(text: scheme.error, bg: scheme.errorContainer);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final _StatusStyle style = _resolveStyle(product.stockStatus);
+    final _StatusStyle style = _resolveStyle(product.stockStatus, context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
@@ -516,7 +519,7 @@ class _ProductCard extends StatelessWidget {
               Text(
                 'C\$ ${product.unitPrice.toStringAsFixed(2)}',
                 style: TextStyle(
-                  color: Color(0xFF1565C0),
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                   fontSize: 14.0,
                 ),
@@ -549,7 +552,7 @@ class _ProductCard extends StatelessWidget {
                 '${product.totalQuantity} uds.',
                 style: TextStyle(
                   fontSize: 12.0,
-                  color: Color(0xFF607D8B),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const Spacer(),
@@ -605,7 +608,9 @@ class CategoriesTab extends StatelessWidget {
                 Center(
                   child: Text(
                     'No hay categorías registradas.',
-                    style: TextStyle(color: Color(0xFF90A4AE)),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -747,7 +752,9 @@ class BrandsTab extends StatelessWidget {
                 Center(
                   child: Text(
                     'No hay marcas registradas.',
-                    style: TextStyle(color: Color(0xFF90A4AE)),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -797,11 +804,13 @@ class _BrandCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20.0,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest,
             child: Text(
               _initials(),
               style: TextStyle(
-                color: Color(0xFF1565C0),
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 13.0,
               ),
@@ -942,7 +951,9 @@ class CategoryProductsScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                           ),
                         ),
                       ],
