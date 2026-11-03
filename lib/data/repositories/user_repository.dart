@@ -34,6 +34,9 @@ class UserRepository {
   Future<void> updateManagedUser(int id, UpdateUserDto dto) =>
       _userService.updateManagedUser(id, dto);
 
+  Future<void> assignUserRole(int userId, int roleId) =>
+      _userService.assignUserRole(userId, roleId);
+
   /// Actualiza los datos permitidos del usuario especificado por su [id].
   Future<UserModel> updateUser(int id, UpdateUserDto dto) =>
       _userService.updateUser(id, dto);
