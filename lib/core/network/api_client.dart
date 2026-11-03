@@ -28,20 +28,18 @@ class ApiClient {
     Map<String, String>? query,
     Object? body,
   ) async {
-    final rawBaseUrl = ApiConstants.instance.baseUrl.trim();
-    final baseUrl = rawBaseUrl.endsWith('/')
-        ? rawBaseUrl.substring(0, rawBaseUrl.length - 1)
-        : rawBaseUrl;
-
-    var cleanPath = path.trim();
-    if (baseUrl.endsWith('/api') && cleanPath.startsWith('/api/')) {
-      cleanPath = cleanPath.substring(4);
+    final baseUri = Uri.parse(ApiConstants.instance.baseUrl.trim());
+    final basePath = baseUri.path.replaceAll(RegExp(r'/+$'), '');
+    var endpointPath = path.trim();
+    if (!endpointPath.startsWith('/')) endpointPath = '/$endpointPath';
+    if (basePath.toLowerCase().endsWith('/api') &&
+        endpointPath.toLowerCase().startsWith('/api/')) {
+      endpointPath = endpointPath.substring(4);
     }
-    if (!cleanPath.startsWith('/')) {
-      cleanPath = '/$cleanPath';
-    }
-
-    final uri = Uri.parse('$baseUrl$cleanPath').replace(queryParameters: query);
+    final uri = baseUri.replace(
+      path: '$basePath$endpointPath',
+      queryParameters: query,
+    );
     final headers = {'Content-Type': 'application/json'};
     final token = await tokenProvider?.call();
     if (token != null) headers['Authorization'] = 'Bearer $token';
@@ -69,8 +67,7 @@ class ApiClient {
     }
 
     debugPrint('→ $method $uri');
-    debugPrint('→ body: ${request.body}');
-    debugPrint('← ${response.statusCode}: ${response.body}');
+    debugPrint('← ${response.statusCode}');
 
     if (response.statusCode == 401) {
       throw const UnauthorizedException();

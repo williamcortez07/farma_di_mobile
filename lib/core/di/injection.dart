@@ -7,6 +7,7 @@ import 'package:farma_di_mobile/data/repositories/user_repository.dart';
 import 'package:farma_di_mobile/presentation/controllers/auth_controler.dart';
 import 'package:farma_di_mobile/presentation/controllers/log_controller.dart';
 import 'package:farma_di_mobile/presentation/controllers/profile_controller.dart';
+import 'package:farma_di_mobile/presentation/controllers/roles_controller.dart';
 import 'package:farma_di_mobile/presentation/providers/catalog_provider.dart';
 import 'package:farma_di_mobile/presentation/providers/log_provider.dart';
 import 'package:farma_di_mobile/presentation/providers/user_provider.dart';
@@ -71,6 +72,9 @@ void setupDependencies() {
       userRepository: getIt<UserRepository>(),
       userProvider: getIt<UserProvider>(),
     ),
+  );
+  getIt.registerFactory<RolesController>(
+    () => RolesController(getIt<UserRepository>()),
   );
 
   // Logs
