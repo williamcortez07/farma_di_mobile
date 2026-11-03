@@ -25,6 +25,8 @@ class SpendingLineChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return SizedBox(
       height: 150,
       child: LineChart(
@@ -58,8 +60,8 @@ class SpendingLineChart extends StatelessWidget {
                         fontSize: 11,
                         fontWeight: last ? FontWeight.w700 : FontWeight.w400,
                         color: last
-                            ? AppColors.primaryDark
-                            : AppColors.mutedText,
+                            ? colors.onSurface
+                            : colors.onSurfaceVariant,
                       ),
                     ),
                   );
