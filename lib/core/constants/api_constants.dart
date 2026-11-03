@@ -29,6 +29,8 @@ class ApiConstants {
   // Endpoints de Usuario
   static const String user = '/User';
   static String userById(int id) => '/User/$id';
+  static const String assignUserRole = '/User/assign-role';
+  static const String roles = '/Roles';
 
   static const timeoutduration = Duration(seconds: 30);
 }

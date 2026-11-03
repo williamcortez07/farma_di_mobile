@@ -22,14 +22,14 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
 
   // Se conserva la paleta para distinguir las categorías.
   static const List<Color> _palette = [
-    AppColors.primaryDark,
+    Color(0xFF2F6FE4),
     AppColors.chartBlue,
     AppColors.positiveGreen,
     Color(0xFF8B7FE0),
     AppColors.warningOrange,
     Color(0xFFE0645F),
     Color(0xFFE0A438),
-    AppColors.neutralGray,
+    Color(0xFF14B8A6),
   ];
 
   @override
@@ -93,6 +93,8 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
 
   Widget _buildLegend(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildLegend() {
+    final colors = Theme.of(context).colorScheme;
 
     return GridView.builder(
       shrinkWrap: true,
@@ -135,6 +137,8 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                     color: isHighlighted
                         ? colorScheme.onSurface
                         : colorScheme.onSurfaceVariant,
+                        ? colors.onSurface
+                        : colors.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -144,6 +148,7 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: isHighlighted ? color : colorScheme.onSurfaceVariant,
+                  color: isHighlighted ? color : colors.onSurfaceVariant,
                 ),
               ),
             ],
@@ -167,6 +172,10 @@ class _EmptyState extends StatelessWidget {
         child: Text(
           'Sin datos de categorías',
           style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 13,
+          ),
         ),
       ),
     );

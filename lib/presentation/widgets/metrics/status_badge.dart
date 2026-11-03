@@ -15,10 +15,14 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveBg =
+        isDark ? textColor.withValues(alpha: 0.18) : backgroundColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: effectiveBg,
         borderRadius: const BorderRadius.all(Radius.circular(8)),
       ),
       child: Text(

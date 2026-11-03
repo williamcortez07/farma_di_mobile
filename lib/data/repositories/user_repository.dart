@@ -10,6 +10,33 @@ class UserRepository {
   /// Obtiene los datos del usuario especificado por su [id].
   Future<UserModel> getUser(int id) => _userService.getUser(id);
 
+  Future<PagedUsersResponse> getUsers({int page = 1, int limit = 10}) =>
+      _userService.getUsers(page: page, limit: limit);
+
+  Future<List<UserRoleModel>> getRoles() => _userService.getRoles();
+
+  Future<void> createUser({
+    required String userName,
+    required String userLastName,
+    required String password,
+    required String mail,
+    required String userPhone,
+    required int roleId,
+  }) => _userService.createUser(
+    userName: userName,
+    userLastName: userLastName,
+    password: password,
+    mail: mail,
+    userPhone: userPhone,
+    roleId: roleId,
+  );
+
+  Future<void> updateManagedUser(int id, UpdateUserDto dto) =>
+      _userService.updateManagedUser(id, dto);
+
+  Future<void> assignUserRole(int userId, int roleId) =>
+      _userService.assignUserRole(userId, roleId);
+
   /// Actualiza los datos permitidos del usuario especificado por su [id].
   Future<UserModel> updateUser(int id, UpdateUserDto dto) =>
       _userService.updateUser(id, dto);

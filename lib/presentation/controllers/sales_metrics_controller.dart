@@ -9,17 +9,12 @@ import '../../services/sales_metrics_service.dart';
 enum SalesKpiStatus { idle, loading, success, error }
 
 /// Controller de métricas de ventas.
-///
-/// Extiende [ChangeNotifier] para integrarse con [ListenableBuilder] /
-/// [AnimatedBuilder] en la capa de presentación sin necesidad de un gestor
-/// de estado externo.  Cuando en el futuro se adopte Riverpod, BLoC u otro
-/// paquete, solo hay que envolver o reemplazar este controller sin tocar los
-/// widgets hoja.
 class SalesMetricsController extends ChangeNotifier {
   SalesMetricsController({SalesMetricsService? service})
       : _service = service ?? SalesMetricsService();
 
   final SalesMetricsService _service;
+  bool _isDisposed = false;
 
   // ---------------------------------------------------------------------------
   // Estado – KPI 1: Ventas por periodo
@@ -64,15 +59,23 @@ class SalesMetricsController extends ChangeNotifier {
       _marginsStatus == SalesKpiStatus.loading ||
       _sharesStatus == SalesKpiStatus.loading;
 
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Carga de datos
   // ---------------------------------------------------------------------------
 
-  /// Carga los 3 KPIs en paralelo.
-  ///
-  /// Diseñado para ser llamado en [initState] o en el primer build del
-  /// widget de métricas.  Cada KPI falla de forma independiente para no
-  /// bloquear los demás en caso de error parcial.
   Future<void> loadAll() async {
     await Future.wait([
       _loadVariations(),
