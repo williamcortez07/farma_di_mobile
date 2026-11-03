@@ -74,6 +74,13 @@ class UserService {
     await _api.put(ApiConstants.userById(id), body: dto.toJson());
   }
 
+  Future<void> assignUserRole(int userId, int roleId) async {
+    await _api.post(
+      ApiConstants.assignUserRole,
+      body: {'userId': userId, 'roleId': roleId},
+    );
+  }
+
   /// Obtiene los datos del usuario especificado por su [id] desde la API.
   Future<UserModel> getUser(int id) async {
     final response = await _api.get(ApiConstants.userById(id));

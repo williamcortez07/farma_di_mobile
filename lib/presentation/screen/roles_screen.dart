@@ -67,6 +67,13 @@ class AppUser {
 
   final UserModel model;
   final String role;
+  int? get roleId {
+    for (final assignedRole in model.roles) {
+      if (assignedRole.rolId > 0) return assignedRole.rolId;
+    }
+    final id = model.rolId;
+    return id != null && id > 0 ? id : null;
+  }
   String get name => model.fullName;
   String get email => model.mail;
   String get phone => model.userPhone ?? '';
@@ -495,7 +502,25 @@ class _RolesScreenState extends State<RolesScreen> {
     final phoneController = TextEditingController(text: user?.phone ?? '');
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    var selectedRole = user?.role ?? (_roles.isNotEmpty ? _roles.first : '');
+    final availableRoles = List<UserRoleModel>.from(_rolesController.roles);
+    final currentRoleId = user?.roleId;
+    if (currentRoleId != null &&
+        !availableRoles.any((role) => role.rolId == currentRoleId)) {
+      availableRoles.add(
+        UserRoleModel(
+          rolId: currentRoleId,
+          rolName: user!.role,
+          isActive: false,
+        ),
+      );
+    }
+    String? selectedRole = currentRoleId == null
+        ? (isEditing || availableRoles.isEmpty
+              ? null
+              : availableRoles.first.rolName)
+        : availableRoles
+              .firstWhere((role) => role.rolId == currentRoleId)
+              .rolName;
     var isActive = user?.active ?? true;
     String? formAlertMessage;
 
@@ -552,7 +577,7 @@ class _RolesScreenState extends State<RolesScreen> {
                         Expanded(
                           child: Text(
                             isEditing
-                                ? 'Detalle Rol ${selectedRole.toLowerCase()}'
+                                ? 'Detalle Rol ${(selectedRole ?? user!.role).toLowerCase()}'
                                 : 'Nuevo usuario',
                             style: const TextStyle(
                               fontSize: 17,
@@ -573,7 +598,11 @@ class _RolesScreenState extends State<RolesScreen> {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    _buildProfileSummary(user, selectedRole, isActive),
+                    _buildProfileSummary(
+                      user,
+                      selectedRole ?? user?.role ?? 'Sin rol',
+                      isActive,
+                    ),
                     if (formAlertMessage != null) ...[
                       const SizedBox(height: 10),
                       NotificationWidget(
@@ -634,49 +663,38 @@ class _RolesScreenState extends State<RolesScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    if (isEditing)
-                      InputDecorator(
-                        decoration: _formDecoration(
-                          prefixIcon: Icons.badge_outlined,
-                        ),
-                        child: Text(
-                          user.role,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                      )
-                    else
-                      DropdownButtonFormField<String>(
-                        initialValue: _roles.contains(selectedRole)
-                            ? selectedRole
-                            : (_roles.isEmpty ? null : _roles.first),
-                        key: ValueKey('role-${_roles.join('-')}-$selectedRole'),
-                        validator: (value) => value == null
-                            ? 'Selecciona un rol'
-                            : null,
-                        onChanged: (value) {
-                          if (value != null) {
-                            setModalState(() => selectedRole = value);
-                          }
-                        },
-                        decoration: _formDecoration(
-                          prefixIcon: Icons.badge_outlined,
-                        ),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.primaryDark,
-                        ),
-                        items: _roles
-                            .map(
-                              (role) => DropdownMenuItem(
-                                value: role,
-                                child: Text(role),
-                              ),
-                            )
-                            .toList(),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedRole,
+                      hint: const Text('Sin rol asignado'),
+                      key: ValueKey(
+                        'role-${availableRoles.map((role) => role.rolId).join('-')}-$selectedRole',
                       ),
+                      validator: (value) => !isEditing && value == null
+                          ? 'Selecciona un rol'
+                          : null,
+                      onChanged: (value) {
+                        setModalState(() => selectedRole = value);
+                      },
+                      decoration: _formDecoration(
+                        prefixIcon: Icons.badge_outlined,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.primaryDark,
+                      ),
+                      items: availableRoles
+                          .map(
+                            (role) => DropdownMenuItem(
+                              value: role.rolName,
+                              child: Text(
+                                role.isActive
+                                    ? role.rolName
+                                    : '${role.rolName} (inactivo)',
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
                     const SizedBox(height: 10),
                     if (isEditing)
                       _buildAccountStatus(isActive, (value) {
@@ -696,7 +714,7 @@ class _RolesScreenState extends State<RolesScreen> {
                           }
                           setModalState(() => formAlertMessage = null);
                           final name = firstNameController.text.trim();
-                          final matchingRoles = _rolesController.roles
+                          final matchingRoles = availableRoles
                               .where((role) => role.rolName == selectedRole)
                               .toList();
                           Navigator.pop(
@@ -770,11 +788,12 @@ class _RolesScreenState extends State<RolesScreen> {
         if (user != null) {
           await _updateUser(
             user,
-            formResult.name,
-            formResult.lastName,
-            formResult.email,
-            formResult.phone,
-            formResult.isActive,
+            result!.name,
+            result!.lastName,
+            result.email,
+            result.phone,
+            result.isActive,
+            result.roleId,
           );
         } else {
           await _addUser(
@@ -1092,6 +1111,7 @@ class _RolesScreenState extends State<RolesScreen> {
     String email,
     String phone,
     bool isActive,
+    int? roleId,
   ) => _rolesController.updateUser(
     user: user.model,
     userName: name,
@@ -1099,5 +1119,6 @@ class _RolesScreenState extends State<RolesScreen> {
     mail: email,
     userPhone: phone,
     isActive: isActive,
+    roleId: roleId,
   );
 }
