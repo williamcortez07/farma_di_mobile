@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
 
 class ErrorView extends StatelessWidget {
-  const ErrorView({super.key, required this.message, this.onRetry});
+  const ErrorView({
+    super.key,
+    required this.message,
+    this.onRetry,
+  });
 
   final String message;
   final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off_rounded, size: 48, color: colors.error),
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: Color(0xFFC62828),
+            ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
-                color: colors.onSurfaceVariant,
+                color: Color(0xFF546E7A),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -34,8 +40,8 @@ class ErrorView extends StatelessWidget {
                 icon: const Icon(Icons.refresh, size: 16),
                 label: const Text('Reintentar'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: colors.primary,
-                  foregroundColor: colors.onPrimary,
+                  backgroundColor: const Color(0xFF1A1A2E),
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
