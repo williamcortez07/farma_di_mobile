@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import '../../../data/models/sales/category_share_model.dart';
 import '../../theme/app_colors.dart';
 
-/// KPI 3 - Participación de ventas por categoría (%).
+/// KPI 3 – Participación de ventas por categoría (%).
 ///
-/// Muestra un PieChart con la distribución porcentual de ingresos por
+/// Muestra un [PieChart] con la distribución porcentual de ingresos por
 /// categoría, acompañado de una leyenda compacta.
 class CategoryShareChart extends StatefulWidget {
-  const CategoryShareChart({super.key, required this.data});
+  const CategoryShareChart({
+    super.key,
+    required this.data,
+  });
 
   final List<CategoryShareModel> data;
 
@@ -20,7 +23,6 @@ class CategoryShareChart extends StatefulWidget {
 class _CategoryShareChartState extends State<CategoryShareChart> {
   int _touchedIndex = -1;
 
-  // Se conserva la paleta para distinguir las categorías.
   static const List<Color> _palette = [
     Color(0xFF2F6FE4),
     AppColors.chartBlue,
@@ -34,9 +36,7 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.isEmpty) {
-      return const _EmptyState();
-    }
+    if (widget.data.isEmpty) return const _EmptyState();
 
     return Column(
       children: [
@@ -53,7 +53,6 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                       _touchedIndex = -1;
                       return;
                     }
-
                     _touchedIndex =
                         response.touchedSection!.touchedSectionIndex;
                   });
@@ -65,7 +64,6 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
               sections: List.generate(widget.data.length, (i) {
                 final isTouched = i == _touchedIndex;
                 final item = widget.data[i];
-
                 return PieChartSectionData(
                   color: _palette[i % _palette.length],
                   value: item.sharePercentage,
@@ -73,8 +71,6 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                   title: isTouched
                       ? '${item.sharePercentage.toStringAsFixed(1)}%'
                       : '',
-                  // El blanco se conserva para contrastar sobre
-                  // los segmentos de colores del gráfico.
                   titleStyle: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -86,13 +82,11 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildLegend(context),
+        _buildLegend(),
       ],
     );
   }
 
-  Widget _buildLegend(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
   Widget _buildLegend() {
     final colors = Theme.of(context).colorScheme;
 
@@ -110,19 +104,18 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
         final item = widget.data[i];
         final color = _palette[i % _palette.length];
         final isHighlighted = i == _touchedIndex;
-
         return GestureDetector(
-          onTap: () {
-            setState(() {
-              _touchedIndex = _touchedIndex == i ? -1 : i;
-            });
-          },
+          onTap: () => setState(
+              () => _touchedIndex = _touchedIndex == i ? -1 : i),
           child: Row(
             children: [
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
               ),
               const SizedBox(width: 6),
               Expanded(
@@ -135,8 +128,6 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                         ? FontWeight.w700
                         : FontWeight.w400,
                     color: isHighlighted
-                        ? colorScheme.onSurface
-                        : colorScheme.onSurfaceVariant,
                         ? colors.onSurface
                         : colors.onSurfaceVariant,
                   ),
@@ -147,7 +138,6 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: isHighlighted ? color : colorScheme.onSurfaceVariant,
                   color: isHighlighted ? color : colors.onSurfaceVariant,
                 ),
               ),
@@ -164,14 +154,11 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return SizedBox(
       height: 100,
       child: Center(
         child: Text(
           'Sin datos de categorías',
-          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 13,

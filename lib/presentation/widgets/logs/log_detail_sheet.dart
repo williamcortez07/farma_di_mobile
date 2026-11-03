@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farma_di_mobile/data/models/system_log_model.dart';
+import 'package:farma_di_mobile/presentation/theme/app_colors.dart';
 
 /// Modal bottom sheet para visualizar los detalles completos de un registro de log
 class LogDetailSheet extends StatelessWidget {
@@ -19,25 +20,25 @@ class LogDetailSheet extends StatelessWidget {
     );
   }
 
-  Color _getLevelColor(BuildContext context) {
+  Color _getLevelColor() {
     switch (log.normalizedLevel) {
       case 'Error':
-        return Theme.of(context).colorScheme.error;
+        return AppColors.red;
       case 'Warning':
-        return Theme.of(context).colorScheme.tertiary;
+        return AppColors.warning;
       default:
-        return Theme.of(context).colorScheme.primary;
+        return AppColors.primary;
     }
   }
 
-  Color _getLevelBgColor(BuildContext context) {
+  Color _getLevelBgColor() {
     switch (log.normalizedLevel) {
       case 'Error':
-        return Theme.of(context).colorScheme.errorContainer;
+        return AppColors.redSoft;
       case 'Warning':
-        return Theme.of(context).colorScheme.tertiaryContainer;
+        return AppColors.warningSoft;
       default:
-        return Theme.of(context).colorScheme.primaryContainer;
+        return AppColors.primarySoft;
     }
   }
 
@@ -75,7 +76,7 @@ class LogDetailSheet extends StatelessWidget {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16.0),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).dividerColor,
+                    color: AppColors.border,
                     borderRadius: BorderRadius.circular(2.0),
                   ),
                 ),
@@ -91,10 +92,10 @@ class LogDetailSheet extends StatelessWidget {
                       children: [
                         Text(
                           'Detalles del Log',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 2.0),
@@ -102,11 +103,9 @@ class LogDetailSheet extends StatelessWidget {
                           identifier,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12.0,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
+                            color: AppColors.textMuted,
                             fontFamily: 'monospace',
                           ),
                         ),
@@ -114,18 +113,15 @@ class LogDetailSheet extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 4.0,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
                     decoration: BoxDecoration(
-                      color: _getLevelBgColor(context),
+                      color: _getLevelBgColor(),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     child: Text(
                       log.normalizedLevel,
                       style: TextStyle(
-                        color: _getLevelColor(context),
+                        color: _getLevelColor(),
                         fontWeight: FontWeight.bold,
                         fontSize: 12.0,
                       ),
@@ -133,135 +129,74 @@ class LogDetailSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 8.0),
                   IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
 
-              Divider(color: Theme.of(context).dividerColor, height: 24.0),
+              const Divider(color: AppColors.border, height: 24.0),
 
               // Información general
-              _buildSectionTitle(context, 'Información General'),
-              _buildDetailRow(
-                context,
-                'Nivel',
-                log.normalizedLevel,
-                _getLevelColor(context),
-              ),
-              _buildDetailRow(
-                context,
-                'Fecha y Hora',
-                _formatDateTime(log.timestamp),
-                Theme.of(context).colorScheme.onSurface,
-              ),
-              _buildDetailRow(
-                context,
-                'Usuario',
-                log.userId ?? 'Anónimo',
-                Theme.of(context).colorScheme.onSurface,
-              ),
-              _buildDetailRow(
-                context,
-                'IP Cliente',
-                log.clientIp ?? '::1',
-                Theme.of(context).colorScheme.onSurface,
-              ),
-              _buildDetailRow(
-                context,
-                'Entorno',
-                log.environment ?? 'N/D',
-                Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              _buildDetailRow(
-                context,
-                'Trace ID',
-                log.traceId ?? 'N/D',
-                Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+              _buildSectionTitle('Información General'),
+              _buildDetailRow('Nivel', log.normalizedLevel, _getLevelColor()),
+              _buildDetailRow('Fecha y Hora', _formatDateTime(log.timestamp), AppColors.textPrimary),
+              _buildDetailRow('Usuario', log.userId ?? 'Anónimo', AppColors.textPrimary),
+              _buildDetailRow('IP Cliente', log.clientIp ?? '::1', AppColors.textPrimary),
+              _buildDetailRow('Entorno', log.environment ?? 'N/D', AppColors.textSecondary),
+              _buildDetailRow('Trace ID', log.traceId ?? 'N/D', AppColors.textSecondary),
 
               const SizedBox(height: 12.0),
 
               // Petición HTTP
               if (log.request != null) ...[
-                _buildSectionTitle(context, 'Petición HTTP'),
-                _buildDetailRow(
-                  context,
-                  'Método',
-                  log.request!.method ?? 'N/D',
-                  Theme.of(context).colorScheme.primary,
-                ),
-                _buildDetailRow(
-                  context,
-                  'Ruta',
-                  log.request!.path ?? 'N/D',
-                  Theme.of(context).colorScheme.onSurface,
-                ),
-                if (log.request!.queryString != null &&
-                    log.request!.queryString!.isNotEmpty)
-                  _buildDetailRow(
-                    context,
-                    'Query String',
-                    log.request!.queryString!,
-                    Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                if (log.request!.payload != null &&
-                    log.request!.payload!.isNotEmpty) ...[
+                _buildSectionTitle('Petición HTTP'),
+                _buildDetailRow('Método', log.request!.method ?? 'N/D', AppColors.primary),
+                _buildDetailRow('Ruta', log.request!.path ?? 'N/D', AppColors.textPrimary),
+                if (log.request!.queryString != null && log.request!.queryString!.isNotEmpty)
+                  _buildDetailRow('Query String', log.request!.queryString!, AppColors.textSecondary),
+                if (log.request!.payload != null && log.request!.payload!.isNotEmpty) ...[
                   const SizedBox(height: 4.0),
-                  Text(
+                  const Text(
                     'Payload:',
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4.0),
-                  _buildCodeBox(context, log.request!.payload!),
+                  _buildCodeBox(log.request!.payload!),
                 ],
                 const SizedBox(height: 12.0),
               ],
 
               // Respuesta HTTP
               if (log.response != null) ...[
-                _buildSectionTitle(context, 'Respuesta'),
+                _buildSectionTitle('Respuesta'),
                 _buildDetailRow(
-                  context,
                   'Código HTTP',
                   '${log.response!.statusCode ?? "N/D"}',
-                  (log.response!.statusCode ?? 200) >= 400
-                      ? Theme.of(context).colorScheme.error
-                      : Theme.of(context).colorScheme.tertiary,
+                  (log.response!.statusCode ?? 200) >= 400 ? AppColors.red : AppColors.success,
                 ),
                 _buildDetailRow(
-                  context,
                   'Tiempo de ejecución',
                   '${log.response!.elapsedMilliseconds ?? 0} ms',
-                  Theme.of(context).colorScheme.onSurface,
+                  AppColors.textPrimary,
                 ),
                 const SizedBox(height: 12.0),
               ],
 
               // Excepción técnica
               if (log.exception != null) ...[
-                _buildSectionTitle(
-                  context,
-                  'Excepción Técnica',
-                  color: Theme.of(context).colorScheme.error,
-                ),
+                _buildSectionTitle('Excepción Técnica', color: AppColors.red),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.errorContainer,
+                    color: AppColors.redSoft,
                     borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.error
-                          .withValues(alpha: 0.3),
-                    ),
+                    border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,32 +204,28 @@ class LogDetailSheet extends StatelessWidget {
                       if (log.exception!.message != null)
                         Text(
                           log.exception!.message!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
+                          style: const TextStyle(
+                            color: AppColors.red,
                             fontWeight: FontWeight.w600,
                             fontSize: 13.0,
                           ),
                         ),
-                      if (log.exception!.source != null &&
-                          log.exception!.source!.isNotEmpty) ...[
+                      if (log.exception!.source != null && log.exception!.source!.isNotEmpty) ...[
                         const SizedBox(height: 6.0),
                         Text(
                           'Origen: ${log.exception!.source}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
+                          style: const TextStyle(
+                            color: AppColors.ink,
                             fontSize: 12.0,
                           ),
                         ),
                       ],
-                      if (log.exception!.stackTrace != null &&
-                          log.exception!.stackTrace!.isNotEmpty) ...[
+                      if (log.exception!.stackTrace != null && log.exception!.stackTrace!.isNotEmpty) ...[
                         const SizedBox(height: 8.0),
                         Text(
                           'StackTrace:\n${log.exception!.stackTrace}',
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
                             fontSize: 11.0,
                             fontFamily: 'monospace',
                           ),
@@ -307,19 +238,19 @@ class LogDetailSheet extends StatelessWidget {
               ],
 
               // Resumen
-              _buildSectionTitle(context, 'Resumen del Evento'),
+              _buildSectionTitle('Resumen del Evento'),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: Theme.of(context).dividerColor),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Text(
                   log.displayMessage,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
                     fontSize: 13.0,
                   ),
                 ),
@@ -332,11 +263,7 @@ class LogDetailSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(
-    BuildContext context,
-    String title, {
-    Color? color,
-  }) {
+  Widget _buildSectionTitle(String title, {Color? color}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, top: 4.0),
       child: Text(
@@ -344,18 +271,13 @@ class LogDetailSheet extends StatelessWidget {
         style: TextStyle(
           fontSize: 14.0,
           fontWeight: FontWeight.bold,
-          color: color ?? Theme.of(context).colorScheme.onSurface,
+          color: color ?? AppColors.textPrimary,
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(
-    BuildContext context,
-    String label,
-    String value,
-    Color valueColor,
-  ) {
+  Widget _buildDetailRow(String label, String value, Color valueColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -365,8 +287,8 @@ class LogDetailSheet extends StatelessWidget {
             width: 130.0,
             child: Text(
               label,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
                 fontSize: 12.5,
               ),
@@ -387,19 +309,19 @@ class LogDetailSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildCodeBox(BuildContext context, String code) {
+  Widget _buildCodeBox(String code) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: AppColors.border),
       ),
       child: Text(
         code,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
+        style: const TextStyle(
+          color: AppColors.ink,
           fontSize: 11.5,
           fontFamily: 'monospace',
         ),
