@@ -137,20 +137,30 @@ class RolesController extends ChangeNotifier {
     required String mail,
     required String userPhone,
     required bool isActive,
+    int? roleId,
     String? password,
   }) async {
-    await _repository.updateManagedUser(
-      user.id,
-      UpdateUserDto(
-        userName: userName,
-        userLastName: userLastName,
-        mail: mail,
-        userPhone: userPhone,
-        isActive: isActive,
-        password: password,
-      ),
-    );
-    _unpagedUsers = null;
-    await fetchUsers(page: currentPage);
+    try {
+      await _repository.updateManagedUser(
+        user.id,
+        UpdateUserDto(
+          userName: userName,
+          userLastName: userLastName,
+          mail: mail,
+          userPhone: userPhone,
+          isActive: isActive,
+          password: password,
+        ),
+      );
+      final currentRoleId = user.roles.isNotEmpty && user.roles.first.rolId > 0
+          ? user.roles.first.rolId
+          : (user.rolId != null && user.rolId! > 0 ? user.rolId : null);
+      if (roleId != null && roleId != currentRoleId) {
+        await _repository.assignUserRole(user.id, roleId);
+      }
+    } finally {
+      _unpagedUsers = null;
+      await fetchUsers(page: currentPage);
+    }
   }
 }
