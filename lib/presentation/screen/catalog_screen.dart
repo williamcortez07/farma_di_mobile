@@ -1,0 +1,1280 @@
+import 'package:flutter/material.dart';
+import 'package:farma_di_mobile/core/di/injection.dart';
+import 'package:farma_di_mobile/data/models/brand_model.dart';
+import 'package:farma_di_mobile/data/models/category_model.dart';
+import 'package:farma_di_mobile/data/models/catalog_view_model.dart';
+import 'package:farma_di_mobile/presentation/providers/catalog_provider.dart';
+import 'package:farma_di_mobile/presentation/widgets/error_view.dart';
+import 'package:farma_di_mobile/presentation/widgets/loading_view.dart';
+
+class _PillIcon extends StatelessWidget {
+  final String categoryName;
+
+  const _PillIcon({required this.categoryName});
+
+  String _resolveEmoji(String category) {
+    switch (category) {
+      case 'Analgésicos':
+        return '💊';
+      case 'Antibióticos':
+        return '🧪';
+      case 'Vitaminas':
+        return '🍊';
+      case 'Antihistamínicos':
+        return '🌬️';
+      case 'Antidiabéticos':
+        return '🩺';
+      case 'Gastrointestinal':
+        return '🫁';
+      case 'Cardiovascular':
+        return '❤️';
+      default:
+        return '💊';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 46.0,
+      height: 46.0,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          _resolveEmoji(categoryName),
+          style: const TextStyle(fontSize: 22.0),
+        ),
+      ),
+    );
+  }
+}
+
+class CatalogScreen extends StatefulWidget {
+  const CatalogScreen({super.key});
+
+  @override
+  State<CatalogScreen> createState() => _CatalogScreenState();
+}
+
+class _CatalogScreenState extends State<CatalogScreen> {
+  late final CatalogProvider _provider = getIt<CatalogProvider>();
+
+  @override
+  void initState() {
+    super.initState();
+    _provider.refreshAll();
+  }
+
+  @override
+  void dispose() {
+    _provider.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        // El AppNavbar (fecha y perfil) lo maneja home_screen con el IndexedStack
+        body: Column(
+          children: [
+            _buildAppBar(),
+            _buildTabBar(),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  ProductsTab(provider: _provider),
+                  CategoriesTab(provider: _provider),
+                  BrandsTab(provider: _provider),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      elevation: 0.5,
+      shadowColor: const Color(0x1A000000),
+      toolbarHeight: 70.0,
+      titleSpacing: 16.0,
+      automaticallyImplyLeading: false,
+      title: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 1.0),
+          Text(
+            'Catálogos',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF1A1A2E),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        child: TabBar(
+          indicator: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelColor: Theme.of(context).colorScheme.onPrimary,
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          dividerColor: Colors.transparent,
+          labelStyle: const TextStyle(
+            fontSize: 13.0,
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 13.0,
+            fontWeight: FontWeight.w500,
+          ),
+          tabs: const [
+            Tab(text: 'Productos'),
+            Tab(text: 'Categorías'),
+            Tab(text: 'Marcas'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProductsTab extends StatefulWidget {
+  final CatalogProvider provider;
+
+  const ProductsTab({super.key, required this.provider});
+
+  @override
+  State<ProductsTab> createState() => _ProductsTabState();
+}
+
+class _ProductsTabState extends State<ProductsTab> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      widget.provider.setSearchText(_searchController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _openFilterModal(BuildContext context, CatalogProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (_) => _CatalogFilterSheet(provider: provider),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.provider,
+      builder: (context, _) {
+        final provider = widget.provider;
+
+        return Column(
+          children: [
+            _SearchBar(
+              controller: _searchController,
+              hasActiveFilters: provider.hasActiveAdvancedFilters,
+              onFilterTap: () => _openFilterModal(context, provider),
+            ),
+            _FilterRow(
+              selected: provider.selectedStockFilter,
+              total: provider.products.length,
+              inStock: provider.inStockCount,
+              lowStock: provider.lowStockCount,
+              outOfStock: provider.outOfStockCount,
+              onSelected: (filter) => provider.setSelectedStockFilter(filter),
+            ),
+            Expanded(
+              child: _buildBody(provider),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(CatalogProvider provider) {
+    if (provider.productsStatus == CatalogStatus.loading) {
+      return const LoadingView(message: 'Cargando productos...');
+    }
+
+    if (provider.productsStatus == CatalogStatus.error) {
+      return ErrorView(
+        message: provider.productsError ?? 'Error al cargar productos.',
+        onRetry: () => provider.fetchProducts(),
+      );
+    }
+
+    final filtered = provider.filteredProducts;
+
+    if (filtered.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () => provider.fetchProducts(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 80),
+            Center(
+              child: Text(
+                'No se encontraron productos.',
+                style: TextStyle(color: Color(0xFF90A4AE)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => provider.fetchProducts(),
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+        itemCount: filtered.length,
+        itemBuilder: (BuildContext context, int index) =>
+            _ProductCard(product: filtered[index]),
+      ),
+    );
+  }
+}
+
+class _SearchBar extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onFilterTap;
+  final bool hasActiveFilters;
+
+  const _SearchBar({
+    required this.controller,
+    required this.onFilterTap,
+    this.hasActiveFilters = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 44.0,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: TextField(
+                controller: controller,
+                style: const TextStyle(fontSize: 13.0),
+                decoration: InputDecoration(
+                  hintText: 'Buscar por nombre, marca o categ...',
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 13.0,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    size: 20.0,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8.0),
+          GestureDetector(
+            onTap: onFilterTap,
+            child: Container(
+              width: 44.0,
+              height: 44.0,
+              decoration: BoxDecoration(
+                color: hasActiveFilters
+                    ? const Color(0xFF0D47A1)
+                    : const Color(0xFF1565C0),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    Icons.tune_rounded,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    size: 20.0,
+                  ),
+                  if (hasActiveFilters)
+                    Positioned(
+                      top: 8.0,
+                      right: 8.0,
+                      child: Container(
+                        width: 8.0,
+                        height: 8.0,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFF5252),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterRow extends StatelessWidget {
+  final String selected;
+  final int total;
+  final int inStock;
+  final int lowStock;
+  final int outOfStock;
+  final ValueChanged<String> onSelected;
+
+  const _FilterRow({
+    required this.selected,
+    required this.total,
+    required this.inStock,
+    required this.lowStock,
+    required this.outOfStock,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 10.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _Chip(
+              label: 'Todos ($total)',
+              isSelected: selected == 'Todos',
+              dotColor: null,
+              onTap: () => onSelected('Todos'),
+            ),
+            const SizedBox(width: 6.0),
+            _Chip(
+              label: 'En stock ($inStock)',
+              isSelected: selected == 'En stock',
+              dotColor: const Color(0xFF2E7D32),
+              onTap: () => onSelected('En stock'),
+            ),
+            const SizedBox(width: 6.0),
+            _Chip(
+              label: 'Stock bajo ($lowStock)',
+              isSelected: selected == 'Stock bajo',
+              dotColor: const Color(0xFFE65100),
+              onTap: () => onSelected('Stock bajo'),
+            ),
+            const SizedBox(width: 6.0),
+            _Chip(
+              label: 'Agotado ($outOfStock)',
+              isSelected: selected == 'Agotado',
+              dotColor: const Color(0xFFC62828),
+              onTap: () => onSelected('Agotado'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final Color? dotColor;
+  final VoidCallback onTap;
+
+  const _Chip({
+    required this.label,
+    required this.isSelected,
+    required this.dotColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 7.0),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (dotColor != null) ...[
+              Container(
+                width: 7.0,
+                height: 7.0,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 5.0),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w500,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductCard extends StatelessWidget {
+  final CatalogProductViewModel product;
+  const _ProductCard({required this.product});
+
+  _StatusStyle _resolveStyle(String status) {
+    switch (status) {
+      case 'En stock':
+        return const _StatusStyle(
+          text: Color(0xFF2E7D32),
+          bg: Color(0xFFE8F5E9),
+        );
+      case 'Stock bajo':
+        return const _StatusStyle(
+          text: Color(0xFFE65100),
+          bg: Color(0xFFFFF3E0),
+        );
+      default:
+        return const _StatusStyle(
+          text: Color(0xFFC62828),
+          bg: Color(0xFFFFEBEE),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _StatusStyle style = _resolveStyle(product.stockStatus);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10.0),
+      padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 10.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 8.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _PillIcon(categoryName: product.categoryName),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.tradeName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      '${product.brandName} · ${product.categoryName}',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      product.barcode,
+                      style: TextStyle(
+                        fontSize: 11.0,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'C\$ ${product.unitPrice.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(0xFF1565C0),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14.0,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 3.0,
+                ),
+                decoration: BoxDecoration(
+                  color: style.bg,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Text(
+                  product.stockStatus,
+                  style: TextStyle(
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w600,
+                    color: style.text,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                '${product.totalQuantity} uds.',
+                style: const TextStyle(
+                  fontSize: 12.0,
+                  color: Color(0xFF607D8B),
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.more_horiz,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                size: 20.0,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusStyle {
+  final Color text;
+  final Color bg;
+  const _StatusStyle({required this.text, required this.bg});
+}
+
+class CategoriesTab extends StatelessWidget {
+  final CatalogProvider provider;
+
+  const CategoriesTab({super.key, required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        if (provider.categoriesStatus == CatalogStatus.loading) {
+          return const LoadingView(message: 'Cargando categorías...');
+        }
+
+        if (provider.categoriesStatus == CatalogStatus.error) {
+          return ErrorView(
+            message: provider.categoriesError ?? 'Error al cargar categorías.',
+            onRetry: () => provider.fetchCategories(),
+          );
+        }
+
+        final categories = provider.categories;
+
+        if (categories.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchCategories(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 80),
+                Center(
+                  child: Text(
+                    'No hay categorías registradas.',
+                    style: TextStyle(color: Color(0xFF90A4AE)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => provider.fetchCategories(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final CategoryModel cat = categories[index];
+              final int count = provider.getProductCountByCategory(cat.name);
+              return _CategoryCard(
+                categoryName: cat.name,
+                productCount: count,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CategoryProductsScreen(
+                        categoryName: cat.name,
+                        provider: provider,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CategoryCard extends StatelessWidget {
+  final String categoryName;
+  final int productCount;
+  final VoidCallback? onTap;
+
+  const _CategoryCard({
+    required this.categoryName,
+    required this.productCount,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 6.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12.0),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.0),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Row(
+              children: [
+                _PillIcon(categoryName: categoryName),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Text(
+                    categoryName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.0,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                Text(
+                  '$productCount productos',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12.0,
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14.0,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BrandsTab extends StatelessWidget {
+  final CatalogProvider provider;
+
+  const BrandsTab({super.key, required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        if (provider.brandsStatus == CatalogStatus.loading) {
+          return const LoadingView(message: 'Cargando marcas...');
+        }
+
+        if (provider.brandsStatus == CatalogStatus.error) {
+          return ErrorView(
+            message: provider.brandsError ?? 'Error al cargar marcas.',
+            onRetry: () => provider.fetchBrands(),
+          );
+        }
+
+        final brands = provider.brands;
+
+        if (brands.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchBrands(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 80),
+                Center(
+                  child: Text(
+                    'No hay marcas registradas.',
+                    style: TextStyle(color: Color(0xFF90A4AE)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => provider.fetchBrands(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+            itemCount: brands.length,
+            itemBuilder: (context, index) => _BrandCard(brand: brands[index]),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _BrandCard extends StatelessWidget {
+  final BrandModel brand;
+  const _BrandCard({required this.brand});
+
+  String _initials() => brand.brandName.length >= 2
+      ? brand.brandName.substring(0, 2).toUpperCase()
+      : brand.brandName.toUpperCase();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10.0),
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 6.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20.0,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Text(
+              _initials(),
+              style: const TextStyle(
+                color: Color(0xFF1565C0),
+                fontWeight: FontWeight.bold,
+                fontSize: 13.0,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  brand.brandName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                if (brand.brandDescription.isNotEmpty) ...[
+                  const SizedBox(height: 2.0),
+                  Text(
+                    brand.brandDescription,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 8.0),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 4.0,
+            ),
+            decoration: BoxDecoration(
+              color: brand.isActive
+                  ? const Color(0xFFE8F5E9)
+                  : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Text(
+              brand.isActive ? 'Activa' : 'Inactiva',
+              style: TextStyle(
+                color: brand.isActive
+                    ? const Color(0xFF2E7D32)
+                    : const Color(0xFF9E9E9E),
+                fontSize: 12.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryProductsScreen extends StatelessWidget {
+  final String categoryName;
+  final CatalogProvider provider;
+
+  const CategoryProductsScreen({
+    super.key,
+    required this.categoryName,
+    required this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        final products = provider.getProductsByCategory(categoryName);
+
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            elevation: 0.5,
+            shadowColor: const Color(0x1A000000),
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18.0,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            titleSpacing: 0.0,
+            title: Row(
+              children: [
+                _PillIcon(categoryName: categoryName),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        categoryName,
+                        style: TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        '${products.length} medicamentos disponibles',
+                        style: TextStyle(
+                          fontSize: 11.0,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          body: products.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 48,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No hay medicamentos registrados en la categoría "$categoryName".',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16.0, 14.0, 16.0, 14.0),
+                  itemCount: products.length,
+                  itemBuilder: (BuildContext context, int index) =>
+                      _ProductCard(product: products[index]),
+                ),
+        );
+      },
+    );
+  }
+}
+
+class _CatalogFilterSheet extends StatefulWidget {
+  final CatalogProvider provider;
+
+  const _CatalogFilterSheet({required this.provider});
+
+  @override
+  State<_CatalogFilterSheet> createState() => _CatalogFilterSheetState();
+}
+
+class _CatalogFilterSheetState extends State<_CatalogFilterSheet> {
+  late String _selectedCategory;
+  late String _selectedBrand;
+  late String _sortBy;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = widget.provider.selectedCategoryFilter;
+    _selectedBrand = widget.provider.selectedBrandFilter;
+    _sortBy = widget.provider.sortBy;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = [
+      'Todas',
+      ...widget.provider.products
+          .map((p) => p.categoryName.trim())
+          .where((c) => c.isNotEmpty)
+          .toSet(),
+    ];
+
+    final brands = [
+      'Todas',
+      ...widget.provider.products
+          .map((p) => p.brandName.trim())
+          .where((b) => b.isNotEmpty)
+          .toSet(),
+    ];
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 40.0,
+                  height: 4.0,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCFD8DC),
+                    borderRadius: BorderRadius.circular(2.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Filtros de productos',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      size: 20.0,
+                      color: Color(0xFF78909C),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              const Text(
+                'Categoría',
+                style: TextStyle(
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF546E7A),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F4F8),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: categories.contains(_selectedCategory)
+                        ? _selectedCategory
+                        : 'Todas',
+                    isExpanded: true,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                    items: categories.map((cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat,
+                        child: Text(cat),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedCategory = val);
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              const Text(
+                'Marca',
+                style: TextStyle(
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF546E7A),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F4F8),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: brands.contains(_selectedBrand)
+                        ? _selectedBrand
+                        : 'Todas',
+                    isExpanded: true,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                    items: brands.map((br) {
+                      return DropdownMenuItem<String>(
+                        value: br,
+                        child: Text(br),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedBrand = val);
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              const Text(
+                'Ordenar por',
+                style: TextStyle(
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF546E7A),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: [
+                  _buildSortChip('Por defecto', 'none'),
+                  _buildSortChip('Nombre: A - Z', 'name_asc'),
+                  _buildSortChip('Nombre: Z - A', 'name_desc'),
+                  _buildSortChip('Precio: Menor a Mayor', 'price_asc'),
+                  _buildSortChip('Precio: Mayor a Menor', 'price_desc'),
+                ],
+              ),
+              const SizedBox(height: 24.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        widget.provider.clearAdvancedFilters();
+                        Navigator.of(context).pop();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 13.0),
+                        side: const BorderSide(color: Color(0xFFCFD8DC)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      child: const Text(
+                        'Limpiar',
+                        style: TextStyle(
+                          color: Color(0xFF546E7A),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        widget.provider.setAdvancedFilters(
+                          category: _selectedCategory,
+                          brand: _selectedBrand,
+                          sort: _sortBy,
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1565C0),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 13.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Aplicar',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSortChip(String label, String value) {
+    final isSelected = _sortBy == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) setState(() => _sortBy = value);
+      },
+      selectedColor: const Color(0xFF1A1A2E),
+      backgroundColor: const Color(0xFFF0F4F8),
+      labelStyle: TextStyle(
+        fontSize: 12.0,
+        fontWeight: FontWeight.w500,
+        color: isSelected ? Colors.white : const Color(0xFF546E7A),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+        side: BorderSide(
+          color: isSelected ? Colors.transparent : const Color(0xFFE2E8F0),
+        ),
+      ),
+      showCheckmark: false,
+    );
+  }
+}
