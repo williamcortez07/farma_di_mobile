@@ -12,7 +12,6 @@ class InventoryMetricsController extends ChangeNotifier {
     : _service = service ?? InventoryMetricsService();
 
   final InventoryMetricsService _service;
-  bool _isDisposed = false;
 
   InventoryKpiStatus _turnoverStatus = InventoryKpiStatus.idle;
   List<ProductTurnoverModel> _turnovers = [];
@@ -24,13 +23,11 @@ class InventoryMetricsController extends ChangeNotifier {
 
   InventoryKpiStatus _expiringStatus = InventoryKpiStatus.idle;
   List<ExpiringBatchModel> _expiringBatches = [];
-  double _overallExpiringPercentage = 0.0;
   String? _expiringError;
 
   InventoryKpiStatus get expiringStatus => _expiringStatus;
   List<ExpiringBatchModel> get expiringBatches =>
       List.unmodifiable(_expiringBatches);
-  double get overallExpiringPercentage => _overallExpiringPercentage;
   String? get expiringError => _expiringError;
 
   InventoryKpiStatus _availabilityStatus = InventoryKpiStatus.idle;
@@ -45,19 +42,6 @@ class InventoryMetricsController extends ChangeNotifier {
       _turnoverStatus == InventoryKpiStatus.loading ||
       _expiringStatus == InventoryKpiStatus.loading ||
       _availabilityStatus == InventoryKpiStatus.loading;
-
-  @override
-  void dispose() {
-    _isDisposed = true;
-    super.dispose();
-  }
-
-  @override
-  void notifyListeners() {
-    if (!_isDisposed) {
-      super.notifyListeners();
-    }
-  }
 
   Future<void> loadAll() async {
     await Future.wait([_loadTurnovers(), _loadExpiring(), _loadAvailability()]);
@@ -82,16 +66,7 @@ class InventoryMetricsController extends ChangeNotifier {
     _expiringError = null;
     notifyListeners();
     try {
-      final mart = await _service.fetchFullDataMart();
       _expiringBatches = await _service.fetchExpiringBatches();
-      if (mart.overallExpiringPercentage > 0) {
-        _overallExpiringPercentage = mart.overallExpiringPercentage;
-      } else if (_expiringBatches.isNotEmpty && mart.totalInventoryItems > 0) {
-        _overallExpiringPercentage =
-            (_expiringBatches.length / mart.totalInventoryItems) * 100;
-      } else {
-        _overallExpiringPercentage = 0.0;
-      }
       _expiringStatus = InventoryKpiStatus.success;
     } catch (e) {
       _expiringError = e.toString();

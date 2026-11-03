@@ -7,13 +7,13 @@ class KpiSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: 100,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 22,
               height: 22,
               child: CircularProgressIndicator(
@@ -21,13 +21,10 @@ class KpiSkeleton extends StatelessWidget {
                 color: AppColors.chartBlue,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Text(
               'Cargando datos del data mart…',
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+              style: TextStyle(fontSize: 12, color: AppColors.mutedText),
             ),
           ],
         ),
@@ -59,10 +56,7 @@ class KpiError extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+            style: const TextStyle(fontSize: 11, color: AppColors.mutedText),
           ),
           if (onRetry != null) ...[
             const SizedBox(height: 4),

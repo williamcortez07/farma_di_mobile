@@ -24,14 +24,14 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
   int _touchedIndex = -1;
 
   static const List<Color> _palette = [
-    Color(0xFF2F6FE4),
+    AppColors.primaryDark,
     AppColors.chartBlue,
     AppColors.positiveGreen,
     Color(0xFF8B7FE0),
     AppColors.warningOrange,
     Color(0xFFE0645F),
     Color(0xFFE0A438),
-    Color(0xFF14B8A6),
+    AppColors.neutralGray,
   ];
 
   @override
@@ -88,8 +88,6 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
   }
 
   Widget _buildLegend() {
-    final colors = Theme.of(context).colorScheme;
-
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -128,8 +126,8 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                         ? FontWeight.w700
                         : FontWeight.w400,
                     color: isHighlighted
-                        ? colors.onSurface
-                        : colors.onSurfaceVariant,
+                        ? AppColors.primaryDark
+                        : AppColors.mutedText,
                   ),
                 ),
               ),
@@ -138,7 +136,7 @@ class _CategoryShareChartState extends State<CategoryShareChart> {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: isHighlighted ? color : colors.onSurfaceVariant,
+                  color: isHighlighted ? color : AppColors.mutedText,
                 ),
               ),
             ],
@@ -154,15 +152,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: 100,
       child: Center(
         child: Text(
           'Sin datos de categorías',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: AppColors.mutedText, fontSize: 13),
         ),
       ),
     );

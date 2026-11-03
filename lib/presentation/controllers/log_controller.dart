@@ -74,12 +74,10 @@ class LogController extends ChangeNotifier {
       list = list.where((log) {
         final lvl = log.normalizedLevel.toUpperCase();
         if (_selectedFilter == 'ERROR') return lvl.contains('ERROR');
-        if (_selectedFilter == 'WARN' || _selectedFilter == 'WARNING') {
+        if (_selectedFilter == 'WARN' || _selectedFilter == 'WARNING')
           return lvl.contains('WARN');
-        }
-        if (_selectedFilter == 'INFO' || _selectedFilter == 'INFORMATION') {
+        if (_selectedFilter == 'INFO' || _selectedFilter == 'INFORMATION')
           return lvl.contains('INFO');
-        }
         return true;
       }).toList();
     }

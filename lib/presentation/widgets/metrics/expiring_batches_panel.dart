@@ -44,9 +44,6 @@ class _GlobalSummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Row(
       children: [
         const Icon(
@@ -58,10 +55,10 @@ class _GlobalSummaryRow extends StatelessWidget {
         Expanded(
           child: Text(
             '$count ${count == 1 ? 'lote próximo' : 'lotes próximos'} a vencer',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: AppColors.primaryDark,
             ),
           ),
         ),
@@ -69,13 +66,9 @@ class _GlobalSummaryRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: isDark
-                ? (overallPct > 0
-                    ? AppColors.warningOrange.withValues(alpha: 0.2)
-                    : AppColors.positiveGreen.withValues(alpha: 0.2))
-                : (overallPct > 0
-                    ? AppColors.warningBackground
-                    : AppColors.positiveBackground),
+            color: overallPct > 0
+                ? AppColors.warningBackground
+                : AppColors.positiveBackground,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -102,12 +95,6 @@ class _BatchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final onSurface = theme.colorScheme.onSurface;
-    final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
-    final trackColor = isDark ? const Color(0xFF263342) : AppColors.trackBackground;
-
     final consumed = batch.batchInitialQuantity - batch.availableQuantity;
     final progress = batch.batchInitialQuantity > 0
         ? (consumed / batch.batchInitialQuantity).clamp(0.0, 1.0)
@@ -117,13 +104,9 @@ class _BatchTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark
-            ? (batch.isCritical
-                ? AppColors.warningOrange.withValues(alpha: 0.15)
-                : AppColors.chartBlue.withValues(alpha: 0.15))
-            : (batch.isCritical
-                ? AppColors.warningBackground
-                : AppColors.infoBackground),
+        color: batch.isCritical
+            ? AppColors.warningBackground
+            : AppColors.infoBackground,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -134,10 +117,10 @@ class _BatchTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   batch.productName,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: onSurface,
+                    color: AppColors.primaryDark,
                   ),
                 ),
               ),
@@ -148,27 +131,27 @@ class _BatchTile extends StatelessWidget {
 
           Row(
             children: [
-              Icon(Icons.tag, size: 12, color: onSurfaceVariant),
+              const Icon(Icons.tag, size: 12, color: AppColors.mutedText),
               const SizedBox(width: 3),
               Text(
                 batch.batchNumber,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
-                  color: onSurfaceVariant,
+                  color: AppColors.mutedText,
                 ),
               ),
               const SizedBox(width: 10),
-              Icon(
+              const Icon(
                 Icons.calendar_month_outlined,
                 size: 12,
-                color: onSurfaceVariant,
+                color: AppColors.mutedText,
               ),
               const SizedBox(width: 3),
               Text(
                 dateFmt.format(batch.expirationDate),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
-                  color: onSurfaceVariant,
+                  color: AppColors.mutedText,
                 ),
               ),
             ],
@@ -182,7 +165,7 @@ class _BatchTile extends StatelessWidget {
               color: progress >= 1.0
                   ? AppColors.positiveGreen
                   : AppColors.warningOrange,
-              backgroundColor: trackColor,
+              backgroundColor: AppColors.trackBackground,
             ),
           ),
           const SizedBox(height: 4),
@@ -191,16 +174,16 @@ class _BatchTile extends StatelessWidget {
             children: [
               Text(
                 '${batch.availableQuantity} disponibles',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10,
-                  color: onSurfaceVariant,
+                  color: AppColors.mutedText,
                 ),
               ),
               Text(
                 'Lote: ${batch.batchInitialQuantity} uds.',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10,
-                  color: onSurfaceVariant,
+                  color: AppColors.mutedText,
                 ),
               ),
             ],
@@ -251,14 +234,10 @@ class _NoExpiringState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.positiveGreen.withValues(alpha: 0.15)
-            : AppColors.positiveBackground,
+        color: AppColors.positiveBackground,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -269,11 +248,11 @@ class _NoExpiringState extends StatelessWidget {
             size: 24,
           ),
           const SizedBox(width: 12),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Sin lotes próximos a vencer',
                   style: TextStyle(
                     fontSize: 13,
@@ -281,13 +260,10 @@ class _NoExpiringState extends StatelessWidget {
                     color: AppColors.positiveGreen,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'El inventario está dentro del rango de seguridad.',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: TextStyle(fontSize: 11, color: AppColors.mutedText),
                 ),
               ],
             ),

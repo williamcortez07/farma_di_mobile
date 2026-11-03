@@ -25,11 +25,6 @@ class SalesVariationChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.isEmpty) return const _EmptyState();
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final gridLineColor = theme.dividerColor.withValues(alpha: isDark ? 0.35 : 0.6);
-    final tooltipBg = isDark ? const Color(0xFF334155) : AppColors.primaryDark;
-
     // Rango del eje Y con un 20% de margen superior para las etiquetas.
     final maxY =
         data.map((e) => e.currentSales).reduce((a, b) => a > b ? a : b) * 1.25;
@@ -51,12 +46,12 @@ class SalesVariationChart extends StatelessWidget {
                 drawVerticalLine: false,
                 horizontalInterval: maxY / 4,
                 getDrawingHorizontalLine: (_) =>
-                    FlLine(color: gridLineColor, strokeWidth: 1),
+                    FlLine(color: AppColors.trackBackground, strokeWidth: 1),
               ),
               borderData: FlBorderData(show: false),
               barTouchData: BarTouchData(
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (_) => tooltipBg,
+                  getTooltipColor: (_) => AppColors.primaryDark,
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     final item = data[group.x];
                     return BarTooltipItem(
@@ -120,9 +115,9 @@ class SalesVariationChart extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           data[index].period,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: AppColors.mutedText,
                           ),
                         ),
                       );
@@ -193,15 +188,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: 120,
       child: Center(
         child: Text(
           'Sin datos de variación',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: AppColors.mutedText, fontSize: 13),
         ),
       ),
     );
