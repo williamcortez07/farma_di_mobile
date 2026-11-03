@@ -6,8 +6,8 @@ import '../../theme/app_colors.dart';
 
 /// KPI 2 – Margen bruto de ventas (%).
 ///
-/// Muestra un gráfico de barras horizontales con el porcentaje
-/// de margen bruto por producto. Las barras se presentan de mayor a menor
+/// Muestra un [HorizontalBarChart] (barras horizontales) con el porcentaje
+/// de margen bruto por producto.  Las barras se presentan de mayor a menor
 /// margen según el ordenamiento aplicado en [SalesMetricsService].
 class GrossMarginChart extends StatelessWidget {
   const GrossMarginChart({super.key, required this.data});
@@ -19,11 +19,6 @@ class GrossMarginChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) return const _EmptyState();
-
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final trackColor = isDark ? const Color(0xFF263342) : AppColors.trackBackground;
-    final tooltipBg = isDark ? const Color(0xFF334155) : AppColors.primaryDark;
 
     final maxValue = data
         .map((e) => e.grossMargin)
@@ -41,7 +36,7 @@ class GrossMarginChart extends StatelessWidget {
           borderData: FlBorderData(show: false),
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
-              getTooltipColor: (_) => tooltipBg,
+              getTooltipColor: (_) => AppColors.primaryDark,
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 final item = data[group.x];
                 return BarTooltipItem(
@@ -79,9 +74,9 @@ class GrossMarginChart extends StatelessWidget {
                     child: Text(
                       data[index].productName,
                       textAlign: TextAlign.right,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
-                        color: theme.colorScheme.onSurface,
+                        color: AppColors.primaryDark,
                       ),
                     ),
                   );
@@ -102,9 +97,9 @@ class GrossMarginChart extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 4),
                     child: Text(
                       'C\$${data[index].grossMargin.toStringAsFixed(0)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: AppColors.mutedText,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -130,7 +125,7 @@ class GrossMarginChart extends StatelessWidget {
                   backDrawRodData: BackgroundBarChartRodData(
                     show: true,
                     toY: data.length.toDouble(),
-                    color: trackColor,
+                    color: AppColors.trackBackground,
                   ),
                 ),
               ],
@@ -143,7 +138,7 @@ class GrossMarginChart extends StatelessWidget {
 
   Color _barColor(int index) {
     const colors = [
-      Color(0xFF2F6FE4),
+      AppColors.primaryDark,
       AppColors.chartBlue,
       AppColors.positiveGreen,
       Color(0xFF8B7FE0),
@@ -161,15 +156,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: 100,
       child: Center(
         child: Text(
           'Sin datos de margen',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: AppColors.mutedText, fontSize: 13),
         ),
       ),
     );

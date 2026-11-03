@@ -76,13 +76,10 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
-        color: isDark ? iconColor.withValues(alpha: 0.15) : bgColor,
+        color: bgColor,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -100,10 +97,7 @@ class _StatCard extends StatelessWidget {
           ),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            style: const TextStyle(fontSize: 11, color: AppColors.mutedText),
           ),
         ],
       ),
@@ -121,11 +115,6 @@ class _AvailabilityBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final trackColor = isDark ? const Color(0xFF263342) : AppColors.trackBackground;
-    final onSurface = theme.colorScheme.onSurface;
-
     final progress = (rate / 100).clamp(0.0, 1.0);
     final barColor = rate >= 90
         ? AppColors.positiveGreen
@@ -138,20 +127,20 @@ class _AvailabilityBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Disponibilidad global',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: onSurface,
+                color: AppColors.primaryDark,
               ),
             ),
             Text(
               '${rate.toStringAsFixed(1)}%  •  $total productos',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: onSurface,
+                color: AppColors.primaryDark,
               ),
             ),
           ],
@@ -163,7 +152,7 @@ class _AvailabilityBar extends StatelessWidget {
             value: progress,
             minHeight: 8,
             color: barColor,
-            backgroundColor: trackColor,
+            backgroundColor: AppColors.trackBackground,
           ),
         ),
       ],

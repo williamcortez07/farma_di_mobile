@@ -58,49 +58,43 @@ class SupplierShareCard extends StatelessWidget {
   }
 
   Widget _buildLegend() {
-    return Builder(
-      builder: (context) {
-        final onSurface = Theme.of(context).colorScheme.onSurface;
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: suppliers.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisExtent: 26,
-            crossAxisSpacing: 24,
-          ),
-          itemBuilder: (_, i) {
-            final s = suppliers[i];
-            return Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(color: s.color, shape: BoxShape.circle),
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: suppliers.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisExtent: 26,
+        crossAxisSpacing: 24,
+      ),
+      itemBuilder: (_, i) {
+        final s = suppliers[i];
+        return Row(
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(color: s.color, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                s.name,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primaryDark,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    s.name,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: onSurface,
-                    ),
-                  ),
-                ),
-                Text(
-                  '${s.percentage.toStringAsFixed(1)}%',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: onSurface,
-                  ),
-                ),
-              ],
-            );
-          },
+              ),
+            ),
+            Text(
+              '${s.percentage.toStringAsFixed(1)}%',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryDark,
+              ),
+            ),
+          ],
         );
       },
     );
