@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../controllers/inventory_metrics_controller.dart';
 import '../controllers/sales_metrics_controller.dart';
@@ -9,12 +9,9 @@ import '../widgets/metrics/gross_margin_chart.dart';
 import '../widgets/metrics/inventory_turnover_chart.dart';
 import '../widgets/metrics/kpi_states.dart';
 import '../widgets/metrics/metrics_section_card.dart';
-import '../widgets/metrics/progress_bar_row.dart';
 import '../widgets/metrics/sales_variation_chart.dart';
-import '../widgets/metrics/spending_line_chart.dart';
 import '../widgets/metrics/status_badge.dart';
 import '../widgets/metrics/stock_availability_panel.dart';
-import '../widgets/metrics/supplier_share_card.dart';
 
 const double _kSpacing = 16.0;
 
@@ -96,48 +93,62 @@ class _MetricsScreenState extends State<MetricsScreen>
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           'Métricas',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w800,
-            color: AppColors.primaryDark,
+            color: theme.colorScheme.onSurface,
           ),
         ),
-        if (_isCurrentTabLoading)
-          const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.chartBlue,
-            ),
-          ),
+        ListenableBuilder(
+          listenable: Listenable.merge([_salesCtrl, _inventoryCtrl, _tabCtrl]),
+          builder: (context, _) {
+            if (!_isCurrentTabLoading) return const SizedBox.shrink();
+            return const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.chartBlue,
+              ),
+            );
+          },
+        ),
       ],
     );
   }
 
   Widget _buildTabBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final trackColor = isDark
+        ? const Color(0xFF1E293B)
+        : AppColors.trackBackground;
+    final indicatorColor = isDark ? AppColors.chartBlue : AppColors.primaryDark;
+
     return Container(
       height: 38,
       decoration: BoxDecoration(
-        color: AppColors.trackBackground,
+        color: trackColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: TabBar(
         controller: _tabCtrl,
         indicator: BoxDecoration(
-          color: AppColors.primaryDark,
+          color: indicatorColor,
           borderRadius: BorderRadius.circular(20),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: AppColors.mutedText,
+        unselectedLabelColor: isDark
+            ? const Color(0xFF94A3B8)
+            : AppColors.mutedText,
         labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
         tabs: _tabs.map((t) => Tab(text: t)).toList(),
       ),
@@ -146,7 +157,7 @@ class _MetricsScreenState extends State<MetricsScreen>
 }
 
 // ============================================================================
-// Tab de Ventas (KPIs 1–3 + Secciones analíticas)
+// Tab de Ventas (KPIs 1–3 de DataMartSales)
 // ============================================================================
 
 class _SalesTab extends StatelessWidget {
@@ -177,15 +188,6 @@ class _SalesTab extends StatelessWidget {
                 const SizedBox(height: _kSpacing),
                 // KPI 3 – Participación por categoría
                 _kpiCategoryShare(controller),
-                const SizedBox(height: _kSpacing),
-                // Gasto en compras
-                _buildSpendingSection(),
-                const SizedBox(height: _kSpacing),
-                // Proveedores
-                const SupplierShareCard(suppliers: _suppliers),
-                const SizedBox(height: _kSpacing),
-                // Rentabilidad de productos
-                _buildProfitabilitySection(),
                 const SizedBox(height: 24),
               ],
             ),
@@ -226,12 +228,20 @@ class _SalesTab extends StatelessWidget {
   }
 
   Widget _kpiGrossMargin(SalesMetricsController c) {
+    final avgMargin = c.grossMargins.isNotEmpty
+        ? c.grossMargins
+                  .map((e) => e.grossMarginPercentage)
+                  .reduce((a, b) => a + b) /
+              c.grossMargins.length
+        : 0.0;
+
     return MetricsSectionCard(
       title: 'Margen bruto de ventas',
       subtitle: 'Por producto – ingresos vs. costo',
-      trailing: c.marginsStatus == SalesKpiStatus.success
-          ? const StatusBadge(
-              text: '4.76 %',
+      trailing:
+          c.marginsStatus == SalesKpiStatus.success && c.grossMargins.isNotEmpty
+          ? StatusBadge(
+              text: '${avgMargin.toStringAsFixed(2)} %',
               backgroundColor: AppColors.infoBackground,
               textColor: AppColors.chartBlue,
             )
@@ -265,87 +275,10 @@ class _SalesTab extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildSpendingSection() {
-    return const MetricsSectionCard(
-      title: 'Gasto en compras',
-      subtitle: 'Total semestral acumulado',
-      trailing: Text(
-        'C\$ 536k',
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: AppColors.primaryDark,
-        ),
-      ),
-      child: SpendingLineChart(),
-    );
-  }
-
-  Widget _buildProfitabilitySection() {
-    return const MetricsSectionCard(
-      title: 'Rentabilidad de productos',
-      subtitle: 'Margen real de contribución',
-      trailing: StatusBadge(
-        text: 'Top 3',
-        backgroundColor: AppColors.positiveBackground,
-        textColor: AppColors.positiveGreen,
-      ),
-      child: Column(
-        children: [
-          ProgressBarRow(
-            title: 'Panadol Forte 500mg',
-            valueText: 'C\$ 35,420',
-            progress: 0.85,
-            barColor: AppColors.positiveGreen,
-            footerStartText: 'Margen: 41.7%',
-            footerEndText: '850 unidades',
-          ),
-          SizedBox(height: 14),
-          ProgressBarRow(
-            title: 'Ciprofloxacino 500mg',
-            valueText: 'C\$ 27,300',
-            progress: 0.65,
-            barColor: AppColors.chartBlue,
-            footerStartText: 'Margen: 48.2%',
-            footerEndText: '420 unidades',
-          ),
-          SizedBox(height: 14),
-          ProgressBarRow(
-            title: 'Tenormin 50mg',
-            valueText: 'C\$ 21,800',
-            progress: 0.52,
-            barColor: AppColors.chartBlue,
-            footerStartText: 'Margen: 39.5%',
-            footerEndText: '310 unidades',
-          ),
-        ],
-      ),
-    );
-  }
-
-  static const List<SupplierShare> _suppliers = [
-    SupplierShare(
-      name: 'Stein',
-      percentage: 32.5,
-      color: AppColors.primaryDark,
-    ),
-    SupplierShare(name: 'Ramos', percentage: 24.4, color: AppColors.chartBlue),
-    SupplierShare(
-      name: 'Calox',
-      percentage: 18.3,
-      color: AppColors.positiveGreen,
-    ),
-    SupplierShare(
-      name: 'Otros',
-      percentage: 24.8,
-      color: AppColors.neutralGray,
-    ),
-  ];
 }
 
 // ============================================================================
-// Tab de Inventario (KPIs 4–5 + Disponibilidad)
+// Tab de Inventario (KPIs 4–5 + Disponibilidad de DataMartInventory)
 // ============================================================================
 
 class _InventoryTab extends StatelessWidget {
@@ -420,12 +353,12 @@ class _InventoryTab extends StatelessWidget {
 
     return MetricsSectionCard(
       title: 'Rotación de inventario',
-      subtitle: 'Índice por producto (top 10 activos)',
+      subtitle: 'Índice por producto (top activos)',
       trailing:
           topProduct != null &&
               controller.turnoverStatus == InventoryKpiStatus.success
-          ? const StatusBadge(
-              text: 'Top 10',
+          ? StatusBadge(
+              text: 'Top ${data.length}',
               backgroundColor: AppColors.infoBackground,
               textColor: AppColors.chartBlue,
             )
@@ -463,7 +396,7 @@ class _InventoryTab extends StatelessWidget {
         onRetry: controller.refresh,
         child: ExpiringBatchesPanel(
           batches: batches,
-          overallExpiringPercentage: 0,
+          overallExpiringPercentage: controller.overallExpiringPercentage,
         ),
       ),
     );

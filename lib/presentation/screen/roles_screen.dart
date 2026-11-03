@@ -577,7 +577,7 @@ class _RolesScreenState extends State<RolesScreen> {
                         Expanded(
                           child: Text(
                             isEditing
-                                ? 'Detalle Rol ${(selectedRole ?? user!.role).toLowerCase()}'
+                                ? 'Detalle Rol ${(selectedRole ?? user.role).toLowerCase()}'
                                 : 'Nuevo usuario',
                             style: const TextStyle(
                               fontSize: 17,
@@ -782,29 +782,31 @@ class _RolesScreenState extends State<RolesScreen> {
       return;
     }
 
-    if (result?.status == _UserFormStatus.saved) {
+    if (result?.status == _UserFormStatus.saved && result != null) {
+      final formResult = result;
       try {
         if (user != null) {
           await _updateUser(
             user,
-            result!.name,
-            result!.lastName,
-            result.email,
-            result.phone,
-            result.isActive,
-            result.roleId,
+            formResult.name,
+            formResult.lastName,
+            formResult.email,
+            formResult.phone,
+            formResult.isActive,
+            formResult.roleId,
           );
         } else {
           await _addUser(
-            result!.name,
-            result!.lastName,
-            result.email,
-            result.roleId,
-            result.password,
-            result.phone,
+            formResult.name,
+            formResult.lastName,
+            formResult.email,
+            formResult.roleId,
+            formResult.password,
+            formResult.phone,
           );
         }
       } catch (error) {
+        if (!mounted) return;
         NotificationWidget.show(
           context,
           type: NotificationType.error,
@@ -814,6 +816,7 @@ class _RolesScreenState extends State<RolesScreen> {
         );
         return;
       }
+      if (!mounted) return;
       NotificationWidget.show(
         context,
         type: NotificationType.success,

@@ -23,6 +23,11 @@ class ProgressBarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final trackColor = isDark ? const Color(0xFF263342) : AppColors.trackBackground;
+    final onSurface = theme.colorScheme.onSurface;
+    final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
     final hasFooter = footerStartText != null || footerEndText != null;
 
     return Column(
@@ -31,20 +36,24 @@ class ProgressBarRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryDark,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: onSurface,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               valueText,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primaryDark,
+                color: onSurface,
               ),
             ),
           ],
@@ -56,7 +65,7 @@ class ProgressBarRow extends StatelessWidget {
             value: progress,
             minHeight: 8,
             color: barColor,
-            backgroundColor: AppColors.trackBackground,
+            backgroundColor: trackColor,
           ),
         ),
         if (hasFooter) ...[
@@ -73,9 +82,9 @@ class ProgressBarRow extends StatelessWidget {
               ),
               Text(
                 footerEndText ?? '',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.mutedText,
+                  color: onSurfaceVariant,
                 ),
               ),
             ],
