@@ -31,6 +31,14 @@ class CatalogProvider extends ChangeNotifier {
   // Filtros de Productos
   String searchText = '';
   String selectedStockFilter = 'Todos';
+  String selectedCategoryFilter = 'Todas';
+  String selectedBrandFilter = 'Todas';
+  String sortBy = 'none';
+
+  bool get hasActiveAdvancedFilters =>
+      selectedCategoryFilter != 'Todas' ||
+      selectedBrandFilter != 'Todas' ||
+      sortBy != 'none';
 
   void setSearchText(String text) {
     searchText = text;
@@ -42,8 +50,26 @@ class CatalogProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setAdvancedFilters({
+    required String category,
+    required String brand,
+    required String sort,
+  }) {
+    selectedCategoryFilter = category;
+    selectedBrandFilter = brand;
+    sortBy = sort;
+    notifyListeners();
+  }
+
+  void clearAdvancedFilters() {
+    selectedCategoryFilter = 'Todas';
+    selectedBrandFilter = 'Todas';
+    sortBy = 'none';
+    notifyListeners();
+  }
+
   List<CatalogProductViewModel> get filteredProducts {
-    return products.where((p) {
+    final list = products.where((p) {
       final query = searchText.trim().toLowerCase();
       final matchesSearch = query.isEmpty ||
           p.tradeName.toLowerCase().contains(query) ||
@@ -54,8 +80,30 @@ class CatalogProvider extends ChangeNotifier {
       final matchesFilter = selectedStockFilter == 'Todos' ||
           p.stockStatus == selectedStockFilter;
 
-      return matchesSearch && matchesFilter;
+      final matchesCategory = selectedCategoryFilter == 'Todas' ||
+          p.categoryName.trim().toLowerCase() ==
+              selectedCategoryFilter.trim().toLowerCase();
+
+      final matchesBrand = selectedBrandFilter == 'Todas' ||
+          p.brandName.trim().toLowerCase() ==
+              selectedBrandFilter.trim().toLowerCase();
+
+      return matchesSearch && matchesFilter && matchesCategory && matchesBrand;
     }).toList();
+
+    if (sortBy == 'name_asc') {
+      list.sort((a, b) =>
+          a.tradeName.toLowerCase().compareTo(b.tradeName.toLowerCase()));
+    } else if (sortBy == 'name_desc') {
+      list.sort((a, b) =>
+          b.tradeName.toLowerCase().compareTo(a.tradeName.toLowerCase()));
+    } else if (sortBy == 'price_asc') {
+      list.sort((a, b) => a.unitPrice.compareTo(b.unitPrice));
+    } else if (sortBy == 'price_desc') {
+      list.sort((a, b) => b.unitPrice.compareTo(a.unitPrice));
+    }
+
+    return list;
   }
 
   int get inStockCount =>
