@@ -126,10 +126,10 @@ class _MetricsScreenState extends State<MetricsScreen>
 
   Widget _buildTabBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final trackColor =
-        isDark ? const Color(0xFF1E293B) : AppColors.trackBackground;
-    final indicatorColor =
-        isDark ? AppColors.chartBlue : AppColors.primaryDark;
+    final trackColor = isDark
+        ? const Color(0xFF1E293B)
+        : AppColors.trackBackground;
+    final indicatorColor = isDark ? AppColors.chartBlue : AppColors.primaryDark;
 
     return Container(
       height: 38,
@@ -146,8 +146,9 @@ class _MetricsScreenState extends State<MetricsScreen>
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor:
-            isDark ? const Color(0xFF94A3B8) : AppColors.mutedText,
+        unselectedLabelColor: isDark
+            ? const Color(0xFF94A3B8)
+            : AppColors.mutedText,
         labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
         tabs: _tabs.map((t) => Tab(text: t)).toList(),
       ),
@@ -229,16 +230,16 @@ class _SalesTab extends StatelessWidget {
   Widget _kpiGrossMargin(SalesMetricsController c) {
     final avgMargin = c.grossMargins.isNotEmpty
         ? c.grossMargins
-                .map((e) => e.grossMarginPercentage)
-                .reduce((a, b) => a + b) /
-            c.grossMargins.length
+                  .map((e) => e.grossMarginPercentage)
+                  .reduce((a, b) => a + b) /
+              c.grossMargins.length
         : 0.0;
 
     return MetricsSectionCard(
       title: 'Margen bruto de ventas',
       subtitle: 'Por producto – ingresos vs. costo',
-      trailing: c.marginsStatus == SalesKpiStatus.success &&
-              c.grossMargins.isNotEmpty
+      trailing:
+          c.marginsStatus == SalesKpiStatus.success && c.grossMargins.isNotEmpty
           ? StatusBadge(
               text: '${avgMargin.toStringAsFixed(2)} %',
               backgroundColor: AppColors.infoBackground,
